@@ -322,7 +322,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.27 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.28 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -646,6 +646,31 @@ const THEMES = [
    {fr:"Maintenant ou jamais !", es:"¡Ahora o nunca!"},
   ],
  },
+ {
+  /* 💛 construido con el material del cuaderno de Mateo — troceado y remezclado,
+     nunca frases kilométricas literales (petición suya, 2026-07-17) */
+  id:"perso", emoji:"💛", name:"Mi mundo", minLvl:1,
+  vocab:[
+   {fr:"J'apprends", es:"Estoy aprendiendo"},
+   {fr:"J'écoute", es:"Estoy escuchando"},
+   {fr:"J'apprends vite", es:"Aprendo rápido"},
+   {fr:"J'adore apprendre", es:"Me encanta aprender"},
+   {fr:"Comment vas-tu ?", es:"¿Cómo has estado?"},
+   {fr:"Quoi de neuf ?", es:"¿Qué hay de nuevo?"},
+   {fr:"Comment ça s'est passé ?", es:"¿Cómo les fue?"},
+   {fr:"Reconnaissant pour tout", es:"Agradecido por todo"},
+   {fr:"J'ai un objectif", es:"Tengo una meta"},
+   {fr:"Il est déjà fixé", es:"Ya está fija"},
+   {fr:"On joue de la musique ensemble", es:"Tocamos música juntos"},
+   {fr:"Je suis fier de toi", es:"Estoy orgulloso de ti"},
+  ],
+  speak:[
+   {fr:"J'apprends vite et j'adore apprendre", es:"Aprendo rápido y me encanta aprender"},
+   {fr:"Quoi de neuf ?", es:"¿Qué hay de nuevo?"},
+   {fr:"J'ai un objectif et il est déjà fixé", es:"Tengo una meta y ya está fija"},
+   {fr:"Je suis reconnaissant pour tout", es:"Estoy agradecido por todo"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -875,6 +900,46 @@ const SCENES = [
     ]},
   ],
  },
+ {
+  /* 📞 el ensayo de LA MISIÓN: hablar con el tío — hecha con el material del cuaderno */
+  id:"oncle", title:"📞 Llamada con tu tío", npc:"🎸", npcName:"Ton oncle",
+  vars:{
+   instrument:[{fr:"de la guitare",es:"guitarra"},{fr:"du piano",es:"piano"},{fr:"de la batterie",es:"batería"},{fr:"de la basse",es:"bajo"}],
+   jour:[{fr:"samedi",es:"el sábado"},{fr:"dimanche",es:"el domingo"},{fr:"vendredi",es:"el viernes"}],
+  },
+  steps:[
+   {npc:"Allô ! Quelle surprise ! Comment vas-tu ?", npcEs:"¡Aló! ¡Qué sorpresa! ¿Cómo has estado?",
+    options:[
+     {fr:"Très bien ! Et toi, quoi de neuf ?", es:"¡Muy bien! ¿Y tú, qué hay de nuevo?", ok:true},
+     {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¡Es tu tío, no un mesero! 😂"},
+     {fr:"Je regarde seulement", es:"Solo estoy mirando", ok:false, why:"¿Mirando qué? ¡Es una llamada! 😅"},
+    ]},
+   {npc:"Ça va, ça va ! Mais... tu parles français maintenant ?!", npcEs:"¡Bien, bien! Pero... ¿¡ahora hablas francés!?",
+    options:[
+     {fr:"J'apprends ! J'apprends vite et j'adore apprendre", es:"¡Estoy aprendiendo! Aprendo rápido y me encanta", ok:true},
+     {fr:"Je ne parle pas encore très bien, mais j'ai un objectif", es:"Aún no hablo muy bien, pero tengo una meta", ok:true, alt:"Tu tío: «La humildad es el principio de la maestría» 🎩"},
+     {fr:"Non", es:"No", ok:false, why:"¡Pero si se lo estás diciendo EN FRANCÉS! 😄"},
+    ]},
+   {npc:"Incroyable ! Et qui t'apprend ?", npcEs:"¡Increíble! ¿Y quién te enseña?",
+    options:[
+     {fr:"Un perroquet qui s'appelle Coco", es:"Un loro que se llama Coco", ok:true, alt:"Tu tío se rió dos minutos seguidos 😂"},
+     {fr:"J'étudie un peu chaque jour", es:"Estudio un poquito cada día", ok:true},
+     {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡No le cuelgues así! 😴"},
+    ]},
+   {npc:"On joue {instrument} ensemble {jour} ?", npcEs:"¿Tocamos {instrument} juntos {jour}?",
+    options:[
+     {fr:"Oui ! J'adore jouer avec toi", es:"¡Sí! Me encanta tocar contigo", ok:true},
+     {fr:"D'accord, à {jour} !", es:"¡Listo, hasta {jour}!", ok:true},
+     {fr:"C'est trop cher", es:"Es muy caro", ok:false, why:"¡Tocar con tu tío es gratis! 💸😂"},
+    ]},
+   {npc:"Parfait ! Je suis fier de toi. À bientôt !", npcEs:"¡Perfecto! Estoy orgulloso de ti. ¡Hasta pronto!",
+    options:[
+     {fr:"Merci ! Je suis reconnaissant pour tout", es:"¡Gracias! Estoy agradecido por todo", ok:true},
+     {fr:"À bientôt ! Gros bisous", es:"¡Hasta pronto! Un abrazo", ok:true},
+     {fr:"Vous désirez ?", es:"¿Qué desea?", ok:false, why:"Esa es de mesero 🧑‍🍳 ¡Despídete bonito!"},
+    ]},
+  ],
+ },
 ];
 
 /* ================== MISIONES DE IMPROVISACIÓN 🎭 ================== */
@@ -910,6 +975,15 @@ const IMPROV=[
  {t:"Di que aprendes francés PORQUE te gusta viajar",
   keys:[["j'apprends"],["parce que"],["voyager"]],
   model:"J'apprends le français parce que j'aime voyager."},
+ {t:"Tu tío te pregunta «Quoi de neuf ?» — cuéntale que estás aprendiendo francés y que aprendes rápido",
+  keys:[["j'apprends"],["français"],["vite"]],
+  model:"J'apprends le français ! J'apprends vite et j'adore apprendre."},
+ {t:"Di que aún no hablas muy bien, PERO que tienes una meta",
+  keys:[["pas encore","ne parle pas"],["mais"],["objectif"]],
+  model:"Je ne parle pas encore très bien français, mais j'ai un objectif !"},
+ {t:"Saluda a tu tío: pregúntale cómo ha estado y qué hay de nuevo",
+  keys:[["comment vas-tu","comment ça va"],["quoi de neuf"]],
+  model:"Salut ! Comment vas-tu ? Quoi de neuf ?"},
 ];
 
 /* Frases motivadoras de Coco */
@@ -1336,10 +1410,12 @@ function gameSource(){
   if((S.session && S.session.immersion) || S.theme==="mix"){
     const un=THEMES.filter(x=>x.minLvl<=level());
     // el cuaderno 📓 entra a la mezcla: tus frases viven en las lecciones
-    return { id:"mix", vocab:un.flatMap(x=>x.vocab).concat(custom), speak:un.flatMap(x=>x.speak).concat(custom) };
+    // las frases 'big' (kilométricas) no entran a ejercicios de vocabulario/escritura:
+    // viven troceadas en pedazos aprendibles; la completa solo se practica hablando
+    return { id:"mix", vocab:un.flatMap(x=>x.vocab).concat(custom.filter(c=>!c.big)), speak:un.flatMap(x=>x.speak).concat(custom) };
   }
   if(S.theme==="notes" && custom.length){
-    return { id:"notes", vocab:custom, speak:custom };
+    return { id:"notes", vocab:custom.filter(c=>!c.big).length?custom.filter(c=>!c.big):custom, speak:custom };
   }
   return { id:theme().id, vocab:theme().vocab, speak:theme().speak };
 }
@@ -1454,7 +1530,10 @@ function gameBlitz(){
     const tag = q.retry ? "🔁 segunda oportunidad" : q.weak ? "🔁 ¡revancha!" : `${qi+1} de ${qs.length}`;
     let answered=false;
 
-    if(tier>=3){
+    // frases largas JAMÁS como ejercicio de escritura (petición de Mateo):
+    // aunque el tier lo pida, caen a opción múltiple
+    const typedOK = q.fr.trim().split(/\s+/).length<=6 && q.fr.length<=45;
+    if(tier>=3 && typedOK){
       /* 🌶️🌶️🌶️ escribe la respuesta en francés */
       area.innerHTML=`
         <div class="prompt">${q.es}
@@ -1584,8 +1663,8 @@ function gameListen(){
     if(!q.retry && !S.session.asked.includes(q.fr)) S.session.asked.push(q.fr);
     const tier=diffFor(t.id).tier;
 
-    if(tier>=2){
-      /* 🌶️🌶️+ dictado: escribe lo que escuchaste */
+    if(tier>=2 && q.fr.trim().split(/\s+/).length<=6 && q.fr.length<=45){
+      /* 🌶️🌶️+ dictado: escribe lo que escuchaste (nunca frases kilométricas) */
       const rate = tier>=3 ? 0.95 : 0.8;
       const base = tier>=3 ? 25 : 20;
       const tag = q.retry ? "🔁 segunda oportunidad" : `${qi+1} de ${qs.length}`;
@@ -2449,6 +2528,15 @@ $("pasteBtn").onclick=()=>{
   ta.style.display=show?"block":"none"; ir.style.display=show?"flex":"none";
   if(show) ta.focus();
 };
+/* troceador: divide una frase larga en pedazos aprendibles, en paralelo es/fr.
+   Solo trocea si ambos idiomas parten en el MISMO número de pedazos (si no, mejor no adivinar). */
+function chunkPhrase(es, fr){
+  const cut=s=>String(s).split(/\s*(?:,|;|\bet\b|\by\b)\s*/i).map(x=>x.trim()).filter(x=>x.length>1);
+  const fe=cut(fr), ee=cut(es);
+  if(fe.length>1 && fe.length===ee.length) return fe.map((f,i)=>({fr:f, es:ee[i]}));
+  return null;
+}
+function isBigPhrase(fr){ return fr.trim().split(/\s+/).length>6 || fr.length>45; }
 function importLines(text){
   let added=0;
   for(const ln of String(text).split(/\n+/)){
@@ -2458,8 +2546,17 @@ function importLines(text){
       S.custom=S.custom||[];
       if(!S.custom.find(c=>norm(c.fr)===norm(fr))){
         const entry={fr, es};
+        if(isBigPhrase(fr)){
+          // frase larga: la completa solo se practica hablando/escuchando;
+          // sus PEDAZOS son los que entran a repasos y ejercicios escritos
+          entry.big=1;
+          (chunkPhrase(es,fr)||[]).forEach(c=>{
+            if(!S.custom.find(x=>norm(x.fr)===norm(c.fr))){ S.custom.push(c); markWeak(c); }
+          });
+        } else {
+          markWeak(entry);      // 📅 entra a tus repasos: aparecerá en la próxima lección
+        }
         S.custom.push(entry);
-        markWeak(entry);        // 📅 entra a tus repasos: aparecerá en la próxima lección
         added++;
       }
       S.pending=(S.pending||[]).filter(p=>norm(p)!==norm(es));
@@ -2624,6 +2721,22 @@ const restored = store.load();
   }
   if(S.lastDay && S.lastDay>t) S.lastDay=t;
   if(future.length) store.save();
+})();
+/* v1.28: remezcla del cuaderno — frases largas ya guardadas se trocean en pedazos
+   aprendibles y salen de las revanchas escritas (petición de Mateo: el material
+   se convierte en ejercicios variados, no en dictados kilométricos) */
+(function remixCustom(){
+  let changed=false;
+  (S.custom||[]).slice().forEach(c=>{
+    if(isBigPhrase(c.fr) && !c.big){
+      c.big=1; changed=true;
+      S.weak=(S.weak||[]).filter(w=>norm(w.fr)!==norm(c.fr));   // la frase monstruo sale de los repasos escritos
+      (chunkPhrase(c.es,c.fr)||[]).forEach(cc=>{
+        if(!S.custom.find(x=>norm(x.fr)===norm(cc.fr))){ S.custom.push(cc); markWeak(cc); }
+      });
+    }
+  });
+  if(changed) store.save();
 })();
 refreshTop();
 renderNotes();
