@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.32 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.33 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1115,83 +1115,83 @@ const SCENES = [
 const TWISTS=[
  {npc:"(Quelqu'un arrive) Pardon... vous avez l'heure ?", npcEs:"(Llega alguien) Perdón... ¿tiene la hora?", skip:["oncle"],
   options:[
-   {fr:"Oui, il est trois heures", es:"Sí, son las tres", ok:true},
-   {fr:"Désolé, je ne sais pas", es:"Lo siento, no sé", ok:true},
+   {fr:"Oui, il est trois heures", es:"Sí, son las tres", ok:true, react:"Merci beaucoup ! Bonne journée !", reactEs:"¡Muchas gracias! ¡Buen día!"},
+   {fr:"Désolé, je ne sais pas", es:"Lo siento, no sé", ok:true, react:"Pas de problème, merci quand même !", reactEs:"No hay problema, ¡gracias igual!"},
    {fr:"Bon appétit !", es:"¡Buen provecho!", ok:false, why:"¿Provecho de qué? ¡Te preguntó la hora! 😅"},
   ]},
  {npc:"Vous n'êtes pas d'ici, non ? D'où venez-vous ?", npcEs:"Usted no es de aquí, ¿no? ¿De dónde viene?",
   options:[
-   {fr:"Je viens de Colombie !", es:"¡Vengo de Colombia!", ok:true},
-   {fr:"J'habite à Bogota", es:"Vivo en Bogotá", ok:true},
+   {fr:"Je viens de Colombie !", es:"¡Vengo de Colombia!", ok:true, react:"La Colombie ! Magnifique !", reactEs:"¡Colombia! ¡Qué maravilla!"},
+   {fr:"J'habite à Bogota", es:"Vivo en Bogotá", ok:true, react:"Ah, Bogota ! J'aimerais visiter un jour", reactEs:"¡Ah, Bogotá! Me gustaría conocerla algún día"},
    {fr:"C'est trop cher", es:"Es muy caro", ok:false, why:"¡Nadie te está cobrando! 😂"},
   ]},
  {npc:"Oh là là, vous parlez bien français !", npcEs:"¡Oh, habla usted bien francés!",
   options:[
-   {fr:"Merci, j'apprends !", es:"¡Gracias, estoy aprendiendo!", ok:true},
-   {fr:"Petit à petit !", es:"¡Poquito a poco!", ok:true, alt:"Se rió: «C'est la bonne attitude !» 😄"},
+   {fr:"Merci, j'apprends !", es:"¡Gracias, estoy aprendiendo!", ok:true, react:"Ça se voit ! Continuez comme ça !", reactEs:"¡Se nota! ¡Siga así!"},
+   {fr:"Petit à petit !", es:"¡Poquito a poco!", ok:true, react:"C'est la bonne attitude !", reactEs:"¡Esa es la actitud!"},
    {fr:"Non", es:"No", ok:false, why:"¡Acepta el cumplido, hombre! 😅 Un «merci» nunca sobra"},
   ]},
  {npc:"(Il fait tomber quelque chose) Oh non !", npcEs:"(Se le cae algo) ¡Oh no!", skip:["oncle"],
   options:[
-   {fr:"Je peux vous aider ?", es:"¿Le puedo ayudar?", ok:true},
-   {fr:"Attention !", es:"¡Cuidado!", ok:true},
+   {fr:"Je peux vous aider ?", es:"¿Le puedo ayudar?", ok:true, react:"Oh, merci ! Vous êtes très gentil !", reactEs:"¡Ay, gracias! ¡Qué amable es usted!"},
+   {fr:"Attention !", es:"¡Cuidado!", ok:true, react:"Ouf ! Merci ! Tout va bien", reactEs:"¡Uf! ¡Gracias! Todo en orden"},
    {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¿La cuenta AHORA? ¡Ayúdale! 😱"},
   ]},
  {npc:"Quel temps aujourd'hui, hein ?", npcEs:"Qué clima el de hoy, ¿eh?",
   options:[
-   {fr:"Oui, il fait très beau !", es:"¡Sí, hace muy buen tiempo!", ok:true},
-   {fr:"Oui, il pleut beaucoup !", es:"¡Sí, llueve muchísimo!", ok:true},
+   {fr:"Oui, il fait très beau !", es:"¡Sí, hace muy buen tiempo!", ok:true, react:"Profitons-en !", reactEs:"¡Hay que aprovecharlo!"},
+   {fr:"Oui, il pleut beaucoup !", es:"¡Sí, llueve muchísimo!", ok:true, react:"Ah oui... vivement le soleil !", reactEs:"Sí... ¡que vuelva el sol pronto!"},
    {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"¿Te llevas... el clima? 😂"},
   ]},
  {npc:"(Un chien entre !) Oh, le petit chien !", npcEs:"(¡Entra un perro!) ¡Ay, el perrito!", skip:["oncle"],
   options:[
-   {fr:"Il est très mignon !", es:"¡Es muy lindo!", ok:true},
-   {fr:"J'adore les chiens", es:"Me encantan los perros", ok:true},
+   {fr:"Il est très mignon !", es:"¡Es muy lindo!", ok:true, react:"Viens ici, toi ! Allez, ouste !", reactEs:"¡Ven acá, tú! ¡Ya, fuera!"},
+   {fr:"J'adore les chiens", es:"Me encantan los perros", ok:true, react:"Moi aussi, j'en ai deux !", reactEs:"¡Yo también, tengo dos!"},
    {fr:"Une table pour deux", es:"Una mesa para dos", ok:false, why:"¿Para ti y el perro? 😂"},
   ]},
  {npc:"Et vous faites quoi dans la vie ?", npcEs:"¿Y usted a qué se dedica?",
   options:[
-   {fr:"Je fais de la musique !", es:"¡Hago música!", ok:true, alt:"«Un artiste ! Magnifique !» 🎶"},
-   {fr:"J'apprends le français, entre autres", es:"Aprendo francés, entre otras cosas", ok:true},
+   {fr:"Je fais de la musique !", es:"¡Hago música!", ok:true, react:"Un artiste ! Il faut jouer pour moi un jour !", reactEs:"¡Un artista! ¡Un día tiene que tocar para mí!"},
+   {fr:"J'apprends le français, entre autres", es:"Aprendo francés, entre otras cosas", ok:true, react:"Et très bien, en plus !", reactEs:"¡Y muy bien, además!"},
    {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡No te duermas, que te están conociendo! 😴"},
   ]},
  {npc:"(Ton téléphone sonne !) Dring dring...", npcEs:"(¡Suena tu teléfono!) Ring ring...", skip:["oncle"],
   options:[
-   {fr:"Pardon, excusez-moi un moment", es:"Perdón, discúlpeme un momento", ok:true},
-   {fr:"Désolé, je le coupe", es:"Perdón, lo apago", ok:true, alt:"«Pas de problème !» 👌"},
+   {fr:"Pardon, excusez-moi un moment", es:"Perdón, discúlpeme un momento", ok:true, react:"Je vous en prie, allez-y", reactEs:"Tranquilo, adelante"},
+   {fr:"Désolé, je le coupe", es:"Perdón, lo apago", ok:true, react:"Merci, c'est gentil", reactEs:"Gracias, muy amable"},
    {fr:"Allô ? ... (tu ignores tout le monde)", es:"¿Aló? ... (ignoras a todos)", ok:false, why:"Contestar sin disculparse... 😬 en Francia eso es grave"},
   ]},
  /* --- actualidad (v1.31 — ⚠️ TEMPORAL, refrescar tras la final del 19/jul) --- */
  {npc:"Vous avez vu ? Espagne-Argentine en finale dimanche !", npcEs:"¿Vio? ¡España-Argentina en la final el domingo!",
   options:[
-   {fr:"Oui ! Qui va gagner, à ton avis ?", es:"¡Sí! ¿Quién va a ganar, en tu opinión?", ok:true},
-   {fr:"Quel match ce sera !", es:"¡Qué partidazo va a ser!", ok:true},
+   {fr:"Oui ! Qui va gagner, à ton avis ?", es:"¡Sí! ¿Quién va a ganar, en tu opinión?", ok:true, react:"Moi je dis l'Espagne ! Enfin... on verra !", reactEs:"¡Yo digo que España! Bueno... ¡veremos!"},
+   {fr:"Quel match ce sera !", es:"¡Qué partidazo va a ser!", ok:true, react:"Oh oui ! J'ai déjà mon maillot !", reactEs:"¡Sí! ¡Ya tengo mi camiseta!"},
    {fr:"Je voudrais du fromage", es:"Quisiera queso", ok:false, why:"¡Te están hablando de LA FINAL y tú de queso! 😂"},
   ]},
  {npc:"(Il soupire) Ah là là... les Bleus ont perdu en demi-finale...", npcEs:"(Suspira) Ay... Francia perdió en la semifinal...",
   options:[
-   {fr:"Courage ! La France a bien joué", es:"¡Ánimo! Francia jugó bien", ok:true},
-   {fr:"Je suis désolé pour toi", es:"Lo siento por ti", ok:true, alt:"«Merci... allez, la vie continue» 🥲"},
+   {fr:"Courage ! La France a bien joué", es:"¡Ánimo! Francia jugó bien", ok:true, react:"C'est vrai... merci", reactEs:"Es verdad... gracias"},
+   {fr:"Je suis désolé pour toi", es:"Lo siento por ti", ok:true, react:"Merci... allez, la vie continue", reactEs:"Gracias... bueno, la vida sigue"},
    {fr:"Ha ha ! Deux à zéro !", es:"¡Ja ja! ¡Dos a cero!", ok:false, why:"Burlarse de la derrota ajena... 😬 con lo sensibles que están"},
   ]},
  /* --- humor francés (v1.31): chistes de juego de palabras — doble aprendizaje --- */
  {npc:"Tu connais la blague ? Qu'est-ce qui est jaune et qui attend ?... Jonathan !", npcEs:"¿Te sabes el chiste? ¿Qué es amarillo y espera?... ¡Jonathan!",
   options:[
-   {fr:"Ha ha, très drôle !", es:"¡Ja ja, muy gracioso!", ok:true},
-   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, alt:"«Jaune attend» (amarillo espera) suena igualito a «Jonathan» 😄 chiste de sonidos"},
+   {fr:"Ha ha, très drôle !", es:"¡Ja ja, muy gracioso!", ok:true, react:"Je la raconte à tout le monde !", reactEs:"¡Se lo cuento a todo el mundo!"},
+   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, react:"C'est un jeu de mots !", reactEs:"¡Es un juego de palabras!", alt:"«Jaune attend» (amarillo espera) suena igualito a «Jonathan» 😄 chiste de sonidos"},
    {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¡Ni siquiera sonreíste! El chiste era gratis 😅"},
   ]},
  {npc:"Pourquoi les poissons détestent l'ordinateur ?... À cause de la souris !", npcEs:"¿Por qué los peces odian el computador?... ¡Por el ratón!",
   options:[
-   {fr:"Ha ha ! Elle est bonne !", es:"¡Ja ja! ¡Ese está bueno!", ok:true},
-   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, alt:"«Souris» es ratón: el animal Y el mouse del computador 🐭🖱️ — igual que en español"},
+   {fr:"Ha ha ! Elle est bonne !", es:"¡Ja ja! ¡Ese está bueno!", ok:true, react:"J'en ai plein d'autres !", reactEs:"¡Tengo muchos más!"},
+   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, react:"C'est un jeu de mots !", reactEs:"¡Es un juego de palabras!", alt:"«Souris» es ratón: el animal Y el mouse del computador 🐭🖱️ — igual que en español"},
    {fr:"Je déteste les poissons", es:"Odio los peces", ok:false, why:"El chiste no era para tomar partido 😂"},
   ]},
  /* --- Colombia (v1.31) --- */
  {npc:"Vous venez d'où ?... La Colombie ! Le pays du café, non ?", npcEs:"¿De dónde viene?... ¡Colombia! El país del café, ¿no?",
   options:[
-   {fr:"Exactement ! Le meilleur du monde", es:"¡Exacto! El mejor del mundo", ok:true},
-   {fr:"Oui ! Et de la meilleure musique", es:"¡Sí! Y de la mejor música", ok:true, alt:"«Ah, la cumbia !» — conoce más de lo que creías 😄"},
+   {fr:"Exactement ! Le meilleur du monde", es:"¡Exacto! El mejor del mundo", ok:true, react:"Il faut que je goûte ça !", reactEs:"¡Tengo que probarlo!"},
+   {fr:"Oui ! Et de la meilleure musique", es:"¡Sí! Y de la mejor música", ok:true, react:"Ah, la cumbia ! J'adore !", reactEs:"¡Ah, la cumbia! ¡Me encanta!"},
    {fr:"Une baguette, s'il vous plaît", es:"Una baguette, por favor", ok:false, why:"Te preguntó por tu país, no pan 😅"},
   ]},
 ];
@@ -2393,6 +2393,15 @@ function gameScene(){
           setTimeout(async ()=>{
             box.innerHTML="";
             await Promise.race([meSay(o), sleep(4500)]);
+            // v1.33: el personaje contesta EN la ficción (sobre todo en imprevistos)
+            // antes de retomar el hilo — corto, natural, como en la vida real
+            const rc = o.react ? [o.react, o.reactEs||""]
+                     : (st.twist ? rnd([["Merci !","¡Gracias!"],["Ah, super !","¡Ah, súper!"]]) : null);
+            if(rc){
+              npcReact(rc[0], rc[1]);
+              if(rc[1]) noteNew(rc[0], rc[1]);
+              await Promise.race([speakFR(rc[0],0.85), sleep(3500)]);
+            }
             // bifurcación tipo videojuego: la opción puede saltar a otro paso (collar de perlas)
             si = o.go ? sc.steps.findIndex(s2=>s2.id===o.go) : si+1;
             if(si<0) si=sc.steps.length;
