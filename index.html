@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.31 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.32 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -748,6 +748,54 @@ const THEMES = [
    {fr:"Quel but incroyable !", es:"¡Qué gol tan increíble!"},
   ],
  },
+ {
+  /* 🛠️ v1.32: el oficio de Mateo — crea productos del diseño a la producción, ama la tecnología */
+  id:"metier", emoji:"🛠️", name:"Mi oficio", minLvl:1,
+  vocab:[
+   {fr:"Je crée des produits", es:"Creo productos"},
+   {fr:"Du design à la production", es:"Del diseño a la producción"},
+   {fr:"Les produits numériques", es:"Los productos digitales"},
+   {fr:"J'ai vingt-huit ans", es:"Tengo veintiocho años"},
+   {fr:"J'adore la technologie", es:"Me encanta la tecnología"},
+   {fr:"Je travaille sur un projet", es:"Estoy trabajando en un proyecto"},
+   {fr:"Une bonne idée", es:"Una buena idea"},
+   {fr:"C'est passionnant", es:"Es apasionante"},
+   {fr:"Qu'est-ce que tu fais dans la vie ?", es:"¿A qué te dedicas?"},
+   {fr:"On peut créer tellement de choses", es:"Se pueden crear tantas cosas"},
+   {fr:"Montre-moi ton travail", es:"Muéstrame tu trabajo"},
+   {fr:"Construire quelque chose", es:"Construir algo"},
+  ],
+  speak:[
+   {fr:"Je crée des produits, du design à la production", es:"Creo productos, del diseño a la producción"},
+   {fr:"Qu'est-ce que tu fais dans la vie ?", es:"¿A qué te dedicas?"},
+   {fr:"J'adore la technologie, c'est passionnant", es:"Me encanta la tecnología, es apasionante"},
+   {fr:"Je travaille sur un projet génial", es:"Estoy trabajando en un proyecto genial"},
+  ],
+ },
+ {
+  /* 💪 v1.32: cuidarse, entrenar, escuchar el cuerpo — parte de quién es Mateo */
+  id:"corps", emoji:"💪", name:"Cuerpo y energía", minLvl:1,
+  vocab:[
+   {fr:"Je fais du sport", es:"Hago ejercicio"},
+   {fr:"Je prends soin de moi", es:"Me cuido"},
+   {fr:"Mon corps", es:"Mi cuerpo"},
+   {fr:"J'ai besoin de repos", es:"Necesito descanso"},
+   {fr:"Je me sens bien", es:"Me siento bien"},
+   {fr:"Je me sens fatigué", es:"Me siento cansado"},
+   {fr:"Plein d'énergie", es:"Lleno de energía"},
+   {fr:"Bien dormir", es:"Dormir bien"},
+   {fr:"Bien manger", es:"Comer bien"},
+   {fr:"Écouter son corps", es:"Escuchar el cuerpo"},
+   {fr:"Respirer profondément", es:"Respirar profundo"},
+   {fr:"Plus fort chaque jour", es:"Más fuerte cada día"},
+  ],
+  speak:[
+   {fr:"Je fais du sport et je prends soin de moi", es:"Hago ejercicio y me cuido"},
+   {fr:"Aujourd'hui, j'ai besoin de repos", es:"Hoy necesito descanso"},
+   {fr:"Je me sens bien, plein d'énergie", es:"Me siento bien, lleno de energía"},
+   {fr:"J'écoute mon corps", es:"Escucho mi cuerpo"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -1017,6 +1065,48 @@ const SCENES = [
     ]},
   ],
  },
+ {
+  /* 🎶 v1.32: la jam session — ensayar cómo se hace un amigo en otro idioma
+     (guitarra + canto de Mateo; el idioma como puente hacia personas) */
+  id:"jam", title:"🎶 La jam session", npc:"🎷", npcName:"{name}",
+  vars:{
+   name:[{fr:"Antoine",es:"Antoine"},{fr:"Manon",es:"Manon"},{fr:"Théo",es:"Théo"},{fr:"Élise",es:"Élise"}],
+   instrument:[{fr:"du piano",es:"piano"},{fr:"de la basse",es:"bajo"},{fr:"du saxophone",es:"saxofón"},{fr:"de la batterie",es:"batería"}],
+   style:[{fr:"le jazz",es:"el jazz"},{fr:"le rock",es:"el rock"},{fr:"la pop",es:"el pop"},{fr:"la salsa",es:"la salsa"}],
+  },
+  steps:[
+   {npc:"Salut ! Moi c'est {name}. Tu joues aussi ?", npcEs:"¡Hola! Yo soy {name}. ¿Tú también tocas?",
+    options:[
+     {fr:"Oui ! Je joue de la guitare et je chante", es:"¡Sí! Toco guitarra y canto", ok:true},
+     {fr:"Salut ! C'est quoi ton instrument ?", es:"¡Hola! ¿Cuál es tu instrumento?", ok:true},
+     {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¡Es una jam, aquí nadie cobra! 😂"},
+    ]},
+   {npc:"Moi je joue {instrument}. Tu préfères quel style ?", npcEs:"Yo toco {instrument}. ¿Qué estilo prefieres?",
+    options:[
+     {fr:"J'adore {style} !", es:"¡Me encanta {style}!", ok:true},
+     {fr:"Un peu de tout — la musique, c'est la vie", es:"Un poco de todo — la música es la vida", ok:true, alt:"«Bien dit !» 🎶"},
+     {fr:"Je déteste la musique", es:"Odio la música", ok:false, why:"¿En una JAM? 😱 Además, mentiroso"},
+    ]},
+   {npc:"Cool ! Et tu viens d'où ? Ton accent est intéressant...", npcEs:"¡Genial! ¿Y de dónde vienes? Tu acento es interesante...",
+    options:[
+     {fr:"De Colombie ! Le pays de la cumbia", es:"¡De Colombia! El país de la cumbia", ok:true, alt:"«La Colombie ! Il faut m'apprendre ça !» 🥁"},
+     {fr:"Je viens de Bogota", es:"Vengo de Bogotá", ok:true},
+     {fr:"Une baguette, s'il vous plaît", es:"Una baguette, por favor", ok:false, why:"El acento no se arregla con pan 😅"},
+    ]},
+   {npc:"On joue ensemble ? Toi, tu chantes !", npcEs:"¿Tocamos juntos? ¡Tú cantas!",
+    options:[
+     {fr:"D'accord ! Un, deux, trois...", es:"¡Listo! Un, dos, tres...", ok:true},
+     {fr:"Oui ! Mais doucement, je suis timide", es:"¡Sí! Pero despacio, soy tímido", ok:true, alt:"«Pas de stress, on est entre amis» 😊"},
+     {fr:"Non, je regarde seulement", es:"No, solo miro", ok:false, why:"¡A la jam se viene a tocar! Dile que sí 🎤"},
+    ]},
+   {npc:"Waouh ! C'était magnifique ! On se revoit ?", npcEs:"¡Guau! ¡Estuvo precioso! ¿Nos volvemos a ver?",
+    options:[
+     {fr:"Bien sûr ! Avec plaisir", es:"¡Claro! Con gusto", ok:true},
+     {fr:"Oui ! La musique nous connecte", es:"¡Sí! La música nos conecta", ok:true, alt:"Amigo nuevo desbloqueado 🤝🎶"},
+     {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡Tan seco! 😴 Dile que sí, que para eso viniste"},
+    ]},
+  ],
+ },
 ];
 
 /* ================== GIROS SORPRESA ✨ (v1.29) ==================
@@ -1157,6 +1247,15 @@ const IMPROV=[
  {t:"Alguien dice algo con lo que NO estás de acuerdo — dilo con respeto y da tu opinión",
   keys:[["pas d'accord","pas du tout"],["je pense","à mon avis","je trouve"]],
   model:"Je ne suis pas d'accord... à mon avis, c'est le contraire !"},
+ {t:"Presenta tu oficio con orgullo: creas productos, del diseño a la producción",
+  keys:[["je crée","produits"],["design","production"]],
+  model:"Je crée des produits, du design à la production !"},
+ {t:"Di qué necesita tu cuerpo hoy (descanso, ejercicio, dormir bien...)",
+  keys:[["mon corps","je me sens","j'ai besoin"],["repos","dormir","sport","énergie"]],
+  model:"Aujourd'hui, mon corps a besoin de repos et de bien dormir."},
+ {t:"En la jam: pregunta qué toca la otra persona y cuenta que tú tocas guitarra y cantas",
+  keys:[["tu joues","instrument"],["guitare"],["je chante","chanter"]],
+  model:"Tu joues de quoi ? Moi, je joue de la guitare et je chante !"},
 ];
 
 /* Frases motivadoras de Coco */
