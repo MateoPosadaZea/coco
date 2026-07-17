@@ -173,6 +173,8 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
   width:92px; height:92px; border-radius:50%; border:none; cursor:pointer; font-size:2.4rem;
   background:var(--red); color:#fff; box-shadow:0 6px 0 rgba(0,0,0,.18); margin:6px auto; display:block;
   transition:transform .1s;
+  /* estilo nota de voz: sin menú de iOS al mantener oprimido, sin seleccionar texto, sin scroll */
+  touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
 }
 .micbtn:active{transform:translateY(4px);}
 .micbtn.rec{animation:flamepulse .8s infinite; background:#D50000;}
@@ -318,7 +320,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.25 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.26 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1723,7 +1725,7 @@ function gameSpeak(){
         <span class="sub">${q.es}</span>
         <div style="margin-top:10px"><button class="btn small purple" id="hear">🔊 Escuchar a Coco</button></div>
       </div>
-      <p style="text-align:center;font-weight:800;opacity:.7;margin:4px 0">Toca el micrófono, di la frase y tócalo de nuevo 👇</p>
+      <p style="text-align:center;font-weight:800;opacity:.7;margin:4px 0">Mantén oprimido el mic mientras hablas y suéltalo 👇 (o toca para empezar/parar)</p>
       <button class="micbtn" id="mic">🎙️</button>
       <div class="stars" id="stars"></div>
       <div class="speakresult" id="spkres"></div>
@@ -1788,7 +1790,7 @@ function gameSpeak(){
     async function startRec(){
       // re-tocar el mic tras un intento flojo = intentar de nuevo (lo natural)
       if(scored && !q._adv){ scored=false; bestSim=-1; bestHeard=""; stars.textContent=""; }
-      mic.classList.add("rec"); res.textContent="🔴 Grabando... di la frase y toca de nuevo para parar"; res.style.color="var(--ink)";
+      mic.classList.add("rec"); res.textContent="🔴 Grabando... suelta (o toca de nuevo) para parar"; res.style.color="var(--ink)";
       pressAt=Date.now();
       setTimeout(()=>{ if(recOn) ensureSR(); },700);            // segundo empujón al oído si se durmió
       clearTimeout(autoStop);
@@ -1853,14 +1855,36 @@ function gameSpeak(){
         setTimeout(()=>selfRate("Escúchate 👂 y compárate con Coco. ¿Cómo te salió?"), 400);
       }
     }
-    // un clic graba, otro clic para — nada de mantener oprimido
-    mic.onclick=()=>{
-      if(!recOn){ recOn=true; startRec(); }
-      else{
+    // Dos formas de grabar (idea del buzón 🪶 v1.26):
+    //  · MANTENER OPRIMIDO estilo nota de voz de WhatsApp: graba mientras sostienes, al soltar para en seco.
+    //  · TOQUE corto clásico: un toque empieza, otro toque para (igual que antes).
+    // La distinción es la duración de la presión: ≥600ms sosteniendo = modo WhatsApp.
+    const HOLD_MS=600;
+    let downAt=0, startedThisPress=false;
+    mic.onpointerdown=(e)=>{
+      e.preventDefault();
+      try{ mic.setPointerCapture(e.pointerId); }catch(_){}
+      downAt=Date.now(); startedThisPress=false;
+      if(!recOn){ recOn=true; startedThisPress=true; startRec(); }
+      // si ya estaba grabando, este toque es "parar": se resuelve al soltar (pointerup)
+    };
+    mic.onpointerup=(e)=>{
+      e.preventDefault();
+      if(!recOn) return;
+      const held=Date.now()-downAt;
+      if(startedThisPress){
+        if(held>=HOLD_MS){ recOn=false; stopRec(); }      // WhatsApp: soltaste → para ya
+        // toque corto: sigue grabando; el próximo toque la para
+      }else{
+        // segundo toque = parar (modo clásico), con el guardia de "aún no dijiste nada"
         if(Date.now()-pressAt<450){ res.textContent="Di la frase primero y luego vuelve a tocar 😉"; res.style.color="var(--orange)"; return; }
         recOn=false; stopRec();
       }
     };
+    mic.onpointercancel=()=>{                             // llamada entrante, cambio de app, etc.
+      if(recOn && startedThisPress && Date.now()-downAt>=HOLD_MS){ recOn=false; stopRec(); }
+    };
+    mic.oncontextmenu=(e)=>e.preventDefault();            // sin menú contextual al sostener
   }
   ask();
 }
