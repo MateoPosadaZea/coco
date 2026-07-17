@@ -198,9 +198,11 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .bigscore{font-size:3.2rem; font-family:'Baloo 2',sans-serif; font-weight:800; text-align:center; color:var(--purple);}
 .medal{font-size:4rem; text-align:center; animation:popIn .5s cubic-bezier(.2,1.6,.4,1);}
 .resultrow{display:flex; justify-content:space-between; font-weight:800; padding:8px 4px; border-bottom:2px dashed #EFE7DA;}
+.saverow{display:flex; gap:8px; align-items:stretch; margin-top:8px;}
 .savecode{
-  font-family:monospace; font-size:.95rem; background:#2B2B3F; color:#9EFFB0; border-radius:12px;
-  padding:12px; word-break:break-all; cursor:pointer; text-align:center; margin-top:8px;
+  font-family:monospace; font-size:.9rem; background:#2B2B3F; color:#9EFFB0; border-radius:12px;
+  padding:12px; cursor:pointer; text-align:left; flex:1; min-width:0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;   /* una sola línea, sin scroll eterno */
 }
 .confetti{position:fixed; z-index:100; top:-20px; font-size:1.3rem; pointer-events:none; animation:confall linear forwards;}
 .dw-bad{background:#FFE0E0; color:#C62828; border-radius:6px; padding:0 4px; text-decoration:line-through;}
@@ -320,7 +322,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.26 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.27 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -363,9 +365,11 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <div class="btn-row" style="margin-top:8px;"><button class="btn small green" id="ideaAdd">🪶 Anotar</button></div>
       <div id="ideaList"></div>
       <div class="btn-row" style="margin-top:10px;">
-        <button class="btn small purple" id="ideaCopy">📋 Copiar buzón para Claude</button>
+        <button class="btn small green" id="ideaSend">📬 Enviar directo</button>
+        <button class="btn small purple" id="ideaCopy">📋 Copiar buzón</button>
         <button class="btn small ghost" id="ideaClear">🧹 Vaciar</button>
       </div>
+      <p class="hint" style="text-align:left;">📬 Enviar directo abre GitHub con tu buzón ya escrito — solo tocas «Submit new issue» y Claude lo lee en la próxima sesión, sin copiar nada.</p>
     </div>
     <button class="btn big" id="btnSetBack">🏠 Volver al laboratorio</button>
   </div>
@@ -416,8 +420,11 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
     <div class="card">
       <h3>💾 Tu código de guardado</h3>
       <p style="font-weight:700; opacity:.7; font-size:.85rem; margin:4px 0;">Como en los videojuegos de antes: copia este código y pégalo mañana para conservar tu racha y puntos.</p>
-      <div class="savecode" id="saveCode" title="Toca para copiar">...</div>
-      <div class="hint" id="copyHint">👆 toca el código para copiarlo</div>
+      <div class="saverow">
+        <div class="savecode" id="saveCode" title="Toca para copiar">...</div>
+        <button class="btn small purple" id="saveCopy" style="flex:0 0 auto;" title="Copiar código">📋</button>
+      </div>
+      <div class="hint" id="copyHint">👆 toca 📋 para copiarlo</div>
     </div>
     <button class="btn big" id="btnHome">🏠 Volver al laboratorio</button>
   </div>
@@ -1831,6 +1838,7 @@ function gameSpeak(){
           if(Date.now()-pressAt<400) return;        // resultado viejo/eco: aún no has hablado
           if(speechSynthesis.speaking) return;       // no puntuar la voz de Coco
           for(const alt of rl){ const s=similarity(alt.transcript,q.fr); if(s>bestSim){bestSim=s; bestHeard=alt.transcript;} }
+          if(bestSim>=.3){ S.prefs.srFails=0; }      // el oído sí funciona en este equipo
           res.textContent=`Coco escuchó: "${bestHeard.trim()}"`;
           if(bestSim>=.8){ onHeard=null; scoreIt(bestSim); }   // clavada: puntúa al instante
         };
@@ -1846,8 +1854,21 @@ function gameSpeak(){
         setTimeout(()=>{
           if(scored) return;
           onHeard=null;
-          if(bestSim>=0) scoreIt(bestSim);
-          else selfRate(`El reconocedor no captó tu voz 🎧 Toca el mic e intenta otra vez, o escúchate con "👂 Escucharme" y califícate tú:`);
+          if(bestSim>=0){ S.prefs.srFails=0; store.save(); scoreIt(bestSim); }
+          else{
+            // el "oído" existe pero no oye (típico de iPhone): tras 2 tomas mudas,
+            // Coco se pasa solo a «Yo me califico» en este equipo — cero frustración
+            S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
+            if(S.prefs.srFails>=2 && S.prefs.vg!=="self"){
+              S.prefs.vg="self"; store.save();
+              try{ recog.abort(); }catch(_){}
+              recog=null;
+              toast("🎧 El oído de este equipo no funciona bien — Coco pasó a «Yo me califico» (cámbialo en ⚙️ si quieres)");
+              selfRate("Escúchate con «👂 Escucharme», compárate con Coco y califícate:");
+            }else{
+              selfRate(`El reconocedor no captó tu voz 🎧 Toca el mic e intenta otra vez, o escúchate con "👂 Escucharme" y califícate tú:`);
+            }
+          }
         }, 1900);
       }
       if(!recog){
@@ -2307,9 +2328,10 @@ $("saveCode").onclick=()=>{
   const code=$("saveCode").textContent;
   (navigator.clipboard? navigator.clipboard.writeText(code) : Promise.reject()).then(
     ()=>{ $("copyHint").textContent="✅ ¡Copiado! Guárdalo donde no se pierda"; },
-    ()=>{ $("copyHint").textContent="Selecciónalo y cópialo manualmente 🙂"; }
+    ()=>{ prompt("Tu código de guardado (cópialo manualmente):", code); }
   );
 };
+$("saveCopy").onclick=()=>$("saveCode").onclick();
 $("btnShowCode").onclick=()=>{
   const code=makeCode();
   (navigator.clipboard? navigator.clipboard.writeText(code) : Promise.reject()).then(
@@ -2555,6 +2577,19 @@ $("ideaCopy").onclick=()=>{
   );
 };
 $("ideaClear").onclick=()=>{ S.inbox=[]; store.save(); renderInbox(); toast("🧹 Buzón vacío"); };
+$("ideaSend").onclick=()=>{
+  // envío directo sin copiar/pegar: abre un issue de GitHub ya redactado —
+  // Mateo solo toca "Submit new issue" y Claude lo lee en la próxima sesión
+  const ib=S.inbox||[];
+  if(!ib.length){ toast("El buzón está vacío 🪶"); return; }
+  const ver=(document.querySelector(".footer-note")||{textContent:""}).textContent.match(/v[\d.]+/);
+  const title=`🪶 Buzón ${ver?ver[0]:""} — ${todayStr()}`;
+  const body=`Buzón de mi app Coco ${ver?ver[0]:""} — ideas y bugs para implementar:\n`+
+    ib.map(it=>`- [${it.d}] ${it.t}`).join("\n")+
+    `\n\n(contexto: ${navigator.userAgent.slice(0,80)})`;
+  window.open("https://github.com/MateoPosadaZea/coco/issues/new?title="+encodeURIComponent(title)+"&body="+encodeURIComponent(body),"_blank");
+  cocoSay("Se abrió GitHub con tu buzón ya escrito 📬 Toca «Submit new issue» y listo — Claude lo verá apenas hablen.");
+};
 
 /* teclas rápidas: 1-4 para opciones */
 document.addEventListener("keydown",e=>{
