@@ -285,6 +285,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
         <button class="btn small purple" id="btnScene">💬 Solo conversación</button>
         <button class="btn small orange" id="btnBlitz">⚡ Solo reto rápido</button>
         <button class="btn small ghost" id="btnProgress">📈 Mi progreso</button>
+        <button class="btn small ghost" id="btnSettings">⚙️ Ajustes</button>
       </div>
       <p class="hint" id="saveStatus" style="margin-top:10px;"></p>
     </div>
@@ -317,7 +318,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.24 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.25 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -335,6 +336,36 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
     <div style="text-align:center; margin-top:16px;">
       <button class="linkish" id="btnQuit">✖ Salir de la sesión</button>
     </div>
+  </div>
+
+  <!-- ============ AJUSTES + BUZÓN ============ -->
+  <div id="scr-settings" class="screen">
+    <div class="card">
+      <h3>⚙️ Ajustes</h3>
+      <p style="font-weight:800; margin:10px 0 4px;">🎙️ Calificación de pronunciación</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn small" id="vgAuto">Coco me escucha</button>
+        <button class="btn small" id="vgSelf">Yo me califico</button>
+      </div>
+      <p class="hint" id="vgHint"></p>
+      <p style="font-weight:800; margin:16px 0 4px;">🔊 Voz de Coco</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn small" id="spNormal">Normal</button>
+        <button class="btn small" id="spSlow">Lentica 🐢</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🪶 Buzón para Claude</h3>
+      <p class="hint" style="text-align:left;">Anota ideas o bugs apenas se te ocurran, donde sea que estés. Cuando quieras, «📋 Copiar buzón» los empaca con todo el contexto — pégalos en el chat con Claude y él evoluciona la app en GitHub.</p>
+      <textarea class="textinput" id="ideaText" rows="2" style="text-align:left; font-size:.95rem;" placeholder="p. ej. el micrófono falló en tal juego · quiero un tema de comida..."></textarea>
+      <div class="btn-row" style="margin-top:8px;"><button class="btn small green" id="ideaAdd">🪶 Anotar</button></div>
+      <div id="ideaList"></div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn small purple" id="ideaCopy">📋 Copiar buzón para Claude</button>
+        <button class="btn small ghost" id="ideaClear">🧹 Vaciar</button>
+      </div>
+    </div>
+    <button class="btn big" id="btnSetBack">🏠 Volver al laboratorio</button>
   </div>
 
   <!-- ============ PROGRESO ============ -->
@@ -894,6 +925,8 @@ const S = {
   weak: [],            // palabras falladas esperando revancha: [{fr,es}]
   custom: [],          // 📓 cuaderno: frases propias ya traducidas [{fr,es}]
   pending: [],         // 📓 anotadas en español, esperando traducción de Claude
+  prefs: {vg:"auto", slow:false},   // ⚙️ vg: "auto" (Coco escucha) | "self" (me califico)
+  inbox: [],           // 🪶 buzón de ideas/bugs para Claude [{d,t}]
   theme: THEMES[0].id,
   session: null,
 };
@@ -949,7 +982,7 @@ const store = {
   save(){
     try{
       // La clave "lingualab_fr" no cambia entre versiones: al actualizar la app, el progreso se conserva
-      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0}));
+      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[]}));
       this.ok = true;
     }catch(e){ this.ok = false; }
   },
@@ -964,6 +997,8 @@ const store = {
       S.lastScenes=Array.isArray(p.ls)?p.ls:[];
       S.custom=Array.isArray(p.c)?p.c:[]; S.pending=Array.isArray(p.p)?p.p:[];
       S.grad=p.g||0;
+      S.prefs=Object.assign({vg:"auto",slow:false}, p.pr||{});
+      S.inbox=Array.isArray(p.ib)?p.ib:[];
       return true;
     }catch(e){ this.ok = false; return false; }
   }
@@ -1082,7 +1117,8 @@ function speakFR(text, rate){
       const u = new SpeechSynthesisUtterance(text);
       currentUtt = u;
       u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
-      u.rate = rate||0.85; u.pitch=1.05;
+      u.rate = (rate||0.85) * ((S.prefs&&S.prefs.slow)?0.8:1);   // 🐢 ajuste de velocidad
+      u.pitch=1.05;
       const mas = $("mascot"); if(mas) mas.classList.add("talk");
       let finished=false;
       const done=()=>{
@@ -1665,6 +1701,8 @@ function gameSpeak(){
     // si la escucha se muere MIENTRAS grabas, se reconecta sola
     recog.onend=()=>{ srOn=false; if(recActive) setTimeout(ensureSR,120); };
   }
+  // ⚙️ modo "yo me califico": sin reconocedor — grabas, te escuchas y te calificas tú
+  if(S.prefs && S.prefs.vg==="self") recog=null;
   function ensureSR(){
     if(!recog || srOn) return;
     try{ recog.start(); srOn=true; }
@@ -2445,6 +2483,54 @@ $("btnAutoTrad").onclick=async()=>{
   b.disabled=false; b.textContent="🪄 Traducir ya";
   renderNotes();
 };
+
+/* ================== ⚙️ AJUSTES + 🪶 BUZÓN ================== */
+function paintSettings(){
+  const p=S.prefs||(S.prefs={vg:"auto",slow:false});
+  const set=(id,on)=>{ const b=$(id); if(b) b.className="btn small "+(on?"purple":"ghost"); };
+  set("vgAuto", p.vg!=="self"); set("vgSelf", p.vg==="self");
+  set("spNormal", !p.slow); set("spSlow", !!p.slow);
+  $("vgHint").textContent = p.vg==="self"
+    ? "Grabas, te escuchas y te calificas tú — cero peleas con el reconocedor 😌"
+    : "Coco intenta reconocer tu voz y puntuar solo (a veces el servicio se pone terco)";
+}
+function renderInbox(){
+  const box=$("ideaList"); if(!box) return;
+  const ib=S.inbox||[];
+  box.innerHTML = ib.length
+    ? ib.map((it,i)=>`<div class="resultrow" style="gap:8px;"><span style="flex:1;">🪶 ${esc(it.t)} <span class="tr" style="font-size:.7rem; opacity:.5;">${it.d}</span></span><button class="linkish" data-deli="${i}">✖</button></div>`).join("")
+    : `<p class="hint">Buzón vacío — todo bajo control 🦜</p>`;
+  box.querySelectorAll("[data-deli]").forEach(b=>b.onclick=()=>{ S.inbox.splice(+b.dataset.deli,1); store.save(); renderInbox(); });
+}
+$("btnSettings").onclick=()=>{ paintSettings(); renderInbox(); show("scr-settings"); };
+$("btnSetBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
+$("vgAuto").onclick =()=>{ S.prefs.vg="auto"; store.save(); paintSettings(); };
+$("vgSelf").onclick =()=>{ S.prefs.vg="self"; store.save(); paintSettings(); };
+$("spNormal").onclick=()=>{ S.prefs.slow=false; store.save(); paintSettings(); speakFR("Bonjour !"); };
+$("spSlow").onclick =()=>{ S.prefs.slow=true;  store.save(); paintSettings(); speakFR("Bonjour !"); };
+$("ideaAdd").onclick=()=>{
+  const t=$("ideaText").value.trim();
+  if(!t) return;
+  S.inbox=S.inbox||[];
+  S.inbox.push({d:todayStr(), t});
+  $("ideaText").value="";
+  store.save(); renderInbox();
+  toast("🪶 Anotada en el buzón");
+};
+$("ideaText").addEventListener("keydown",e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("ideaAdd").click(); } });
+$("ideaCopy").onclick=()=>{
+  const ib=S.inbox||[];
+  if(!ib.length){ toast("El buzón está vacío 🪶"); return; }
+  const ver=(document.querySelector(".footer-note")||{textContent:""}).textContent.match(/v[\d.]+/);
+  const txt=`Buzón de mi app Coco ${ver?ver[0]:""} — ideas y bugs para implementar:\n`+
+    ib.map(it=>`- [${it.d}] ${it.t}`).join("\n")+
+    `\n(contexto: ${navigator.userAgent.slice(0,80)})`;
+  (navigator.clipboard? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+    ()=>toast("📋 Buzón copiado — pégalo en el chat con Claude"),
+    ()=>prompt("Copia tu buzón manualmente:", txt)
+  );
+};
+$("ideaClear").onclick=()=>{ S.inbox=[]; store.save(); renderInbox(); toast("🧹 Buzón vacío"); };
 
 /* teclas rápidas: 1-4 para opciones */
 document.addEventListener("keydown",e=>{
