@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.29 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.30 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1249,6 +1249,7 @@ if("speechSynthesis" in window){
   speechSynthesis.onvoiceschanged = pickVoice;
 }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 let currentUtt=null, resumeInt=null;   // referencia viva: evita que Chrome "recolecte" la frase a mitad de camino
 function speakFR(text, rate){
   return new Promise(res=>{
@@ -1269,10 +1270,11 @@ function speakFR(text, rate){
       };
       u.onend=done; u.onerror=done;
       speechSynthesis.speak(u);
-      // Chrome a veces pausa la síntesis en frases y la corta: darle un empujón periódico
+      // Chrome a veces pausa la síntesis en frases y la corta: darle un empujón periódico.
+      // En iOS ese pause/resume es contraproducente (WebKit se atraganta): allá solo vigilamos el final.
       if(resumeInt) clearInterval(resumeInt);
       resumeInt=setInterval(()=>{
-        if(speechSynthesis.speaking && !speechSynthesis.paused){ speechSynthesis.pause(); speechSynthesis.resume(); }
+        if(!IOS && speechSynthesis.speaking && !speechSynthesis.paused){ speechSynthesis.pause(); speechSynthesis.resume(); }
         else if(!speechSynthesis.speaking && !speechSynthesis.pending){ done(); }
       },4000);
       // red de seguridad: nunca dejar una promesa colgada
@@ -2324,7 +2326,10 @@ function gameImprov(){
 
 /* ================== RESULTADOS ================== */
 function endSession(){
-  stopTimer();   // el micrófono se conserva: así el permiso se pide UNA vez por pestaña
+  stopTimer();
+  releaseMic();  // v1.30: soltar el micrófono al terminar — un stream vivo en segundo plano
+                 // es de las cosas por las que iOS mata la app (pantallazo negro);
+                 // getMic() lo vuelve a pedir sin drama en el próximo juego de hablar
   const s=S.session;
   const acc = s.tries? s.hits/s.tries : 0;
 
@@ -2761,6 +2766,31 @@ $("ideaSend").onclick=()=>{
   window.open("https://github.com/MateoPosadaZea/coco/issues/new?title="+encodeURIComponent(title)+"&body="+encodeURIComponent(body),"_blank");
   cocoSay("Se abrió GitHub con tu buzón ya escrito 📬 Toca «Submit new issue» y listo — Claude lo verá apenas hablen.");
 };
+
+/* ===== v1.30: blindaje anti-pantallazo-negro (iOS mata procesos con hambre de memoria) ===== */
+// al pasar a segundo plano: guardar YA, soltar el micrófono y callar a Coco.
+// Una app quieta y liviana es una app que iOS no mata.
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden){
+    try{ store.save(); }catch(e){}
+    try{ releaseMic(); }catch(e){}
+    try{ speechSynthesis.cancel(); }catch(e){}
+  }
+});
+window.addEventListener("pagehide", ()=>{ try{ store.save(); }catch(e){} });
+// errores de verdad se auto-anotan en el 🪶 buzón (máx 3, sin duplicados) — la app se reporta sola
+function autoBug(msg){
+  try{
+    S.inbox=S.inbox||[];
+    const t="[auto] "+String(msg).slice(0,140);
+    if(S.inbox.find(it=>it.t===t)) return;
+    if(S.inbox.filter(it=>it.t.startsWith("[auto]")).length>=3) return;
+    S.inbox.push({d:todayStr(), t});
+    store.save();
+  }catch(e){}
+}
+window.addEventListener("error", e=>autoBug("Error: "+(e.message||"?")+" @"+((e.filename||"").split("/").pop())+":"+(e.lineno||"?")));
+window.addEventListener("unhandledrejection", e=>autoBug("Promesa rota: "+String(e.reason).slice(0,100)));
 
 /* teclas rápidas: 1-4 para opciones */
 document.addEventListener("keydown",e=>{
