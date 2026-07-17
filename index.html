@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.30 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.31 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -674,6 +674,80 @@ const THEMES = [
    {fr:"Je suis reconnaissant pour tout", es:"Estoy agradecido por todo"},
   ],
  },
+ {
+  /* 🗣️ kit de opinar (v1.31): herramientas para opinar de CUALQUIER tema —
+     Coco enseña a opinar, nunca opiniones. Todas las posturas bien dichas valen. */
+  id:"opinions", emoji:"🗣️", name:"Opinar como un pro", minLvl:1,
+  vocab:[
+   {fr:"À mon avis", es:"En mi opinión"},
+   {fr:"Je pense que...", es:"Pienso que..."},
+   {fr:"Je trouve que...", es:"Me parece que..."},
+   {fr:"Je suis d'accord", es:"Estoy de acuerdo"},
+   {fr:"Je ne suis pas d'accord", es:"No estoy de acuerdo"},
+   {fr:"Pas du tout !", es:"¡Para nada!"},
+   {fr:"Tu as raison", es:"Tienes razón"},
+   {fr:"C'est vrai", es:"Es cierto"},
+   {fr:"Ça dépend", es:"Depende"},
+   {fr:"Peut-être", es:"Quizás"},
+   {fr:"J'adore ça", es:"Me encanta eso"},
+   {fr:"Ça me rend heureux", es:"Eso me hace feliz"},
+  ],
+  speak:[
+   {fr:"À mon avis, c'est génial", es:"En mi opinión, es genial"},
+   {fr:"Je ne suis pas d'accord", es:"No estoy de acuerdo"},
+   {fr:"Tu as raison, c'est vrai", es:"Tienes razón, es cierto"},
+   {fr:"Ça dépend, peut-être", es:"Depende, quizás"},
+  ],
+ },
+ {
+  /* 🇨🇴 hablar de lo suyo en francés (v1.31) */
+  id:"colombie", emoji:"🇨🇴", name:"Colombia en francés", minLvl:1,
+  vocab:[
+   {fr:"Je viens de Colombie", es:"Vengo de Colombia"},
+   {fr:"Bogota est ma ville", es:"Bogotá es mi ciudad"},
+   {fr:"Le café colombien", es:"El café colombiano"},
+   {fr:"Le meilleur du monde", es:"El mejor del mundo"},
+   {fr:"Il fait frais à Bogota", es:"Hace fresco en Bogotá"},
+   {fr:"La côte caraïbe", es:"La costa caribe"},
+   {fr:"J'adore la cumbia", es:"Me encanta la cumbia"},
+   {fr:"On danse beaucoup", es:"Bailamos mucho"},
+   {fr:"Les montagnes sont belles", es:"Las montañas son hermosas"},
+   {fr:"Tu connais la Colombie ?", es:"¿Conoces Colombia?"},
+   {fr:"Viens me rendre visite !", es:"¡Ven a visitarme!"},
+   {fr:"Je suis fier de mon pays", es:"Estoy orgulloso de mi país"},
+  ],
+  speak:[
+   {fr:"Je viens de Colombie, le pays du café", es:"Vengo de Colombia, el país del café"},
+   {fr:"Tu connais la Colombie ?", es:"¿Conoces Colombia?"},
+   {fr:"J'adore la cumbia, on danse beaucoup", es:"Me encanta la cumbia, bailamos mucho"},
+   {fr:"Viens me rendre visite !", es:"¡Ven a visitarme!"},
+  ],
+ },
+ {
+  /* 🏆 TEMA DEL MOMENTO (v1.31 — 17/jul/2026): la final España-Argentina del domingo 19.
+     ⚠️ TEMPORAL: refrescar/retirar cuando pase la final (Claude lo actualiza vía pipeline). */
+  id:"moment", emoji:"🏆", name:"La final del Mundial", minLvl:1,
+  vocab:[
+   {fr:"La finale", es:"La final"},
+   {fr:"Le match", es:"El partido"},
+   {fr:"Une équipe", es:"Un equipo"},
+   {fr:"Un but", es:"Un gol"},
+   {fr:"Le gardien", es:"El arquero"},
+   {fr:"Gagner", es:"Ganar"},
+   {fr:"Perdre", es:"Perder"},
+   {fr:"L'Espagne", es:"España"},
+   {fr:"L'Argentine", es:"Argentina"},
+   {fr:"Dimanche", es:"El domingo"},
+   {fr:"Quel match !", es:"¡Qué partido!"},
+   {fr:"On regarde ensemble ?", es:"¿Lo vemos juntos?"},
+  ],
+  speak:[
+   {fr:"Tu regardes la finale dimanche ?", es:"¿Vas a ver la final el domingo?"},
+   {fr:"Qui va gagner, à ton avis ?", es:"¿Quién va a ganar, en tu opinión?"},
+   {fr:"Je pense que l'Argentine va gagner", es:"Pienso que Argentina va a ganar"},
+   {fr:"Quel but incroyable !", es:"¡Qué gol tan increíble!"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -997,6 +1071,39 @@ const TWISTS=[
    {fr:"Désolé, je le coupe", es:"Perdón, lo apago", ok:true, alt:"«Pas de problème !» 👌"},
    {fr:"Allô ? ... (tu ignores tout le monde)", es:"¿Aló? ... (ignoras a todos)", ok:false, why:"Contestar sin disculparse... 😬 en Francia eso es grave"},
   ]},
+ /* --- actualidad (v1.31 — ⚠️ TEMPORAL, refrescar tras la final del 19/jul) --- */
+ {npc:"Vous avez vu ? Espagne-Argentine en finale dimanche !", npcEs:"¿Vio? ¡España-Argentina en la final el domingo!",
+  options:[
+   {fr:"Oui ! Qui va gagner, à ton avis ?", es:"¡Sí! ¿Quién va a ganar, en tu opinión?", ok:true},
+   {fr:"Quel match ce sera !", es:"¡Qué partidazo va a ser!", ok:true},
+   {fr:"Je voudrais du fromage", es:"Quisiera queso", ok:false, why:"¡Te están hablando de LA FINAL y tú de queso! 😂"},
+  ]},
+ {npc:"(Il soupire) Ah là là... les Bleus ont perdu en demi-finale...", npcEs:"(Suspira) Ay... Francia perdió en la semifinal...",
+  options:[
+   {fr:"Courage ! La France a bien joué", es:"¡Ánimo! Francia jugó bien", ok:true},
+   {fr:"Je suis désolé pour toi", es:"Lo siento por ti", ok:true, alt:"«Merci... allez, la vie continue» 🥲"},
+   {fr:"Ha ha ! Deux à zéro !", es:"¡Ja ja! ¡Dos a cero!", ok:false, why:"Burlarse de la derrota ajena... 😬 con lo sensibles que están"},
+  ]},
+ /* --- humor francés (v1.31): chistes de juego de palabras — doble aprendizaje --- */
+ {npc:"Tu connais la blague ? Qu'est-ce qui est jaune et qui attend ?... Jonathan !", npcEs:"¿Te sabes el chiste? ¿Qué es amarillo y espera?... ¡Jonathan!",
+  options:[
+   {fr:"Ha ha, très drôle !", es:"¡Ja ja, muy gracioso!", ok:true},
+   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, alt:"«Jaune attend» (amarillo espera) suena igualito a «Jonathan» 😄 chiste de sonidos"},
+   {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¡Ni siquiera sonreíste! El chiste era gratis 😅"},
+  ]},
+ {npc:"Pourquoi les poissons détestent l'ordinateur ?... À cause de la souris !", npcEs:"¿Por qué los peces odian el computador?... ¡Por el ratón!",
+  options:[
+   {fr:"Ha ha ! Elle est bonne !", es:"¡Ja ja! ¡Ese está bueno!", ok:true},
+   {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, alt:"«Souris» es ratón: el animal Y el mouse del computador 🐭🖱️ — igual que en español"},
+   {fr:"Je déteste les poissons", es:"Odio los peces", ok:false, why:"El chiste no era para tomar partido 😂"},
+  ]},
+ /* --- Colombia (v1.31) --- */
+ {npc:"Vous venez d'où ?... La Colombie ! Le pays du café, non ?", npcEs:"¿De dónde viene?... ¡Colombia! El país del café, ¿no?",
+  options:[
+   {fr:"Exactement ! Le meilleur du monde", es:"¡Exacto! El mejor del mundo", ok:true},
+   {fr:"Oui ! Et de la meilleure musique", es:"¡Sí! Y de la mejor música", ok:true, alt:"«Ah, la cumbia !» — conoce más de lo que creías 😄"},
+   {fr:"Une baguette, s'il vous plaît", es:"Una baguette, por favor", ok:false, why:"Te preguntó por tu país, no pan 😅"},
+  ]},
 ];
 
 /* ================== MISIONES DE IMPROVISACIÓN 🎭 ================== */
@@ -1041,6 +1148,15 @@ const IMPROV=[
  {t:"Saluda a tu tío: pregúntale cómo ha estado y qué hay de nuevo",
   keys:[["comment vas-tu","comment ça va"],["quoi de neuf"]],
   model:"Salut ! Comment vas-tu ? Quoi de neuf ?"},
+ {t:"¿Qué te hace feliz? Respóndelo con ganas, con lo tuyo",
+  keys:[["me rend heureux","j'adore","j'aime"],["musique","apprendre","café","famille","jouer"]],
+  model:"La musique me rend heureux, et j'adore apprendre !"},
+ {t:"Da tu opinión sobre la final del Mundial: quién gana, según tú",
+  keys:[["je pense que","à mon avis","je trouve que"],["espagne","argentine"],["gagner"]],
+  model:"À mon avis, l'Argentine va gagner la finale !"},
+ {t:"Alguien dice algo con lo que NO estás de acuerdo — dilo con respeto y da tu opinión",
+  keys:[["pas d'accord","pas du tout"],["je pense","à mon avis","je trouve"]],
+  model:"Je ne suis pas d'accord... à mon avis, c'est le contraire !"},
 ];
 
 /* Frases motivadoras de Coco */
@@ -2066,18 +2182,28 @@ function instScene(sc){
 /* ✨ giros sorpresa: a veces (¡no siempre!) un imprevisto se cuela en la escena.
    Mismo lugar, nunca la misma visita — antirrepetición pedido por Mateo (v1.29) */
 function injectTwist(sc){
-  if(Math.random()<0.35) return sc;              // a veces no pasa nada — eso también es sorpresa
-  const pool=TWISTS.map((t,i)=>({t,i})).filter(x=>!(x.t.skip||[]).includes(sc.id));
-  if(!pool.length) return sc;
+  if(Math.random()<0.15) return sc;              // alguna visita tranquila: la sorpresa necesita ausencia
   S.lastTwists=S.lastTwists||[];
-  let cands=pool.filter(x=>!S.lastTwists.includes(x.i));
-  if(!cands.length){ S.lastTwists=[]; cands=pool; }
-  const pick=rnd(cands);
-  S.lastTwists.push(pick.i);
-  if(S.lastTwists.length>=TWISTS.length) S.lastTwists=S.lastTwists.slice(-(TWISTS.length-1));
-  const steps=sc.steps.slice();
-  const pos=1+Math.floor(Math.random()*Math.max(1,steps.length-2));   // nunca de primero ni de último
-  steps.splice(pos,0,{...pick.t, twist:true});
+  const pickTwist=(exclude)=>{
+    const pool=TWISTS.map((t,i)=>({t,i})).filter(x=>!(x.t.skip||[]).includes(sc.id) && !exclude.includes(x.i));
+    if(!pool.length) return null;
+    let cands=pool.filter(x=>!S.lastTwists.includes(x.i));
+    if(!cands.length){ S.lastTwists=S.lastTwists.filter(i=>exclude.includes(i)); cands=pool; }
+    const pick=rnd(cands);
+    S.lastTwists.push(pick.i);
+    if(S.lastTwists.length>=TWISTS.length) S.lastTwists=S.lastTwists.slice(-(TWISTS.length-1));
+    return pick;
+  };
+  let steps=sc.steps.slice();
+  const used=[];
+  const n = (Math.random()<0.3 && steps.length>=4) ? 2 : 1;   // a veces caen DOS imprevistos
+  for(let k=0;k<n;k++){
+    const pick=pickTwist(used);
+    if(!pick) break;
+    used.push(pick.i);
+    const pos=1+Math.floor(Math.random()*Math.max(1,steps.length-2));   // nunca de primero ni de último
+    steps.splice(pos,0,{...pick.t, twist:true});
+  }
   return {...sc, steps};
 }
 function pickScene(){
