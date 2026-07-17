@@ -181,6 +181,9 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .btn.rec{animation:flamepulse .8s infinite; filter:brightness(1.15);}
 textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .speakresult{text-align:center; font-weight:800; margin-top:10px; min-height:28px; font-size:1.05rem;}
+.twisttag{display:inline-block; background:linear-gradient(90deg,#FFD54F,#FF8A65); color:#4A2B00;
+  font-size:.7rem; font-weight:800; border-radius:20px; padding:2px 10px; margin-bottom:4px;
+  animation:popIn .4s cubic-bezier(.2,1.6,.4,1);}
 .stars{font-size:1.8rem; letter-spacing:4px; text-align:center; min-height:36px;}
 
 /* ---------- conversation ---------- */
@@ -322,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.28 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.29 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -940,6 +943,60 @@ const SCENES = [
     ]},
   ],
  },
+];
+
+/* ================== GIROS SORPRESA ✨ (v1.29) ==================
+   Imprevistos que se cuelan al azar en cualquier escena: mismo lugar, nunca la
+   misma visita. skip: escenas donde el giro no tiene sentido (p.ej. una llamada). */
+const TWISTS=[
+ {npc:"(Quelqu'un arrive) Pardon... vous avez l'heure ?", npcEs:"(Llega alguien) Perdón... ¿tiene la hora?", skip:["oncle"],
+  options:[
+   {fr:"Oui, il est trois heures", es:"Sí, son las tres", ok:true},
+   {fr:"Désolé, je ne sais pas", es:"Lo siento, no sé", ok:true},
+   {fr:"Bon appétit !", es:"¡Buen provecho!", ok:false, why:"¿Provecho de qué? ¡Te preguntó la hora! 😅"},
+  ]},
+ {npc:"Vous n'êtes pas d'ici, non ? D'où venez-vous ?", npcEs:"Usted no es de aquí, ¿no? ¿De dónde viene?",
+  options:[
+   {fr:"Je viens de Colombie !", es:"¡Vengo de Colombia!", ok:true},
+   {fr:"J'habite à Bogota", es:"Vivo en Bogotá", ok:true},
+   {fr:"C'est trop cher", es:"Es muy caro", ok:false, why:"¡Nadie te está cobrando! 😂"},
+  ]},
+ {npc:"Oh là là, vous parlez bien français !", npcEs:"¡Oh, habla usted bien francés!",
+  options:[
+   {fr:"Merci, j'apprends !", es:"¡Gracias, estoy aprendiendo!", ok:true},
+   {fr:"Petit à petit !", es:"¡Poquito a poco!", ok:true, alt:"Se rió: «C'est la bonne attitude !» 😄"},
+   {fr:"Non", es:"No", ok:false, why:"¡Acepta el cumplido, hombre! 😅 Un «merci» nunca sobra"},
+  ]},
+ {npc:"(Il fait tomber quelque chose) Oh non !", npcEs:"(Se le cae algo) ¡Oh no!", skip:["oncle"],
+  options:[
+   {fr:"Je peux vous aider ?", es:"¿Le puedo ayudar?", ok:true},
+   {fr:"Attention !", es:"¡Cuidado!", ok:true},
+   {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"¿La cuenta AHORA? ¡Ayúdale! 😱"},
+  ]},
+ {npc:"Quel temps aujourd'hui, hein ?", npcEs:"Qué clima el de hoy, ¿eh?",
+  options:[
+   {fr:"Oui, il fait très beau !", es:"¡Sí, hace muy buen tiempo!", ok:true},
+   {fr:"Oui, il pleut beaucoup !", es:"¡Sí, llueve muchísimo!", ok:true},
+   {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"¿Te llevas... el clima? 😂"},
+  ]},
+ {npc:"(Un chien entre !) Oh, le petit chien !", npcEs:"(¡Entra un perro!) ¡Ay, el perrito!", skip:["oncle"],
+  options:[
+   {fr:"Il est très mignon !", es:"¡Es muy lindo!", ok:true},
+   {fr:"J'adore les chiens", es:"Me encantan los perros", ok:true},
+   {fr:"Une table pour deux", es:"Una mesa para dos", ok:false, why:"¿Para ti y el perro? 😂"},
+  ]},
+ {npc:"Et vous faites quoi dans la vie ?", npcEs:"¿Y usted a qué se dedica?",
+  options:[
+   {fr:"Je fais de la musique !", es:"¡Hago música!", ok:true, alt:"«Un artiste ! Magnifique !» 🎶"},
+   {fr:"J'apprends le français, entre autres", es:"Aprendo francés, entre otras cosas", ok:true},
+   {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡No te duermas, que te están conociendo! 😴"},
+  ]},
+ {npc:"(Ton téléphone sonne !) Dring dring...", npcEs:"(¡Suena tu teléfono!) Ring ring...", skip:["oncle"],
+  options:[
+   {fr:"Pardon, excusez-moi un moment", es:"Perdón, discúlpeme un momento", ok:true},
+   {fr:"Désolé, je le coupe", es:"Perdón, lo apago", ok:true, alt:"«Pas de problème !» 👌"},
+   {fr:"Allô ? ... (tu ignores tout le monde)", es:"¿Aló? ... (ignoras a todos)", ok:false, why:"Contestar sin disculparse... 😬 en Francia eso es grave"},
+  ]},
 ];
 
 /* ================== MISIONES DE IMPROVISACIÓN 🎭 ================== */
@@ -2004,6 +2061,23 @@ function instScene(sc){
     }))
   };
 }
+/* ✨ giros sorpresa: a veces (¡no siempre!) un imprevisto se cuela en la escena.
+   Mismo lugar, nunca la misma visita — antirrepetición pedido por Mateo (v1.29) */
+function injectTwist(sc){
+  if(Math.random()<0.35) return sc;              // a veces no pasa nada — eso también es sorpresa
+  const pool=TWISTS.map((t,i)=>({t,i})).filter(x=>!(x.t.skip||[]).includes(sc.id));
+  if(!pool.length) return sc;
+  S.lastTwists=S.lastTwists||[];
+  let cands=pool.filter(x=>!S.lastTwists.includes(x.i));
+  if(!cands.length){ S.lastTwists=[]; cands=pool; }
+  const pick=rnd(cands);
+  S.lastTwists.push(pick.i);
+  if(S.lastTwists.length>=TWISTS.length) S.lastTwists=S.lastTwists.slice(-(TWISTS.length-1));
+  const steps=sc.steps.slice();
+  const pos=1+Math.floor(Math.random()*Math.max(1,steps.length-2));   // nunca de primero ni de último
+  steps.splice(pos,0,{...pick.t, twist:true});
+  return {...sc, steps};
+}
 function pickScene(){
   S.lastScenes = S.lastScenes||[];
   let cands=SCENES.filter(s=>!S.lastScenes.includes(s.id));
@@ -2011,7 +2085,7 @@ function pickScene(){
   const sc=rnd(cands);
   S.lastScenes.push(sc.id);
   if(S.lastScenes.length>=SCENES.length) S.lastScenes=S.lastScenes.slice(-(SCENES.length-1));
-  return instScene(sc);
+  return injectTwist(instScene(sc));
 }
 
 function gameScene(){
@@ -2032,8 +2106,8 @@ function gameScene(){
     const trHtml = tier()>=3
       ? `<span class="tr hiddenTr">👁 toca para traducir</span>`
       : `<span class="tr">${step.npcEs}</span>`;
-    div.innerHTML=`<div class="npcface">${sc.npc}</div>
-      <div class="msg npc">${step.npc}${trHtml}
+    div.innerHTML=`<div class="npcface">${step.twist?"✨":sc.npc}</div>
+      <div class="msg npc">${step.twist?'<div class="twisttag">✨ ¡Imprevisto!</div>':""}${step.npc}${trHtml}
       <button class="replaybtn" title="repetir">🔊</button></div>`;
     const hid=div.querySelector(".hiddenTr");
     if(hid) hid.onclick=()=>{ hid.textContent=step.npcEs; hid.classList.remove("hiddenTr"); };
