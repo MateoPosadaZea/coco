@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.33 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.34 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1358,20 +1358,22 @@ const store = {
     }catch(e){ this.ok = false; return false; }
   }
 };
-/* escalera de niveles honesta: el título de arriba hay que sudarlo */
+/* v1.34 — niveles CERO INFLAR (regla de Mateo): títulos con gracia que no
+   prometen fluidez. Nada de "casi nativo" en el día 2: la puerta es la que
+   mide de verdad; estos son apodos del viaje, no diplomas. */
 const LVLS=[
- {xp:0,     name:"Aprendiz"},
+ {xp:0,     name:"Recién llegado"},
  {xp:300,   name:"Curioso"},
- {xp:800,   name:"Turista"},
+ {xp:800,   name:"Turista valiente"},
  {xp:1600,  name:"Viajero"},
- {xp:3000,  name:"Charlatán"},
- {xp:5000,  name:"Vecino del barrio"},
- {xp:8000,  name:"Parisino honorario"},
+ {xp:3000,  name:"Charlatán de café"},
+ {xp:5000,  name:"Amigo del panadero"},
+ {xp:8000,  name:"Cliente habitual"},
  {xp:12000, name:"Bohemio de Montmartre"},
- {xp:18000, name:"Casi nativo"},
+ {xp:18000, name:"Cantante de jam"},
  {xp:26000, name:"Filósofo de café"},
- {xp:36000, name:"Diplomático"},
- {xp:48000, name:"Políglota"},
+ {xp:36000, name:"Contador de blagues"},
+ {xp:48000, name:"Leyenda del Laboratorio"},
 ];
 const $ = id => document.getElementById(id);
 const rnd = a => a[Math.floor(Math.random()*a.length)];
