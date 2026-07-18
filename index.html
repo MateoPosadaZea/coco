@@ -374,7 +374,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.45 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.46 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2779,6 +2779,12 @@ function gameScene(){
       tip.textContent = bonus ? "¿Cuál dijiste (o cuál se le parece)? Tócala 👇 +"+bonus+" de bono" : "Elige tu respuesta 👇";
       box.appendChild(tip);
       renderOpts(st, box, bonus);
+      // v1.46: ¿te enredaste o el mic arrancó tarde? Otra toma, sin drama (el bono se conserva)
+      const rt=document.createElement("button");
+      rt.className="linkish"; rt.style.cssText="margin:6px auto; display:block";
+      rt.textContent="🎙️ Otra toma — repetir mi respuesta";
+      rt.onclick=()=>freeStep(st, box);
+      box.appendChild(rt);
       // renderOpts limpia box al acertar — reinsertar los extras que agrega arriba no hace falta
     };
     $("freePeek").onclick=()=>reveal(0,false);
