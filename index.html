@@ -21,12 +21,14 @@
   --radius:22px;
   --soft:var(--soft); --soft2:var(--soft2); --tint:var(--tint); --tintp:var(--tintp);
   --goodbg:#E3FBE9; --badbg:#FFE7E7; --dwbad:#FFE0E0;
+  --selbg:#FFF6E5; --tile:#FFF8EE;
 }
 /* 🌙 modo oscuro (v1.36 — buzón directo #2): jugar de noche sin quemarse los ojos */
 body.dark{
   --bg:#15151F; --ink:#ECECF4; --card:#232332;
   --soft:#2C2C3E; --soft2:#333349; --tint:#28304E; --tintp:#2F2946;
   --goodbg:#1C3527; --badbg:#3E2230; --dwbad:#4A2430;
+  --selbg:#3B3322; --tile:#2C2C3E;
   --shadow:0 6px 0 rgba(0,0,0,.35);
 }
 body.dark::before{opacity:.22;}
@@ -48,8 +50,8 @@ body.dark .chip{box-shadow:0 3px 0 rgba(0,0,0,.3);}
 body.dark .msg.npc{box-shadow:0 3px 0 rgba(0,0,0,.3);}
 body.dark .replaybtn{background:#3A3A54; color:var(--ink);}
 /* v1.38 — el tema seleccionado y las fichas de progreso también en versión noche */
-body.dark .levelcard.selected{background:#3B3322; border-color:var(--orange);}
-body.dark .ptile{background:#2C2C3E;}
+body.dark .levelcard.selected{background:var(--selbg); border-color:var(--orange);}
+body.dark .ptile{background:var(--tile);}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
 body{
@@ -257,7 +259,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
   box-shadow:0 4px 0 rgba(43,43,63,.10); border:3px solid transparent; transition:transform .12s;
 }
 .levelcard:hover{transform:translateY(-3px);}
-.levelcard.selected{border-color:var(--orange); background:#FFF6E5;}
+.levelcard.selected{border-color:var(--orange); background:var(--selbg);}
 .levelcard.locked{opacity:.5; cursor:default;}
 .levelcard .lemoji{font-size:1.7rem;}
 .levelcard .lname{font-weight:800; font-size:.78rem; margin-top:3px;}
@@ -266,7 +268,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 
 /* ---------- progreso ---------- */
 .pstats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;}
-.ptile{background:#FFF8EE; border-radius:16px; padding:12px; text-align:center;}
+.ptile{background:var(--tile); border-radius:16px; padding:12px; text-align:center;}
 .ptile .pnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.6rem;}
 .ptile .plab{font-size:.72rem; font-weight:800; opacity:.6;}
 .chart{display:flex; align-items:flex-end; gap:2px; height:150px; padding:6px 2px 0;}
@@ -355,7 +357,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.39 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.40 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
