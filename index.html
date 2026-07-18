@@ -265,6 +265,21 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .levelcard .lname{font-weight:800; font-size:.78rem; margin-top:3px;}
 
 .lang .soon.won{background:var(--goodbg); color:var(--green);}
+
+/* ---------- v1.43: chuleta 📖 + cancionero 🎵 + modo libre 🎭 ---------- */
+.levelcard{position:relative;}
+.peek{position:absolute; top:5px; right:5px; font-size:.78rem; background:var(--tint); border-radius:8px; padding:1px 5px; cursor:pointer; z-index:2;}
+.cheatov{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:60; display:flex; align-items:flex-end; justify-content:center;}
+.cheat{background:var(--bg); border-radius:22px 22px 0 0; max-height:82vh; overflow:auto; width:100%; max-width:560px; padding:18px 16px 30px; animation:pop .25s ease;}
+.cheatrow{display:flex; align-items:center; gap:8px; padding:9px 2px; border-bottom:2px dashed var(--soft); font-weight:800;}
+.cheatrow .cfr{flex:1;}
+.cheatrow .ces{opacity:.65; font-weight:700; font-size:.85rem; text-align:right;}
+.cheatfam{margin:16px 0 2px; font-weight:800; color:var(--purple); font-size:.95rem;}
+.cheatforms{font-size:.78rem; opacity:.7; font-weight:700;}
+.wordchip{display:inline-block; background:var(--card); border:2px solid var(--soft2); border-radius:12px; padding:8px 12px; margin:4px; font-weight:800; cursor:pointer;}
+.wordchip.used{opacity:.22; pointer-events:none;}
+.builtline{min-height:46px; background:var(--card); border-radius:12px; border:2px dashed var(--soft2); padding:8px 10px; font-weight:800; margin:8px 0; text-align:left; font-size:1.05rem;}
+
 .footer-note{text-align:center; font-size:.75rem; opacity:.55; font-weight:700; margin-top:20px;}
 
 /* ---------- progreso ---------- */
@@ -324,6 +339,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <div class="btn-row" style="margin-top:10px;">
         <button class="btn small purple" id="btnScene">💬 Solo conversación</button>
         <button class="btn small orange" id="btnBlitz">⚡ Solo reto rápido</button>
+        <button class="btn small" id="btnSongs" style="display:none; background:var(--pink); color:#fff;">🎵 Cancionero</button>
         <button class="btn small ghost" id="btnProgress">📈 Mi progreso</button>
         <button class="btn small ghost" id="btnSettings">⚙️ Ajustes</button>
       </div>
@@ -358,7 +374,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.42 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.43 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -393,12 +409,25 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
         <button class="btn small" id="spNormal">Normal</button>
         <button class="btn small" id="spSlow">Lentica 🐢</button>
       </div>
+      <p style="font-weight:800; margin:16px 0 4px;">🎭 Escenas de conversación</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn small" id="scOpt">Con opciones</button>
+        <button class="btn small" id="scFree">Modo libre 🎙️</button>
+      </div>
+      <p class="hint">En modo libre el personaje habla y tú respondes con tu voz, sin ver las opciones — como en la vida real. Luego comparas y eliges lo que dijiste.</p>
       <p style="font-weight:800; margin:16px 0 4px;">🎨 Tema</p>
       <div class="btn-row" style="justify-content:center;">
         <button class="btn small" id="thLight">☀️ Claro</button>
         <button class="btn small" id="thDark">🌙 Oscuro</button>
       </div>
       <p class="hint">El oscuro descansa los ojos en las sesiones nocturnas 🌙</p>
+    </div>
+    <div class="card">
+      <h3>🎵 Cancionero</h3>
+      <p class="hint" style="text-align:left;">¿Un verso de una canción se te pegó? Anótalo aquí (formato: <b>francés = español</b>, la traducción es opcional). Coco lo convierte en ejercicios: completar la palabra, ordenar el verso y cantarlo 🎤</p>
+      <textarea class="textinput" id="songText" rows="2" style="text-align:left; font-size:.95rem;" placeholder="Je veux de l'amour, de la joie = Quiero amor, alegría"></textarea>
+      <div class="btn-row" style="margin-top:8px;"><button class="btn small green" id="songAdd">🎵 Anotar verso</button></div>
+      <div id="songList"></div>
     </div>
     <div class="card">
       <h3>🪶 Buzón para Claude</h3>
@@ -1174,6 +1203,40 @@ const SCENES = [
  },
 ];
 
+/* ================== FAMILIAS DE VERBOS 📖 (v1.43 — para la chuleta) ==================
+   Idea de Mateo: ver los verbos en lista, agrupados, para empezar a relacionarlos. */
+const VERB_FAMILIES=[
+ {name:"🏛️ Los dos pilares", verbs:[
+  {fr:"Être — ser / estar", f:"je suis · tu es · il est · on est"},
+  {fr:"Avoir — tener", f:"j'ai · tu as · il a · on a"},
+ ]},
+ {name:"🚶 Movimiento", verbs:[
+  {fr:"Aller — ir", f:"je vais · tu vas · il va"},
+  {fr:"Venir — venir", f:"je viens · tu viens · il vient"},
+  {fr:"Partir — irse / partir", f:"je pars · tu pars · il part"},
+ ]},
+ {name:"🎛️ Modales (los que mandan a otro verbo)", verbs:[
+  {fr:"Vouloir — querer", f:"je veux · tu veux · il veut"},
+  {fr:"Pouvoir — poder", f:"je peux · tu peux · il peut"},
+  {fr:"Devoir — deber / tener que", f:"je dois · tu dois · il doit"},
+ ]},
+ {name:"🛠️ Del día a día", verbs:[
+  {fr:"Faire — hacer", f:"je fais · tu fais · il fait"},
+  {fr:"Dire — decir", f:"je dis · tu dis · il dit"},
+  {fr:"Savoir — saber", f:"je sais · tu sais · il sait"},
+  {fr:"Voir — ver", f:"je vois · tu vois · il voit"},
+  {fr:"Prendre — tomar / coger", f:"je prends · tu prends · il prend"},
+  {fr:"Donner — dar", f:"je donne · tu donnes · il donne"},
+ ]},
+ {name:"❤️ Del corazón", verbs:[
+  {fr:"Aimer — amar / gustar", f:"j'aime · tu aimes · il aime"},
+  {fr:"Adorer — encantar", f:"j'adore · tu adores · il adore"},
+  {fr:"Apprendre — aprender", f:"j'apprends · tu apprends · il apprend"},
+  {fr:"Chanter — cantar", f:"je chante · tu chantes · il chante"},
+  {fr:"Jouer — tocar / jugar", f:"je joue · tu joues · il joue"},
+ ]},
+];
+
 /* ================== GIROS SORPRESA ✨ (v1.29) ==================
    Imprevistos que se cuelan al azar en cualquier escena: mismo lugar, nunca la
    misma visita. skip: escenas donde el giro no tiene sentido (p.ej. una llamada). */
@@ -1369,6 +1432,8 @@ const S = {
   pending: [],         // 📓 anotadas en español, esperando traducción de Claude
   prefs: {vg:"auto", slow:false},   // ⚙️ vg: "auto" (Coco escucha) | "self" (me califico)
   inbox: [],           // 🪶 buzón de ideas/bugs para Claude [{d,t}]
+  songs: [],           // 🎵 cancionero: versos de canciones [{fr,es,d}]
+  gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
   theme: THEMES[0].id,
   session: null,
 };
@@ -1405,6 +1470,9 @@ function clearWeak(v){
   if(w.box>SRS_DAYS.length){                             // superó todas las cajas: graduada 🎓
     S.weak=S.weak.filter(x=>x.fr!==v.fr);
     S.grad=(S.grad||0)+1;                                // cuenta para "francés sólido"
+    S.gradList=(S.gradList||[]);                         // ⚡ y queda en la lista: el quiz sorpresa puede RE-probarla
+    if(!S.gradList.find(g=>g.fr===w.fr)) S.gradList.push({fr:w.fr, es:w.es});
+    if(S.gradList.length>60) S.gradList.shift();
     toast(`🎓 "${esc(v.fr)}" dominada — sale de los repasos`);
     return;
   }
@@ -1424,7 +1492,7 @@ const store = {
   save(){
     try{
       // La clave "lingualab_fr" no cambia entre versiones: al actualizar la app, el progreso se conserva
-      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[],pc:S.ps||null}));
+      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[],pc:S.ps||null,sg:S.songs||[],gl:S.gradList||[]}));
       this.ok = true;
     }catch(e){ this.ok = false; }
   },
@@ -1442,6 +1510,8 @@ const store = {
       S.prefs=Object.assign({vg:"auto",slow:false}, p.pr||{});
       S.inbox=Array.isArray(p.ib)?p.ib:[];
       if(p.pc && p.pc.score) S.ps=p.pc;   // ☂️ paracaídas de sesión interrumpida
+      S.songs=Array.isArray(p.sg)?p.sg:[];
+      S.gradList=Array.isArray(p.gl)?p.gl:[];
       return true;
     }catch(e){ this.ok = false; return false; }
   }
@@ -1506,13 +1576,14 @@ function refreshTop(){
   }
   renderThemes();
   renderLangs();
+  const bs=$("btnSongs"); if(bs) bs.style.display=(S.songs&&S.songs.length)?"":"none";
 }
 
 /* ================== CÓDIGO DE GUARDADO ================== */
 function makeCode(){
   // respaldo COMPLETO (v2): sirve para mudar el progreso entero a otro navegador u origen
   const payload = JSON.stringify({v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay,
-    h:S.hist.slice(-60), t:S.theme, f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0});
+    h:S.hist.slice(-60), t:S.theme, f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0, sg:S.songs||[], gl:S.gradList||[]});
   const b = btoa(unescape(encodeURIComponent(payload)));
   let sum=0; for(const c of b) sum=(sum+c.charCodeAt(0))%97;
   return "COCO-"+b+"-"+String(sum).padStart(2,"0");
@@ -1535,6 +1606,8 @@ function loadCode(code){
       S.custom=Array.isArray(p.c)?p.c:[];
       S.pending=Array.isArray(p.p)?p.p:[];
       S.grad=p.g||0;
+      S.songs=Array.isArray(p.sg)?p.sg:[];
+      S.gradList=Array.isArray(p.gl)?p.gl:[];
     } else {
       S.hist = Array.isArray(p.h) ? p.h.map(e=>({d:e[0],p:e[1],a:e[2],n:e[3]||1})) : [];
     }
@@ -1731,9 +1804,45 @@ function renderThemes(){
     d.className="levelcard"+(locked?" locked":"")+(S.theme===t.id?" selected":"");
     d.innerHTML=`<div class="lemoji">${locked?"🔒":t.emoji}</div><div class="lname">${t.name}</div>`+
       (locked?`<div class="lname" style="opacity:.6">Nivel ${t.minLvl}</div>`:"");
-    if(!locked) d.onclick=()=>{ S.theme=t.id; store.save(); renderThemes(); cocoSay(`Refuerzo de ${t.emoji} "${t.name}" — cuando quieras variedad, vuelve a 🌀 Mezcla.`); };
+    if(!locked){
+      d.onclick=()=>{ S.theme=t.id; store.save(); renderThemes(); cocoSay(`Refuerzo de ${t.emoji} "${t.name}" — cuando quieras variedad, vuelve a 🌀 Mezcla.`); };
+      const pk=document.createElement("div"); pk.className="peek"; pk.textContent="📖"; pk.title="Ver la lista";
+      pk.onclick=(ev)=>{ ev.stopPropagation(); openCheat(t); };
+      d.appendChild(pk);
+    }
     g.appendChild(d);
   });
+}
+/* 📖 la chuleta (v1.43): la lista completa del tema, en calma — para conocer y relacionar.
+   Los ejercicios fijan; la lista mapea. Idea de Mateo. */
+function openCheat(t){
+  const ov=document.createElement("div"); ov.className="cheatov";
+  const inner=document.createElement("div"); inner.className="cheat";
+  let rows=`<h3 style="margin-top:0">${t.emoji} ${t.name} — la chuleta 📖</h3>
+    <p class="hint" style="text-align:left; margin-top:0">🔊 para oírla · ⭐ = "esta quiero dominarla" (va a tus repasos)</p>`;
+  if(t.id==="verbes"){
+    VERB_FAMILIES.forEach(f=>{
+      rows+=`<div class="cheatfam">${f.name}</div>`;
+      f.verbs.forEach(v=>{
+        rows+=`<div class="cheatrow"><span class="cfr">${esc(v.fr)}<div class="cheatforms">${esc(v.f)}</div></span><button class="replaybtn" data-say="${esc(v.f).replace(/·/g,",")}">🔊</button></div>`;
+      });
+    });
+    rows+=`<div class="cheatfam">⚡ Las formas que ya juegas</div>`;
+  }
+  const list=(t.vocab||[]).concat(t.speak||[]);
+  list.forEach((v,i)=>{
+    rows+=`<div class="cheatrow"><span class="cfr">${esc(v.fr)}</span><span class="ces">${esc(v.es)}</span><button class="replaybtn" data-say="${esc(v.fr)}">🔊</button><button class="replaybtn" data-star="${i}" title="a mis repasos">⭐</button></div>`;
+  });
+  rows+=`<button class="btn big" style="margin-top:14px" id="cheatClose">Listo 👍</button>`;
+  inner.innerHTML=rows; ov.appendChild(inner); document.body.appendChild(ov);
+  inner.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speakFR(b.dataset.say,0.8));
+  inner.querySelectorAll("[data-star]").forEach(b=>b.onclick=()=>{
+    const v=list[+b.dataset.star]; markWeak(v); store.save(); b.textContent="✔";
+    toast("🗓️ A tus repasos: "+esc(v.fr));
+  });
+  const close=()=>ov.remove();
+  ov.onclick=(e)=>{ if(e.target===ov) close(); };
+  inner.querySelector("#cheatClose").onclick=close;
 }
 function theme(){ return THEMES.find(t=>t.id===S.theme) || THEMES[0]; }
 
@@ -1818,16 +1927,86 @@ function paintDots(){
     d.className="pdot"+(i<S.session.idx?" done":i===S.session.idx?" now":"");
   });
 }
-function nextGame(){
-  const s=S.session;
-  if(s.idx>=s.games.length){ endSession(); return; }
-  paintDots();
-  const g=s.games[s.idx];
+function launchGame(g){
   if(g==="blitz") gameBlitz();
   else if(g==="listen") gameListen();
   else if(g==="speak") gameSpeak();
   else if(g==="scene") gameScene();
   else if(g==="improv") gameImprov();
+  else if(g==="songs") gameSongs();
+}
+function nextGame(){
+  const s=S.session;
+  if(s.idx>=s.games.length){ endSession(); return; }
+  paintDots();
+  const g=s.games[s.idx];
+  // ⚡ quiz sorpresa (v1.43): a veces, entre juego y juego, Coco emboscada — con invitación
+  if(!s.quizAsked && s.idx>0 && Math.random()<0.18){
+    const pool=quizPool();
+    if(pool.length>=3){ s.quizAsked=true; offerQuiz(pool, ()=>launchGame(g)); return; }
+  }
+  launchGame(g);
+}
+/* ⚡ munición del quiz: graduadas 🎓 (¡se pueden RE-probar!), repasos avanzados y cuaderno */
+function quizPool(){
+  const seen=new Set(), out=[];
+  const push=(it)=>{ if(it.fr && it.es && !seen.has(it.fr)){ seen.add(it.fr); out.push(it); } };
+  (S.gradList||[]).forEach(g=>push({fr:g.fr, es:g.es, grad:true}));
+  (S.weak||[]).filter(w=>(w.box||0)>=2).forEach(w=>push({fr:w.fr, es:w.es}));
+  (S.custom||[]).filter(c=>!c.big).forEach(c=>push({fr:c.fr, es:c.es}));
+  return shuffle(out);
+}
+function offerQuiz(pool, resume){
+  noTimer(); $("gameTitle").textContent="⚡ ¿Quiz sorpresa?";
+  const area=$("gameArea");
+  area.innerHTML=`<div class="prompt">⚡ ¡Quiz sorpresa!
+      <span class="sub">3 relámpago de TU memoria (graduadas 🎓 incluidas) · bono por aceptar · pasar no cuesta nada</span></div>
+    <div class="btn-row" style="margin-top:12px;"><button class="btn green" id="qzGo">¡Dale! ⚡</button><button class="btn ghost" id="qzNo">Ahora no</button></div>`;
+  $("qzNo").onclick=()=>{ toast("Tranquilo — el quiz vuelve cuando menos lo esperes 😏"); resume(); };
+  $("qzGo").onclick=()=>runQuiz(pool.slice(0,3), resume);
+}
+function runQuiz(qs, resume){
+  const area=$("gameArea");
+  let qi=0;
+  const allVocab=THEMES.flatMap(t=>t.vocab);
+  function ask(){
+    if(qi>=qs.length){ toast("⚡ ¡Quiz sorpresa superado! Memoria de acero"); resume(); return; }
+    const q=qs[qi];
+    const wrong=shuffle(allVocab.filter(v=>v.fr!==q.fr && v.es!==q.es)).slice(0,3);
+    const opts=shuffle([q,...wrong]);
+    area.innerHTML=`<div class="prompt">${q.fr}
+        <span class="sub">⚡ ${qi+1} de ${qs.length} · ¿Qué significa?${q.grad?" · 🎓 graduada: ¿la sigues teniendo?":""}</span></div>
+      <div class="options">${opts.map((o,i)=>`<div class="opt" data-i="${i}">${o.es}</div>`).join("")}</div>`;
+    speakFR(q.fr);
+    let done=false;
+    area.querySelectorAll(".opt").forEach((el,i)=>{
+      el.onclick=(ev)=>{
+        if(done) return; done=true;
+        S.session.tries++;
+        const ok=opts[i]===q;
+        if(ok){
+          el.classList.add("good");
+          addPts(15,ev); S.session.score+=5; floatPoints(5);   // bono por aceptar la emboscada
+          if(!q.grad) clearWeak(q);
+          chute();
+          setTimeout(()=>{qi++; ask();}, 800);
+        } else {
+          el.classList.add("bad"); missPts();
+          area.querySelectorAll(".opt").forEach((e2,j)=>{ if(opts[j]===q) e2.classList.add("good"); });
+          if(q.grad){
+            // CERO INFLAR: una graduada que falla DEJA de contar y vuelve al repaso
+            S.gradList=(S.gradList||[]).filter(g=>g.fr!==q.fr);
+            S.grad=Math.max(0,(S.grad||0)-1);
+            markWeak(q); store.save();
+            toast("🎓→🔁 Esa se escapó de la memoria — vuelve al repaso. Honestidad ante todo 😉");
+          } else { markWeak(q); store.save(); }
+          noteReview("fail", q.fr, q.es, "quiz sorpresa ⚡");
+          nextBtn(area, ()=>{qi++; ask();});
+        }
+      };
+    });
+  }
+  ask();
 }
 /* informe de la sesión: aciertos ganados y tropiezos con su explicación */
 function noteReview(kind, fr, es, extra){
@@ -2489,6 +2668,11 @@ function gameScene(){
     const box=$("sceneOpts");
     box.innerHTML="";
     hinted=false;
+    // 🎭 modo libre (v1.43): el personaje habla y TÚ respondes con la voz, sin ver opciones
+    if(S.prefs && S.prefs.free){ freeStep(st, box); return; }
+    renderOpts(st, box, 0);
+  }
+  function renderOpts(st, box, freeBonus){
     const noTr = tier()>=2;   // 🌶️🌶️+: opciones sin traducción
     shuffle(st.options).forEach(o=>{
       const el=document.createElement("div");
@@ -2500,6 +2684,7 @@ function gameScene(){
         if(o.ok){
           el.classList.add("good");
           pts+=addPts(hinted?10:20,ev);
+          if(freeBonus){ pts+=freeBonus; S.session.score+=freeBonus; floatPoints(freeBonus); }   // 🎭 bono por responder a pelo
           if(o.alt){ setTimeout(()=>cocoToastInChat(o.alt),900); }
           // decir mi línea completa antes de que el personaje responda
           setTimeout(async ()=>{
@@ -2550,6 +2735,48 @@ function gameScene(){
       hb.onclick=()=>{ hinted=true; box.querySelectorAll(".optTr").forEach(e=>e.style.display="block"); hb.remove(); };
       box.appendChild(hb);
     }
+  }
+  /* 🎭 modo libre: grabas tu respuesta a pelo → luego se revelan las opciones,
+     tocas la que dijiste (o la que quieras practicar). Grabar primero da bono. */
+  function freeStep(st, box){
+    let mediaRec=null, chunks=[], myUrl=null, recOn=false, autoStop=null;
+    box.innerHTML=`
+      <p style="text-align:center;font-weight:800;opacity:.75;margin:6px 0">Respóndele con tu voz 🎙️ — sin mirar opciones, como en la vida real</p>
+      <button class="micbtn" id="sceneMic" style="width:74px;height:74px;font-size:1.9rem">🎙️</button>
+      <div class="btn-row"><button class="linkish" id="freePeek">🫣 Mejor con opciones esta vez (sin bono)</button></div>`;
+    const reveal=(bonus, withPlayback)=>{
+      box.innerHTML="";
+      if(withPlayback && myUrl){
+        const row=document.createElement("div"); row.className="btn-row"; row.style.marginBottom="6px";
+        row.innerHTML=`<button class="btn small ghost">👂 Escucharme</button>`;
+        row.querySelector("button").onclick=()=>{ new Audio(myUrl).play(); };
+        box.appendChild(row);
+      }
+      const tip=document.createElement("p");
+      tip.style.cssText="text-align:center;font-weight:800;opacity:.7;margin:2px 0 6px";
+      tip.textContent = bonus ? "¿Cuál dijiste (o cuál se le parece)? Tócala 👇 +"+bonus+" de bono" : "Elige tu respuesta 👇";
+      box.appendChild(tip);
+      renderOpts(st, box, bonus);
+      // renderOpts limpia box al acertar — reinsertar los extras que agrega arriba no hace falta
+    };
+    $("freePeek").onclick=()=>reveal(0,false);
+    $("sceneMic").onclick=async()=>{
+      const mic=$("sceneMic");
+      if(!recOn){
+        recOn=true; mic.classList.add("rec");
+        try{
+          const stream=await getMic();
+          chunks=[]; mediaRec=new MediaRecorder(stream);
+          mediaRec.ondataavailable=e=>chunks.push(e.data);
+          mediaRec.onstop=()=>{ if(chunks.length){ if(myUrl) URL.revokeObjectURL(myUrl); myUrl=URL.createObjectURL(new Blob(chunks,{type:"audio/webm"})); } reveal(8,true); };
+          mediaRec.start();
+          autoStop=setTimeout(()=>{ if(recOn){ recOn=false; mic.classList.remove("rec"); try{mediaRec.stop();}catch(e){} } }, 9000);
+        }catch(e){ recOn=false; mic.classList.remove("rec"); reveal(5,false); }   // sin mic: igual hablaste en voz alta — bono chico
+      } else {
+        recOn=false; clearTimeout(autoStop); mic.classList.remove("rec");
+        try{ if(mediaRec && mediaRec.state!=="inactive") mediaRec.stop(); }catch(e){ reveal(8,false); }
+      }
+    };
   }
   function cocoToastInChat(txt){
     const div=document.createElement("div");
@@ -2668,6 +2895,126 @@ function gameImprov(){
     $("okBtn").onclick=submit;
   }
   ask();
+}
+
+
+/* ================== JUEGO 6: CANCIONERO 🎵 (v1.43) ==================
+   Los versos que Mateo anota se vuelven ejercicios: la melodía sopla las respuestas. */
+function gameSongs(){
+  $("gameTitle").textContent="🎵 Cancionero";
+  noTimer(); updateTierChip(1);
+  const area=$("gameArea");
+  const pool=shuffle((S.songs||[]).slice());
+  const n=Math.min(3, pool.length);
+  let i=0, pts=0;
+  if(!n){
+    area.innerHTML=`<div class="prompt">🎵 Tu cancionero está vacío<span class="sub">Anota versos en ⚙️ Ajustes → 🎵 Cancionero y vuelve — el primero que se te pegue 😉</span></div>`;
+    nextBtn(area, ()=>gameDone("🎵 Cancionero",0));
+    return;
+  }
+  function next(){
+    if(i>=n){ gameDone("🎵 Cancionero",pts); return; }
+    const v=pool[i];
+    const words=v.fr.split(/\s+/);
+    const valid=["sing"];
+    if(words.length>=3 && words.length<=10) valid.push("order");
+    if(words.some(w=>w.replace(/[^\p{L}']/gu,"").length>=4)) valid.push("blank");
+    const kind=rnd(valid);
+    if(kind==="blank") exBlank(v); else if(kind==="order") exOrder(v); else exSing(v);
+  }
+  /* completar la palabra que falta — la melodía en tu cabeza es la pista */
+  function exBlank(v){
+    const words=v.fr.split(/\s+/);
+    const cands=words.map((w,ix)=>({w,ix,clean:w.replace(/[^\p{L}']/gu,"")})).filter(x=>x.clean.length>=4);
+    const target=rnd(cands);
+    const display=words.map((w,ix)=>ix===target.ix?"＿＿＿":w).join(" ");
+    const dpool=[...new Set(
+      [].concat(...(S.songs||[]).filter(s2=>s2.fr!==v.fr).map(s2=>s2.fr.split(/\s+/)),
+                THEMES.flatMap(t=>t.vocab.map(x=>x.fr.split(/\s+/).pop())))
+        .map(w=>w.replace(/[^\p{L}']/gu,""))
+        .filter(w=>w.length>=4 && norm(w)!==norm(target.clean))
+    )];
+    const opts=shuffle([target.clean, ...shuffle(dpool).slice(0,3)]);
+    area.innerHTML=`<div class="prompt" style="font-size:1.15rem">🎵 ${display}${v.es?`<span class="sub">${v.es}</span>`:""}
+        <span class="sub">¿Qué palabra falta? Canta el verso en tu cabeza 😉</span></div>
+      <div class="options">${opts.map((o,ix)=>`<div class="opt" data-i="${ix}">${o}</div>`).join("")}</div>`;
+    let done=false;
+    area.querySelectorAll(".opt").forEach((el,ix)=>{
+      el.onclick=(ev)=>{
+        if(done) return; done=true; S.session.tries++;
+        const ok=norm(opts[ix])===norm(target.clean);
+        if(ok){ el.classList.add("good"); pts+=addPts(20,ev); }
+        else { el.classList.add("bad"); missPts(); area.querySelectorAll(".opt").forEach((e2,j)=>{ if(norm(opts[j])===norm(target.clean)) e2.classList.add("good"); }); }
+        speakFR(v.fr, 0.8);
+        nextBtn(area, ()=>{i++; next();});
+      };
+    });
+  }
+  /* armar el verso palabra por palabra */
+  function exOrder(v){
+    const words=v.fr.split(/\s+/);
+    let pos=0, errs=0;
+    area.innerHTML=`<div class="prompt" style="font-size:1.05rem">🎵 Arma el verso, palabra por palabra${v.es?`<span class="sub">${v.es}</span>`:""}</div>
+      <div class="builtline" id="built"></div><div id="chips" style="text-align:center"></div>
+      <div class="speakresult" id="sfb"></div>`;
+    const chips=$("chips");
+    shuffle(words.map((w,ix)=>({w,ix}))).forEach(o=>{
+      const c=document.createElement("span"); c.className="wordchip"; c.textContent=o.w;
+      c.onclick=(ev)=>{
+        if(c.classList.contains("used")) return;
+        if(norm(o.w)===norm(words[pos])){
+          c.classList.add("used"); $("built").textContent+=(pos?" ":"")+words[pos]; pos++;
+          if(pos===words.length){
+            S.session.tries++; pts+=addPts(errs?12:22,ev);
+            $("sfb").textContent = errs? "🎶 ¡Armado! (con un tropiezo, como toda buena canción)" : "🎶 ¡Verso perfecto!";
+            $("sfb").style.color="var(--green)";
+            speakFR(v.fr,0.8);
+            nextBtn(area, ()=>{i++; next();});
+          }
+        } else { errs++; c.style.animation="shake .3s"; setTimeout(()=>c.style.animation="",320); ding(false); }
+      };
+      chips.appendChild(c);
+    });
+  }
+  /* cantarlo — grabarte, escucharte, calificarte (cantar ya es ganar) */
+  function exSing(v){
+    area.innerHTML=`<div class="prompt" style="font-size:1.2rem">🎤 "${v.fr}"${v.es?`<span class="sub">${v.es}</span>`:""}
+        <div style="margin-top:8px"><button class="btn small purple" id="hearV">🔊 Oírlo</button></div></div>
+      <button class="micbtn" id="singMic" style="width:80px;height:80px;font-size:2rem">🎙️</button>
+      <div class="btn-row"><button class="btn small ghost" id="singPlay" style="display:none">👂 Escucharme</button></div>
+      <div class="speakresult" id="sres"></div>`;
+    $("hearV").onclick=()=>speakFR(v.fr,0.75);
+    speakFR(v.fr,0.8);
+    let rec=null, chunks=[], url=null, on=false, at=null;
+    function selfR(){
+      const r=$("sres"); if(r.dataset.done) return;
+      r.innerHTML="¿Cómo sonó? Escúchate 👂 y califícate:";
+      const row=document.createElement("div"); row.className="btn-row"; row.style.marginTop="8px";
+      row.innerHTML=`<button class="btn small green">🎤 ¡Como Zaz!</button><button class="btn small orange">🙂 Va saliendo</button><button class="btn small red">😅 Desafinado pero feliz</button>`;
+      const [a,b,c]=row.querySelectorAll("button");
+      const fin=(p,msg)=>{ if(r.dataset.done)return; r.dataset.done=1; S.session.tries++; if(p>=15){pts+=addPts(p);} else {pts+=p; S.session.score+=p; floatPoints(p); ding(true); chute();} if(msg){r.innerHTML=msg;} nextBtn(r, ()=>{i++; next();}); };
+      a.onclick=()=>fin(25); b.onclick=()=>fin(15); c.onclick=()=>fin(8,"¡Cantar ya es ganar! 🎶 +8");
+      r.appendChild(row);
+    }
+    $("singMic").onclick=async()=>{
+      const m=$("singMic");
+      if(!on){
+        on=true; m.classList.add("rec");
+        try{
+          const st=await getMic();
+          chunks=[]; rec=new MediaRecorder(st);
+          rec.ondataavailable=e=>chunks.push(e.data);
+          rec.onstop=()=>{ if(chunks.length){ if(url) URL.revokeObjectURL(url); url=URL.createObjectURL(new Blob(chunks,{type:"audio/webm"})); const pb=$("singPlay"); pb.style.display="inline-flex"; pb.onclick=()=>new Audio(url).play(); } selfR(); };
+          rec.start();
+          at=setTimeout(()=>{ if(on){ on=false; m.classList.remove("rec"); try{rec.stop();}catch(e){} } },12000);
+        }catch(e){ on=false; m.classList.remove("rec"); selfR(); }
+      } else {
+        on=false; clearTimeout(at); m.classList.remove("rec");
+        try{ if(rec && rec.state!=="inactive") rec.stop(); }catch(e){ selfR(); }
+      }
+    };
+  }
+  next();
 }
 
 /* ================== RESULTADOS ================== */
@@ -2826,6 +3173,7 @@ $("btnPlay").onclick =()=>startSession(["blitz","listen","speak","scene"]);
 $("btnLong").onclick =()=>startSession(["blitz","listen","speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnBlitz").onclick=()=>startSession(["blitz","blitz"]);
+$("btnSongs").onclick=()=>startSession(["songs"]);
 $("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("mascot").onclick  =()=>{ speakFR(rnd(["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
@@ -3060,6 +3408,7 @@ function paintSettings(){
   set("vgAuto", p.vg!=="self"); set("vgSelf", p.vg==="self");
   set("spNormal", !p.slow); set("spSlow", !!p.slow);
   set("thLight", !p.dark); set("thDark", !!p.dark);
+  set("scOpt", !p.free); set("scFree", !!p.free);
   $("vgHint").textContent = p.vg==="self"
     ? "Grabas, te escuchas y te calificas tú — cero peleas con el reconocedor 😌"
     : "Coco intenta reconocer tu voz y puntuar solo (a veces el servicio se pone terco)";
@@ -3072,7 +3421,7 @@ function renderInbox(){
     : `<p class="hint">Buzón vacío — todo bajo control 🦜</p>`;
   box.querySelectorAll("[data-deli]").forEach(b=>b.onclick=()=>{ S.inbox.splice(+b.dataset.deli,1); store.save(); renderInbox(); });
 }
-$("btnSettings").onclick=()=>{ paintSettings(); renderInbox(); show("scr-settings"); };
+$("btnSettings").onclick=()=>{ paintSettings(); renderInbox(); renderSongs(); show("scr-settings"); };
 $("btnSetBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("vgAuto").onclick =()=>{ S.prefs.vg="auto"; store.save(); paintSettings(); };
 $("vgSelf").onclick =()=>{ S.prefs.vg="self"; store.save(); paintSettings(); };
@@ -3082,6 +3431,29 @@ $("spSlow").onclick =()=>{ S.prefs.slow=true;  store.save(); paintSettings(); sp
 function applyTheme(){ document.body.classList.toggle("dark", !!(S.prefs && S.prefs.dark)); }
 $("thLight").onclick=()=>{ S.prefs.dark=false; store.save(); applyTheme(); paintSettings(); };
 $("thDark").onclick =()=>{ S.prefs.dark=true;  store.save(); applyTheme(); paintSettings(); };
+/* 🎭 modo libre en escenas (v1.43) */
+$("scOpt").onclick =()=>{ S.prefs.free=false; store.save(); paintSettings(); };
+$("scFree").onclick=()=>{ S.prefs.free=true;  store.save(); paintSettings(); toast("🎭 Modo libre: en las escenas responderás con tu voz, sin opciones a la vista"); };
+/* 🎵 cancionero (v1.43) */
+function renderSongs(){
+  const box=$("songList"); if(!box) return;
+  const sg=S.songs||[];
+  box.innerHTML = sg.length
+    ? sg.map((v,i)=>`<div class="resultrow"><span>🎵 ${esc(v.fr)}${v.es?` <span style="opacity:.55">— ${esc(v.es)}</span>`:""}</span><button class="linkish" data-dels="${i}">✖</button></div>`).join("")
+    : `<p class="hint">Aún no hay versos — el primero que se te pegue al oído, aquí 🎶</p>`;
+  box.querySelectorAll("[data-dels]").forEach(b=>b.onclick=()=>{ S.songs.splice(+b.dataset.dels,1); store.save(); renderSongs(); refreshTop(); });
+}
+$("songAdd").onclick=()=>{
+  const t=$("songText").value.trim(); if(!t) return;
+  const parts=t.split(/\s*=\s*/);
+  const fr=parts[0].trim(), es=(parts[1]||"").trim();
+  if(!fr) return;
+  S.songs=S.songs||[];
+  if(!S.songs.find(v=>norm(v.fr)===norm(fr))){ S.songs.push({fr, es, d:todayStr()}); store.save(); }
+  $("songText").value=""; renderSongs(); refreshTop();
+  toast("🎵 Verso anotado — el Cancionero te espera en el inicio");
+};
+$("songText").addEventListener("keydown",e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("songAdd").click(); } });
 $("ideaAdd").onclick=()=>{
   const t=$("ideaText").value.trim();
   if(!t) return;
