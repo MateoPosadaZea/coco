@@ -47,6 +47,9 @@ body.dark .textinput:focus{border-color:#7C93FF;}
 body.dark .chip{box-shadow:0 3px 0 rgba(0,0,0,.3);}
 body.dark .msg.npc{box-shadow:0 3px 0 rgba(0,0,0,.3);}
 body.dark .replaybtn{background:#3A3A54; color:var(--ink);}
+/* v1.38 — el tema seleccionado y las fichas de progreso también en versión noche */
+body.dark .levelcard.selected{background:#3B3322; border-color:var(--orange);}
+body.dark .ptile{background:#2C2C3E;}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
 body{
@@ -352,7 +355,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.37 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.38 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
