@@ -374,7 +374,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.44 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.45 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1207,33 +1207,33 @@ const SCENES = [
    Idea de Mateo: ver los verbos en lista, agrupados, para empezar a relacionarlos. */
 const VERB_FAMILIES=[
  {name:"🏛️ Los dos pilares", verbs:[
-  {fr:"Être — ser / estar", f:"je suis · tu es · il est · on est"},
-  {fr:"Avoir — tener", f:"j'ai · tu as · il a · on a"},
+  {fr:"Être — ser / estar", ex:[{fr:"Être",es:"Ser / estar"},{fr:"Je suis",es:"Yo soy / estoy"}], f:"je suis · tu es · il est · on est"},
+  {fr:"Avoir — tener", ex:[{fr:"Avoir",es:"Tener"},{fr:"J'ai",es:"Yo tengo"}], f:"j'ai · tu as · il a · on a"},
  ]},
  {name:"🚶 Movimiento", verbs:[
-  {fr:"Aller — ir", f:"je vais · tu vas · il va"},
-  {fr:"Venir — venir", f:"je viens · tu viens · il vient"},
-  {fr:"Partir — irse / partir", f:"je pars · tu pars · il part"},
+  {fr:"Aller — ir", ex:[{fr:"Aller",es:"Ir"},{fr:"Je vais",es:"Yo voy"}], f:"je vais · tu vas · il va"},
+  {fr:"Venir — venir", ex:[{fr:"Venir",es:"Venir"},{fr:"Je viens",es:"Yo vengo"}], f:"je viens · tu viens · il vient"},
+  {fr:"Partir — irse / partir", ex:[{fr:"Partir",es:"Irse / partir"},{fr:"Je pars",es:"Yo me voy"}], f:"je pars · tu pars · il part"},
  ]},
  {name:"🎛️ Modales (los que mandan a otro verbo)", verbs:[
-  {fr:"Vouloir — querer", f:"je veux · tu veux · il veut"},
-  {fr:"Pouvoir — poder", f:"je peux · tu peux · il peut"},
-  {fr:"Devoir — deber / tener que", f:"je dois · tu dois · il doit"},
+  {fr:"Vouloir — querer", ex:[{fr:"Vouloir",es:"Querer"},{fr:"Je veux",es:"Yo quiero"}], f:"je veux · tu veux · il veut"},
+  {fr:"Pouvoir — poder", ex:[{fr:"Pouvoir",es:"Poder"},{fr:"Je peux",es:"Yo puedo"}], f:"je peux · tu peux · il peut"},
+  {fr:"Devoir — deber / tener que", ex:[{fr:"Devoir",es:"Deber / tener que"},{fr:"Je dois",es:"Yo debo"}], f:"je dois · tu dois · il doit"},
  ]},
  {name:"🛠️ Del día a día", verbs:[
-  {fr:"Faire — hacer", f:"je fais · tu fais · il fait"},
-  {fr:"Dire — decir", f:"je dis · tu dis · il dit"},
-  {fr:"Savoir — saber", f:"je sais · tu sais · il sait"},
-  {fr:"Voir — ver", f:"je vois · tu vois · il voit"},
-  {fr:"Prendre — tomar / coger", f:"je prends · tu prends · il prend"},
-  {fr:"Donner — dar", f:"je donne · tu donnes · il donne"},
+  {fr:"Faire — hacer", ex:[{fr:"Faire",es:"Hacer"},{fr:"Je fais",es:"Yo hago"}], f:"je fais · tu fais · il fait"},
+  {fr:"Dire — decir", ex:[{fr:"Dire",es:"Decir"},{fr:"Je dis",es:"Yo digo"}], f:"je dis · tu dis · il dit"},
+  {fr:"Savoir — saber", ex:[{fr:"Savoir",es:"Saber"},{fr:"Je sais",es:"Yo sé"}], f:"je sais · tu sais · il sait"},
+  {fr:"Voir — ver", ex:[{fr:"Voir",es:"Ver"},{fr:"Je vois",es:"Yo veo"}], f:"je vois · tu vois · il voit"},
+  {fr:"Prendre — tomar / coger", ex:[{fr:"Prendre",es:"Tomar / coger"},{fr:"Je prends",es:"Yo tomo"}], f:"je prends · tu prends · il prend"},
+  {fr:"Donner — dar", ex:[{fr:"Donner",es:"Dar"},{fr:"Je donne",es:"Yo doy"}], f:"je donne · tu donnes · il donne"},
  ]},
  {name:"❤️ Del corazón", verbs:[
-  {fr:"Aimer — amar / gustar", f:"j'aime · tu aimes · il aime"},
-  {fr:"Adorer — encantar", f:"j'adore · tu adores · il adore"},
-  {fr:"Apprendre — aprender", f:"j'apprends · tu apprends · il apprend"},
-  {fr:"Chanter — cantar", f:"je chante · tu chantes · il chante"},
-  {fr:"Jouer — tocar / jugar", f:"je joue · tu joues · il joue"},
+  {fr:"Aimer — amar / gustar", ex:[{fr:"Aimer",es:"Amar / gustar"},{fr:"J'aime",es:"Amo / me gusta"}], f:"j'aime · tu aimes · il aime"},
+  {fr:"Adorer — encantar", ex:[{fr:"Adorer",es:"Encantar"},{fr:"J'adore",es:"Me encanta"}], f:"j'adore · tu adores · il adore"},
+  {fr:"Apprendre — aprender", ex:[{fr:"Apprendre",es:"Aprender"},{fr:"J'apprends",es:"Yo aprendo"}], f:"j'apprends · tu apprends · il apprend"},
+  {fr:"Chanter — cantar", ex:[{fr:"Chanter",es:"Cantar"},{fr:"Je chante",es:"Yo canto"}], f:"je chante · tu chantes · il chante"},
+  {fr:"Jouer — tocar / jugar", ex:[{fr:"Jouer",es:"Tocar / jugar"},{fr:"Je joue",es:"Yo toco / juego"}], f:"je joue · tu joues · il joue"},
  ]},
 ];
 
@@ -1821,10 +1821,11 @@ function openCheat(t){
   let rows=`<h3 style="margin-top:0">${t.emoji} ${t.name} — la chuleta 📖</h3>
     <p class="hint" style="text-align:left; margin-top:0">🔊 para oírla · ⭐ = "esta quiero dominarla" (va a tus repasos)</p>`;
   if(t.id==="verbes"){
-    VERB_FAMILIES.forEach(f=>{
+    VERB_FAMILIES.forEach((f,fi)=>{
       rows+=`<div class="cheatfam">${f.name}</div>`;
-      f.verbs.forEach(v=>{
-        rows+=`<div class="cheatrow"><span class="cfr">${esc(v.fr)}<div class="cheatforms">${esc(v.f)}</div></span><button class="replaybtn" data-say="${esc(v.f).replace(/·/g,",")}">🔊</button></div>`;
+      f.verbs.forEach((v,vi)=>{
+        // v1.45: TODO es ejercitable — ⭐ manda el verbo (infinitivo + forma "je") a tus repasos
+        rows+=`<div class="cheatrow"><span class="cfr">${esc(v.fr)}<div class="cheatforms">${esc(v.f)}</div></span><button class="replaybtn" data-say="${esc(v.f).replace(/·/g,",")}">🔊</button><button class="replaybtn" data-vstar="${fi}-${vi}" title="a mis repasos">⭐</button></div>`;
       });
     });
     rows+=`<div class="cheatfam">⚡ Las formas que ya juegas</div>`;
@@ -1839,6 +1840,13 @@ function openCheat(t){
   inner.querySelectorAll("[data-star]").forEach(b=>b.onclick=()=>{
     const v=list[+b.dataset.star]; markWeak(v); store.save(); b.textContent="✔";
     toast("🗓️ A tus repasos: "+esc(v.fr));
+  });
+  inner.querySelectorAll("[data-vstar]").forEach(b=>b.onclick=()=>{
+    const [fi,vi]=b.dataset.vstar.split("-").map(Number);
+    const v=VERB_FAMILIES[fi].verbs[vi];
+    (v.ex||[]).forEach(e=>markWeak(e));
+    store.save(); b.textContent="✔";
+    toast("🗓️ A tus repasos: "+(v.ex||[]).map(e=>esc(e.fr)).join(" y "));
   });
   const close=()=>ov.remove();
   ov.onclick=(e)=>{ if(e.target===ov) close(); };
@@ -2626,7 +2634,14 @@ function gameScene(){
       : `<span class="tr">${step.npcEs}</span>`;
     div.innerHTML=`<div class="npcface">${step.twist?"✨":sc.npc}</div>
       <div class="msg npc">${step.twist?'<div class="twisttag">✨ ¡Imprevisto!</div>':""}${step.npc}${trHtml}
-      <button class="replaybtn" title="repetir">🔊</button></div>`;
+      <button class="replaybtn" title="repetir">🔊</button> <button class="replaybtn npcsave" title="a mis repasos">⭐</button></div>`;
+    // v1.45: lo que dice el personaje también es ejercitable — un toque y a tus repasos
+    const nsb=div.querySelector(".npcsave");
+    nsb.onclick=()=>{
+      markWeak({fr:step.npc, es:step.npcEs}); store.save();
+      nsb.textContent="✔"; nsb.disabled=true;
+      toast("🗓️ A tus repasos: la frase del personaje 🔁");
+    };
     const hid=div.querySelector(".hiddenTr");
     if(hid) hid.onclick=()=>{ hid.textContent=step.npcEs; hid.classList.remove("hiddenTr"); };
     noteNew(step.npc, step.npcEs);
