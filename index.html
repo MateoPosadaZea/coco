@@ -358,7 +358,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.41 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.42 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1424,7 +1424,7 @@ const store = {
   save(){
     try{
       // La clave "lingualab_fr" no cambia entre versiones: al actualizar la app, el progreso se conserva
-      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[]}));
+      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[],pc:S.ps||null}));
       this.ok = true;
     }catch(e){ this.ok = false; }
   },
@@ -1441,6 +1441,7 @@ const store = {
       S.grad=p.g||0;
       S.prefs=Object.assign({vg:"auto",slow:false}, p.pr||{});
       S.inbox=Array.isArray(p.ib)?p.ib:[];
+      if(p.pc && p.pc.score) S.ps=p.pc;   // ☂️ paracaídas de sesión interrumpida
       return true;
     }catch(e){ this.ok = false; return false; }
   }
@@ -1852,6 +1853,14 @@ function gameDone(name, pts){
   s.idx++; showCombo(0); s.combo=0;
   nextGame();
 }
+/* ☂️ paracaídas (v1.42): cada respuesta respalda la sesión en curso al instante.
+   Si iOS mata la app a mitad de sesión (pantallazo negro), al reabrir se rescatan
+   los puntos — en este laboratorio no se pierde nada. */
+function chute(){
+  const s=S.session; if(!s) return;
+  S.ps={d:todayStr(), score:s.score, hits:s.hits, tries:s.tries};
+  store.save();
+}
 function addPts(base, ev){
   const s=S.session;
   s.combo++; s.best=Math.max(s.best,s.combo); s.hits++;
@@ -1860,9 +1869,10 @@ function addPts(base, ev){
   showCombo(s.combo);
   floatPoints(pts, ev? ev.clientX : undefined, ev? ev.clientY : undefined);
   ding(true);
+  chute();   // ☂️ respaldo instantáneo
   return pts;
 }
-function missPts(){ const s=S.session; s.combo=0; showCombo(0); ding(false); }
+function missPts(){ const s=S.session; s.combo=0; showCombo(0); ding(false); chute(); }
 
 /* ================== JUEGO 1: RAYO LÉXICO ⚡ ================== */
 function gameBlitz(){
@@ -2167,7 +2177,7 @@ function gameSpeak(){
   getMic().catch(()=>{});
 
   function ask(){
-    if(qi>=qs.length){ if(recog){ try{recog.stop();}catch(e){} } gameDone("🎤 ¡Suéltalo!",pts); return; }
+    if(qi>=qs.length){ if(recog){ try{recog.stop();}catch(e){} } releaseMic(); gameDone("🎤 ¡Suéltalo!",pts); return; }   // v1.42: mic libre apenas termina el juego de hablar
     const q=qs[qi];
     area.innerHTML=`
       <div class="prompt" style="font-size:1.35rem">"${q.fr}"
@@ -2681,6 +2691,7 @@ function endSession(){
   }
   S.bestStreak = Math.max(S.bestStreak, S.streak);
   S.xp += s.score;
+  delete S.ps;   // ☂️ sesión completada normal: el paracaídas ya no hace falta
 
   // historial diario
   let h = S.hist.find(e=>e.d===today);
@@ -2815,7 +2826,7 @@ $("btnPlay").onclick =()=>startSession(["blitz","listen","speak","scene"]);
 $("btnLong").onclick =()=>startSession(["blitz","listen","speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnBlitz").onclick=()=>startSession(["blitz","blitz"]);
-$("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
+$("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("mascot").onclick  =()=>{ speakFR(rnd(["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
 $("saveCode").onclick=()=>{
@@ -3182,6 +3193,25 @@ const restored = store.load();
     }
   });
   if(changed) store.save();
+})();
+/* ☂️ rescate (v1.42): si iOS mató la app a mitad de sesión, los puntos vuelven solos */
+(function rescueChute(){
+  const p=S.ps;
+  if(!p || !p.score){ if(p){ delete S.ps; store.save(); } return; }
+  const today=todayStr();
+  if(S.lastDay!==today){
+    const y=new Date(); y.setDate(y.getDate()-1);
+    S.streak = (S.lastDay===localISO(y)) ? S.streak+1 : 1;
+    S.lastDay=today;
+    S.bestStreak=Math.max(S.bestStreak,S.streak);
+  }
+  S.xp += p.score;
+  const acc = p.tries? Math.round(p.hits/p.tries*100) : 0;
+  let h=S.hist.find(e=>e.d===today);
+  if(!h){ h={d:today,p:0,a:0,n:0}; S.hist.push(h); }
+  h.a=Math.round((h.a*h.n + acc)/(h.n+1)); h.p+=p.score; h.n++;
+  delete S.ps; store.save();
+  setTimeout(()=>{ cocoSay(`☂️ La app se cerró a mitad de sesión, pero rescaté tus <b>${p.score} ⭐</b> — en este laboratorio no se pierde nada.`); }, 900);
 })();
 applyTheme();   // 🌙 el tema elegido se aplica desde el arranque
 refreshTop();
