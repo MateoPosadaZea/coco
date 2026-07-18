@@ -264,6 +264,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .levelcard .lemoji{font-size:1.7rem;}
 .levelcard .lname{font-weight:800; font-size:.78rem; margin-top:3px;}
 
+.lang .soon.won{background:var(--goodbg); color:var(--green);}
 .footer-note{text-align:center; font-size:.75rem; opacity:.55; font-weight:700; margin-top:20px;}
 
 /* ---------- progreso ---------- */
@@ -357,7 +358,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.40 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.41 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1631,7 +1632,7 @@ function whatIsIt(text){
 function doubleNote(input, q){
   const known=whatIsIt(input);
   if(!known || norm(known.fr)===norm(q.fr)) return "";
-  return `<div style="background:#FFF6E5;border-radius:10px;padding:4px 10px;margin-top:4px;display:inline-block">🤓 Ojo: "<b>${esc(known.fr)}</b>" existe — significa "<b>${esc(known.es)}</b>"… pero te pedí "${esc(q.es)}"</div>`;
+  return `<div style="background:var(--selbg);border-radius:10px;padding:4px 10px;margin-top:4px;display:inline-block">🤓 Ojo: "<b>${esc(known.fr)}</b>" existe — significa "<b>${esc(known.es)}</b>"… pero te pedí "${esc(q.es)}"</div>`;
 }
 
 /* revisión tipo profesor: tu respuesta se queda, con los errores encerrados */
@@ -1755,7 +1756,7 @@ function renderLangs(){
   if(!it||!pt) return;
   if(frenchSolid()){
     pt.classList.remove("locked");
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon" style="background:#E3FBE9;color:#1B5E20">¡GANADO! 🎉</div>`;
+    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon" class="won">¡GANADO! 🎉</div>`;
     pt.onclick=()=>cocoSay("🎉 ¡Te ganaste el portugués con francés sólido DE VERDAD! Pídele a Claude en el chat que lo construya y aparecerá aquí.");
   } else {
     const s=solidStats();
@@ -2543,7 +2544,7 @@ function gameScene(){
   function cocoToastInChat(txt){
     const div=document.createElement("div");
     div.className="npcline";
-    div.innerHTML=`<div class="npcface">${cocoFace(28)}</div><div class="msg npc" style="background:#FFF6E5">${withCoco(txt)}</div>`;
+    div.innerHTML=`<div class="npcface">${cocoFace(28)}</div><div class="msg npc" style="background:var(--selbg)">${withCoco(txt)}</div>`;
     chat.appendChild(div); chat.scrollTop=chat.scrollHeight;
     setTimeout(()=>div.remove(),3500);
   }
