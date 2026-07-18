@@ -33,6 +33,20 @@ body.dark::before{opacity:.22;}
 body.dark .btn.yellow{color:#2B2B3F;}
 body.dark .dw-bad{color:#FF8A80;}
 body.dark .dw-miss{color:#69F0AE;}
+/* v1.37 — contraste oscuro (feedback de Mateo): botones sin seleccionar y hovers visibles */
+body.dark .btn.ghost{background:#3A3A54; color:var(--ink); border:2px solid #52526E; box-shadow:0 4px 0 rgba(0,0,0,.35);}
+body.dark .btn.ghost:hover{background:#454560;}
+body.dark .btn:hover{filter:brightness(1.18);}
+body.dark .opt{border-color:#41415C;}
+body.dark .opt:hover{border-color:#7C93FF; background:#2B2B40;}
+body.dark .linkish{color:#8FA2FF;}
+body.dark .lang{border-color:#41415C;}
+body.dark .lang.selected{border-color:#7C93FF;}
+body.dark .textinput{border-color:#52526E;}
+body.dark .textinput:focus{border-color:#7C93FF;}
+body.dark .chip{box-shadow:0 3px 0 rgba(0,0,0,.3);}
+body.dark .msg.npc{box-shadow:0 3px 0 rgba(0,0,0,.3);}
+body.dark .replaybtn{background:#3A3A54; color:var(--ink);}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
 body{
@@ -338,7 +352,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.36 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.37 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -815,6 +829,32 @@ const THEMES = [
    {fr:"J'écoute mon corps", es:"Escucho mi cuerpo"},
   ],
  },
+ {
+  /* 🌦️ v1.37: decir la verdad de cómo estás — no siempre es "bien", y eso también se dice.
+     Petición de Mateo: "no siempre estoy bien... quisiera aprender a decirlo en francés".
+     CERO CULPA aplica a las emociones: nombrarlas es sano, pedirse apoyo también. */
+  id:"emotions", emoji:"🌦️", name:"Cómo estoy de verdad", minLvl:1,
+  vocab:[
+   {fr:"Ça ne va pas très bien", es:"No estoy muy bien"},
+   {fr:"Je suis un peu triste", es:"Estoy un poco triste"},
+   {fr:"Je suis fatigué aujourd'hui", es:"Hoy estoy cansado"},
+   {fr:"J'ai eu une journée difficile", es:"Tuve un día difícil"},
+   {fr:"Je me sens seul parfois", es:"A veces me siento solo"},
+   {fr:"J'ai besoin de parler", es:"Necesito hablar"},
+   {fr:"Merci de demander", es:"Gracias por preguntar"},
+   {fr:"Ça va passer", es:"Ya pasará"},
+   {fr:"Demain sera meilleur", es:"Mañana será mejor"},
+   {fr:"Et toi, ça va vraiment ?", es:"¿Y tú, de verdad estás bien?"},
+   {fr:"Je suis là pour toi", es:"Aquí estoy para ti"},
+   {fr:"Un câlin", es:"Un abrazo"},
+  ],
+  speak:[
+   {fr:"Ça ne va pas très bien aujourd'hui", es:"Hoy no estoy muy bien"},
+   {fr:"J'ai eu une journée difficile", es:"Tuve un día difícil"},
+   {fr:"Merci de demander, ça va passer", es:"Gracias por preguntar, ya pasará"},
+   {fr:"Et toi, ça va vraiment ?", es:"¿Y tú, de verdad estás bien?"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -1206,6 +1246,13 @@ const TWISTS=[
    {fr:"Je ne comprends pas... explique ?", es:"No entiendo... ¿me explicas?", ok:true, react:"C'est un jeu de mots !", reactEs:"¡Es un juego de palabras!", alt:"«Souris» es ratón: el animal Y el mouse del computador 🐭🖱️ — igual que en español"},
    {fr:"Je déteste les poissons", es:"Odio los peces", ok:false, why:"El chiste no era para tomar partido 😂"},
   ]},
+ /* --- honestidad emocional (v1.37) --- */
+ {npc:"Ça va ? ... Non, mais vraiment — ça va ?", npcEs:"¿Todo bien? ... No, en serio — ¿estás bien?",
+  options:[
+   {fr:"Pas très bien, pour être honnête", es:"No muy bien, para ser honesto", ok:true, react:"Merci d'être honnête. Je suis là, hein", reactEs:"Gracias por ser honesto. Aquí estoy, ¿eh?"},
+   {fr:"Oui ! Et toi, ça va vraiment ?", es:"¡Sí! ¿Y tú, de verdad estás bien?", ok:true, react:"...pas trop, mais ça va passer. Merci de demander !", reactEs:"...no mucho, pero ya pasará. ¡Gracias por preguntar!"},
+   {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"Te preguntó cómo estás, no qué compras 😅"},
+  ]},
  /* --- Colombia (v1.31) --- */
  {npc:"Vous venez d'où ?... La Colombie ! Le pays du café, non ?", npcEs:"¿De dónde viene?... ¡Colombia! El país del café, ¿no?",
   options:[
@@ -1275,6 +1322,9 @@ const IMPROV=[
  {t:"En la jam: pregunta qué toca la otra persona y cuenta que tú tocas guitarra y cantas",
   keys:[["tu joues","instrument"],["guitare"],["je chante","chanter"]],
   model:"Tu joues de quoi ? Moi, je joue de la guitare et je chante !"},
+ {t:"Sé honesto: hoy no estás muy bien, tuviste un día difícil — y agradece que te pregunten",
+  keys:[["pas très bien","difficile","triste","fatigué"],["merci"]],
+  model:"Ça ne va pas très bien... j'ai eu une journée difficile. Merci de demander."},
 ];
 
 /* Frases motivadoras de Coco */
