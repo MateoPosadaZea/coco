@@ -325,7 +325,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.34 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.35 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -801,7 +801,7 @@ const THEMES = [
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
 const SCENES = [
  {
-  id:"cafe-paris", title:"☕ En un café de París", npc:"🧑‍🍳", npcName:"Le serveur",
+  id:"cafe-paris", themes:["cafe","quotidien"], title:"☕ En un café de París", npc:"🧑‍🍳", npcName:"Le serveur",
   vars:{
    drink:[{fr:"Un café",es:"Un café"},{fr:"Un thé",es:"Un té"},{fr:"Un chocolat chaud",es:"Un chocolate caliente"},{fr:"Un jus d'orange",es:"Un jugo de naranja"}],
    food:[{fr:"Un croissant",es:"Un croissant"},{fr:"Une tartine",es:"Una tostada"},{fr:"Un pain au chocolat",es:"Un pan de chocolate"}],
@@ -847,7 +847,7 @@ const SCENES = [
   ],
  },
  {
-  id:"rencontre", title:"🤝 Conociendo a alguien", npc:"🧑‍🎨", npcName:"{name}",
+  id:"rencontre", themes:["presentation","salutations"], title:"🤝 Conociendo a alguien", npc:"🧑‍🎨", npcName:"{name}",
   vars:{ name:[{fr:"Camille",es:"Camille"},{fr:"Chloé",es:"Chloé"},{fr:"Louis",es:"Louis"},{fr:"Léa",es:"Léa"},{fr:"Hugo",es:"Hugo"}] },
   steps:[
    {npc:"Salut ! Moi c'est {name}. Comment tu t'appelles ?", npcEs:"¡Hola! Yo soy {name}. ¿Cómo te llamas?",
@@ -883,7 +883,7 @@ const SCENES = [
   ],
  },
  {
-  id:"perdu", title:"🗼 Perdido en París", npc:"👮", npcName:"L'agent",
+  id:"perdu", themes:["ville"], title:"🗼 Perdido en París", npc:"👮", npcName:"L'agent",
   vars:{
    place:[{fr:"la Tour Eiffel",es:"la Torre Eiffel"},{fr:"le Louvre",es:"el Louvre"},{fr:"Notre-Dame",es:"Notre-Dame"},{fr:"le musée d'Orsay",es:"el museo de Orsay"}],
    mins:[{fr:"dix",es:"diez"},{fr:"quinze",es:"quince"},{fr:"vingt",es:"veinte"}],
@@ -922,7 +922,7 @@ const SCENES = [
   ],
  },
  {
-  id:"boulangerie", title:"🥖 En la panadería", npc:"👩‍🍳", npcName:"La boulangère",
+  id:"boulangerie", themes:["cafe","achats"], title:"🥖 En la panadería", npc:"👩‍🍳", npcName:"La boulangère",
   vars:{
    item:[{fr:"une baguette",es:"una baguette"},{fr:"un croissant",es:"un croissant"},{fr:"un pain au chocolat",es:"un pan de chocolate"},{fr:"une tarte aux pommes",es:"una tarta de manzana"}],
    price:[{fr:"deux euros",es:"dos euros"},{fr:"trois euros",es:"tres euros"},{fr:"quatre euros cinquante",es:"cuatro euros con cincuenta"}],
@@ -955,7 +955,7 @@ const SCENES = [
   ],
  },
  {
-  id:"hotel", title:"🏨 Llegando al hotel", npc:"🛎️", npcName:"Le réceptionniste",
+  id:"hotel", themes:["ville","salutations"], title:"🏨 Llegando al hotel", npc:"🛎️", npcName:"Le réceptionniste",
   vars:{
    nights:[{fr:"deux nuits",es:"dos noches"},{fr:"trois nuits",es:"tres noches"},{fr:"une nuit",es:"una noche"}],
    floor:[{fr:"au premier étage",es:"en el primer piso"},{fr:"au deuxième étage",es:"en el segundo piso"},{fr:"au troisième étage",es:"en el tercer piso"}],
@@ -994,7 +994,7 @@ const SCENES = [
   ],
  },
  {
-  id:"marche", title:"🍎 En el mercado", npc:"👨‍🌾", npcName:"Le vendeur",
+  id:"marche", themes:["achats","cafe"], title:"🍎 En el mercado", npc:"👨‍🌾", npcName:"Le vendeur",
   vars:{
    fruit:[{fr:"des pommes",es:"manzanas"},{fr:"des fraises",es:"fresas"},{fr:"des oranges",es:"naranjas"},{fr:"du fromage",es:"queso"}],
   },
@@ -1027,7 +1027,7 @@ const SCENES = [
  },
  {
   /* 📞 el ensayo de LA MISIÓN: hablar con el tío — hecha con el material del cuaderno */
-  id:"oncle", title:"📞 Llamada con tu tío", npc:"🎸", npcName:"Ton oncle",
+  id:"oncle", themes:["perso","quotidien"], title:"📞 Llamada con tu tío", npc:"🎸", npcName:"Ton oncle",
   vars:{
    instrument:[{fr:"de la guitare",es:"guitarra"},{fr:"du piano",es:"piano"},{fr:"de la batterie",es:"batería"},{fr:"de la basse",es:"bajo"}],
    jour:[{fr:"samedi",es:"el sábado"},{fr:"dimanche",es:"el domingo"},{fr:"vendredi",es:"el viernes"}],
@@ -1068,7 +1068,7 @@ const SCENES = [
  {
   /* 🎶 v1.32: la jam session — ensayar cómo se hace un amigo en otro idioma
      (guitarra + canto de Mateo; el idioma como puente hacia personas) */
-  id:"jam", title:"🎶 La jam session", npc:"🎷", npcName:"{name}",
+  id:"jam", themes:["perso","metier","colombie"], title:"🎶 La jam session", npc:"🎷", npcName:"{name}",
   vars:{
    name:[{fr:"Antoine",es:"Antoine"},{fr:"Manon",es:"Manon"},{fr:"Théo",es:"Théo"},{fr:"Élise",es:"Élise"}],
    instrument:[{fr:"du piano",es:"piano"},{fr:"de la basse",es:"bajo"},{fr:"du saxophone",es:"saxofón"},{fr:"de la batterie",es:"batería"}],
@@ -2309,8 +2309,15 @@ function injectTwist(sc){
 }
 function pickScene(){
   S.lastScenes = S.lastScenes||[];
-  let cands=SCENES.filter(s=>!S.lastScenes.includes(s.id));
-  if(!cands.length){ S.lastScenes=[]; cands=SCENES; }
+  // 📬 buzón directo #1 (v1.35): si elegiste un tema, "Solo conversación" lo respeta —
+  // se juegan las escenas de ese tema (si el tema aún no tiene escenas, rotan todas)
+  let base=SCENES;
+  if(S.theme && S.theme!=="mix" && S.theme!=="notes"){
+    const themed=SCENES.filter(s=>(s.themes||[]).includes(S.theme));
+    if(themed.length) base=themed;
+  }
+  let cands=base.filter(s=>!S.lastScenes.includes(s.id));
+  if(!cands.length) cands=base;   // pocas escenas en el tema: se permite repetir antes que ignorar tu elección
   const sc=rnd(cands);
   S.lastScenes.push(sc.id);
   if(S.lastScenes.length>=SCENES.length) S.lastScenes=S.lastScenes.slice(-(SCENES.length-1));
