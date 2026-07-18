@@ -374,7 +374,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.43 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.44 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2639,8 +2639,15 @@ function gameScene(){
     noteNew(opt.fr, opt.es);
     const div=document.createElement("div");
     div.className="msg me";
-    div.innerHTML=`${opt.fr}<span class="tr">${opt.es}</span> <button class="replaybtn" title="repetir">🔊</button>`;
+    // v1.44: ⭐ en TU burbuja — "esta frase quiero recordarla y usarla" → directo a tus repasos
+    div.innerHTML=`${opt.fr}<span class="tr">${opt.es}</span> <button class="replaybtn" title="repetir">🔊</button> <button class="replaybtn savebtn" title="a mis repasos">⭐</button>`;
     div.querySelector(".replaybtn").onclick=()=>speakFR(opt.fr,0.8);
+    const sb=div.querySelector(".savebtn");
+    sb.onclick=()=>{
+      markWeak({fr:opt.fr, es:opt.es}); store.save();
+      sb.textContent="✔"; sb.disabled=true;
+      toast("🗓️ A tus repasos: la verás en tu próxima lección 🔁");
+    };
     chat.appendChild(div);
     chat.scrollTop=chat.scrollHeight;
     return speakFR(opt.fr,0.85);
