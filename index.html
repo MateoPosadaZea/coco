@@ -338,7 +338,6 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <p class="hint" style="margin:6px 0 0;">Más preguntas, temas mezclados y misiones de improvisación 🎭</p>
       <div class="btn-row" style="margin-top:10px;">
         <button class="btn small purple" id="btnScene">💬 Solo conversación</button>
-        <button class="btn small orange" id="btnBlitz">⚡ Solo reto rápido</button>
         <button class="btn small" id="btnSongs" style="display:none; background:var(--pink); color:#fff;">🎵 Cancionero</button>
         <button class="btn small ghost" id="btnProgress">📈 Mi progreso</button>
         <button class="btn small ghost" id="btnSettings">⚙️ Ajustes</button>
@@ -360,21 +359,19 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <div class="btn-row" id="noteRow" style="display:none; margin-top:8px;"><button class="btn small green" id="noteAdd">✏️ Anotarla para aprenderla</button></div>
       <div id="pendList"></div>
       <div class="btn-row" id="pendActions" style="display:none; margin-top:10px;">
-        <button class="btn small green" id="btnAutoTrad" style="display:none;">🪄 Traducir ya</button>
         <button class="btn small purple" id="copyPend">📋 Copiar para Claude</button>
         <button class="btn small ghost" id="pasteBtn">📥 Pegar traducciones</button>
       </div>
       <textarea class="textinput" id="pasteArea" rows="3" style="display:none; margin-top:8px; font-size:.9rem; text-align:left;" placeholder="Pega aquí las líneas de Claude:&#10;estoy aprendiendo = j'apprends"></textarea>
       <div class="btn-row" id="importRow" style="display:none; margin-top:8px;"><button class="btn small green" id="importBtn">Importar ✔</button></div>
       <div id="customList"></div>
-      <div style="text-align:center; margin-top:8px;"><button class="linkish" id="btnApiKey">⚙️ Conectar Claude — traducción con un toque (opcional)</button></div>
     </div>
 
     <div style="text-align:center;">
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.46 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.47 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -3200,7 +3197,6 @@ $("btnProgBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("btnPlay").onclick =()=>startSession(["blitz","listen","speak","scene"]);
 $("btnLong").onclick =()=>startSession(["blitz","listen","speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
-$("btnBlitz").onclick=()=>startSession(["blitz","blitz"]);
 $("btnSongs").onclick=()=>startSession(["songs"]);
 $("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
@@ -3297,7 +3293,6 @@ function renderNotes(){
     : "";
   pl.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{ S.pending.splice(+b.dataset.delp,1); store.save(); renderNotes(); });
   const pa=$("pendActions"); if(pa) pa.style.display = pend.length ? "flex" : "none";
-  const at=$("btnAutoTrad"); if(at) at.style.display = (pend.length && apiKey()) ? "inline-flex" : "none";
   const last=cust.slice(-5).reverse();
   cl.innerHTML = cust.length
     ? `<p style="font-weight:800; margin:8px 0 2px; font-size:.85rem;">✅ Ya en tus lecciones (${cust.length}):</p>`+
@@ -3378,56 +3373,8 @@ $("importBtn").onclick=()=>{
   }
 };
 
-/* ---- 🪄 Claude integrado (opcional): traduce sin salir de la app ----
-   La clave vive SOLO en el localStorage de ESTE navegador; nunca viaja en el
-   código COCO ni debe pegarse dentro del archivo (el repo de Pages es público). */
-const API_KEY_STORE="coco_api_key";
-function apiKey(){ try{ return localStorage.getItem(API_KEY_STORE)||""; }catch(e){ return ""; } }
-$("btnApiKey").onclick=()=>{
-  const cur=apiKey();
-  const k=prompt(cur
-    ? "Claude ya está conectado 🪄 Pega una clave nueva para cambiarla, o deja vacío y OK para desconectar:"
-    : "Pega tu clave de API de Anthropic (empieza por sk-ant-...).\nSe guarda SOLO en este navegador — nunca la publiques ni la pegues en el archivo:", "");
-  if(k===null) return;
-  try{ if(k.trim()) localStorage.setItem(API_KEY_STORE,k.trim()); else localStorage.removeItem(API_KEY_STORE); }catch(e){}
-  renderNotes();
-  toast(k.trim() ? "🪄 Claude conectado — ahora hay botón «Traducir ya»" : "Claude desconectado — sigue el modo copiar/pegar");
-};
-$("btnAutoTrad").onclick=async()=>{
-  const pend=(S.pending||[]).slice();
-  if(!pend.length || !apiKey()) return;
-  const b=$("btnAutoTrad"); b.disabled=true; b.textContent="🪄 Traduciendo...";
-  try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{
-        "content-type":"application/json",
-        "x-api-key":apiKey(),
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true"
-      },
-      body:JSON.stringify({
-        model:"claude-haiku-4-5",
-        max_tokens:1000,
-        system:"Eres traductor español→francés para una app de aprendizaje de nivel A1. Responde SOLO líneas con el formato exacto «español = francés», una por frase, sin comentarios ni nada más.",
-        messages:[{role:"user",content:"Traduce estas frases:\n"+pend.map(p=>"- "+p).join("\n")}]
-      })
-    });
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    const j=await r.json();
-    const text=(j.content||[]).map(c=>c.text||"").join("\n");
-    const added=importLines(text);
-    if(added){
-      store.save(); refreshTop(); renderNotes();
-      toast(`🪄 ${added} frase${added===1?"":"s"} traducida${added===1?"":"s"} y en tus lecciones 🎉`);
-      cocoSay("¡Traducción mágica! 📓 Ya están en la Mezcla y en tus repasos.");
-    } else toast("Claude respondió pero no entendí el formato 🤔 usa copiar/pegar esta vez");
-  }catch(e){
-    toast(String(e).includes("401") ? "Clave inválida 🔑 revísala en ⚙️" : "No pude conectar 🌐 usa copiar/pegar esta vez");
-  }
-  b.disabled=false; b.textContent="🪄 Traducir ya";
-  renderNotes();
-};
+/* 🪄 API de Claude retirada en v1.47 — la poda: nunca se usó; el camino
+   cuaderno → chat con Claude → «Pegar traducciones» hace lo mismo, gratis y mejor. */
 
 /* ================== ⚙️ AJUSTES + 🪶 BUZÓN ================== */
 function paintSettings(){
