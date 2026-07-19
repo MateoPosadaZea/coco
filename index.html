@@ -371,7 +371,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.47 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.48 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -887,6 +887,31 @@ const THEMES = [
    {fr:"Et toi, ça va vraiment ?", es:"¿Y tú, de verdad estás bien?"},
   ],
  },
+ {
+  /* 💘 v1.48: encanto y halagos (pedido de Mateo) — sinceros, específicos y con clase.
+     El arte francés del cumplido: se nota lo que ES verdad, no lo que suena bonito. */
+  id:"charme", emoji:"💘", name:"Encanto y halagos", minLvl:1,
+  vocab:[
+   {fr:"Tu es charmante", es:"Eres encantadora"},
+   {fr:"Tu es charmant", es:"Eres encantador"},
+   {fr:"Tu as un beau sourire", es:"Tienes una sonrisa hermosa"},
+   {fr:"Tu as de beaux yeux", es:"Tienes ojos lindos"},
+   {fr:"J'aime ton énergie", es:"Me gusta tu energía"},
+   {fr:"Quel style !", es:"¡Qué estilo!"},
+   {fr:"Tu es très élégante", es:"Estás muy elegante"},
+   {fr:"Tu me fais rire", es:"Me haces reír"},
+   {fr:"Tu danses très bien", es:"Bailas muy bien"},
+   {fr:"Je peux t'inviter à un café ?", es:"¿Te puedo invitar a un café?"},
+   {fr:"C'était un plaisir de te rencontrer", es:"Fue un placer conocerte"},
+   {fr:"On se revoit bientôt ?", es:"¿Nos vemos pronto?"},
+  ],
+  speak:[
+   {fr:"Tu as un beau sourire", es:"Tienes una sonrisa hermosa"},
+   {fr:"J'aime beaucoup ton énergie", es:"Me gusta mucho tu energía"},
+   {fr:"Je peux t'inviter à un café ?", es:"¿Te puedo invitar a un café?"},
+   {fr:"C'était un plaisir de te rencontrer", es:"Fue un placer conocerte"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -938,7 +963,7 @@ const SCENES = [
   ],
  },
  {
-  id:"rencontre", themes:["presentation","salutations"], title:"🤝 Conociendo a alguien", npc:"🧑‍🎨", npcName:"{name}",
+  id:"rencontre", themes:["presentation","salutations","charme"], title:"🤝 Conociendo a alguien", npc:"🧑‍🎨", npcName:"{name}",
   vars:{ name:[{fr:"Camille",es:"Camille"},{fr:"Chloé",es:"Chloé"},{fr:"Louis",es:"Louis"},{fr:"Léa",es:"Léa"},{fr:"Hugo",es:"Hugo"}] },
   steps:[
    {npc:"Salut ! Moi c'est {name}. Comment tu t'appelles ?", npcEs:"¡Hola! Yo soy {name}. ¿Cómo te llamas?",
@@ -1159,7 +1184,7 @@ const SCENES = [
  {
   /* 🎶 v1.32: la jam session — ensayar cómo se hace un amigo en otro idioma
      (guitarra + canto de Mateo; el idioma como puente hacia personas) */
-  id:"jam", themes:["perso","metier","colombie"], title:"🎶 La jam session", npc:"🎷", npcName:"{name}",
+  id:"jam", themes:["perso","metier","colombie","charme"], title:"🎶 La jam session", npc:"🎷", npcName:"{name}",
   vars:{
    name:[{fr:"Antoine",es:"Antoine"},{fr:"Manon",es:"Manon"},{fr:"Théo",es:"Théo"},{fr:"Élise",es:"Élise"}],
    instrument:[{fr:"du piano",es:"piano"},{fr:"de la basse",es:"bajo"},{fr:"du saxophone",es:"saxofón"},{fr:"de la batterie",es:"batería"}],
@@ -1319,6 +1344,13 @@ const TWISTS=[
    {fr:"Oui ! Et toi, ça va vraiment ?", es:"¡Sí! ¿Y tú, de verdad estás bien?", ok:true, react:"...pas trop, mais ça va passer. Merci de demander !", reactEs:"...no mucho, pero ya pasará. ¡Gracias por preguntar!"},
    {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"Te preguntó cómo estás, no qué compras 😅"},
   ]},
+ /* --- encanto (v1.48) --- */
+ {npc:"Vous avez un très beau sourire, vous savez ?", npcEs:"Tiene usted una sonrisa muy linda, ¿sabe?", themes:["charme"],
+  options:[
+   {fr:"Merci beaucoup ! Vous aussi", es:"¡Muchas gracias! Usted también", ok:true, react:"Ah, merci ! Quelle belle journée, du coup", reactEs:"¡Ah, gracias! Qué buen día, de repente"},
+   {fr:"Oh... merci, ça me touche", es:"Oh... gracias, me conmueve", ok:true, react:"C'est sincère, hein !", reactEs:"¡Es sincero, eh!"},
+   {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"El cumplido no está a la venta 😂 Di merci"},
+  ]},
  /* --- Colombia (v1.31) --- */
  {npc:"Vous venez d'où ?... La Colombie ! Le pays du café, non ?", themes:["colombie"], npcEs:"¿De dónde viene?... ¡Colombia! El país del café, ¿no?",
   options:[
@@ -1403,6 +1435,12 @@ const IMPROV=[
  {t:"Sé honesto: hoy no estás muy bien, tuviste un día difícil — y agradece que te pregunten",
   keys:[["pas très bien","difficile","triste","fatigué"],["merci"]],
   model:"Ça ne va pas très bien... j'ai eu une journée difficile. Merci de demander."},
+ {t:"Haz un cumplido sincero y específico: su sonrisa, su energía o su estilo",
+  keys:[["beau sourire","ton énergie","quel style","beaux yeux","charmante","charmant","élégante"]],
+  model:"Tu as un beau sourire, et j'aime beaucoup ton énergie !"},
+ {t:"Invita a alguien a un café, con encanto y sin presión",
+  keys:[["inviter","un café"],["plaisir","si tu veux","je peux"]],
+  model:"Je peux t'inviter à un café ? Ce serait un plaisir."},
 ];
 
 /* Frases motivadoras de Coco */
