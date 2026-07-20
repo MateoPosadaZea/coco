@@ -371,7 +371,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.49 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.50 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -3633,6 +3633,27 @@ const restored = store.load();
   h.a=Math.round((h.a*h.n + acc)/(h.n+1)); h.p+=p.score; h.n++;
   delete S.ps; store.save();
   setTimeout(()=>{ cocoSay(`☂️ La app se cerró a mitad de sesión, pero rescaté tus <b>${p.score} ⭐</b> — en este laboratorio no se pierde nada.`); }, 900);
+})();
+/* 🎁 v1.50: siembra única — las frases de la revancha con el tío, directo al cuaderno
+   (Mateo pidió "pégalas de una vez"; se importan solas una sola vez, con dedupe) */
+(function seedTio(){
+  S.prefs=S.prefs||{};
+  if(S.prefs.seedTio) return;
+  const added=importLines(
+`quiero practicar contigo = Je veux pratiquer avec toi
+¿me enseñas? = Tu m'apprends ?
+hazme preguntas = Pose-moi des questions
+habla lento, por favor = Parle lentement, s'il te plaît
+guíame = Guide-moi
+estoy aprendiendo francés = J'apprends le français
+esto es una prueba = C'est un test
+este es el reto que busco = C'est le défi que je cherche
+¿tienes algún consejo? = Tu as un conseil ?
+¿cómo aprender más rápido? = Comment apprendre plus vite ?
+ayúdame a mejorar = Aide-moi à progresser`);
+  S.prefs.seedTio=1;
+  store.save();
+  if(added) setTimeout(()=>toast(`🎁 ${added} frases para tu tío sembradas en el cuaderno — ya están en tus repasos`), 1200);
 })();
 applyTheme();   // 🌙 el tema elegido se aplica desde el arranque
 refreshTop();
