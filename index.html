@@ -371,7 +371,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.48 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.49 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -888,6 +888,32 @@ const THEMES = [
   ],
  },
  {
+  /* 🆘 v1.49: el kit anti-blanco — nacido de la primera práctica real con el tío
+     (se quedó en blanco, día 3). Los que hablan idiomas no son los que nunca se
+     quedan en blanco: son los que saben qué decir cuando pasa. */
+  id:"sos", emoji:"🆘", name:"Cuando me quedo en blanco", minLvl:1,
+  vocab:[
+   {fr:"Attends...", es:"Espera..."},
+   {fr:"Un moment...", es:"Un momento..."},
+   {fr:"Laisse-moi réfléchir", es:"Déjame pensar"},
+   {fr:"Comment on dit... ?", es:"¿Cómo se dice...?"},
+   {fr:"Parle plus lentement, s'il te plaît", es:"Habla más despacio, por favor"},
+   {fr:"Répète, s'il te plaît", es:"Repite, por favor"},
+   {fr:"Je ne sais pas encore le dire", es:"Aún no sé decirlo"},
+   {fr:"Je comprends un peu", es:"Entiendo un poco"},
+   {fr:"C'est nouveau pour moi", es:"Es nuevo para mí"},
+   {fr:"Ça viendra !", es:"¡Ya llegará!"},
+   {fr:"J'apprends depuis trois jours !", es:"¡Llevo tres días aprendiendo!"},
+   {fr:"La prochaine fois, je dirai plus", es:"La próxima vez diré más"},
+  ],
+  speak:[
+   {fr:"Attends... comment on dit... ?", es:"Espera... ¿cómo se dice...?"},
+   {fr:"Parle plus lentement, s'il te plaît", es:"Habla más despacio, por favor"},
+   {fr:"Je ne sais pas encore le dire", es:"Aún no sé decirlo"},
+   {fr:"Laisse-moi réfléchir un moment", es:"Déjame pensar un momento"},
+  ],
+ },
+ {
   /* 💘 v1.48: encanto y halagos (pedido de Mateo) — sinceros, específicos y con clase.
      El arte francés del cumplido: se nota lo que ES verdad, no lo que suena bonito. */
   id:"charme", emoji:"💘", name:"Encanto y halagos", minLvl:1,
@@ -1344,6 +1370,13 @@ const TWISTS=[
    {fr:"Oui ! Et toi, ça va vraiment ?", es:"¡Sí! ¿Y tú, de verdad estás bien?", ok:true, react:"...pas trop, mais ça va passer. Merci de demander !", reactEs:"...no mucho, pero ya pasará. ¡Gracias por preguntar!"},
    {fr:"Je le prends", es:"Me lo llevo", ok:false, why:"Te preguntó cómo estás, no qué compras 😅"},
   ]},
+ /* --- anti-blanco (v1.49): el error clásico es asentir sin entender --- */
+ {npc:"(Il parle très vite) Alors-donc-voilà-tu-vois-ce-que-je-veux-dire... ?", npcEs:"(Habla rapidísimo) Entonces-pues-ya-ves-lo-que-te-quiero-decir... ¿no?", themes:["sos"],
+  options:[
+   {fr:"Parle plus lentement, s'il te plaît !", es:"¡Habla más despacio, por favor!", ok:true, react:"Pardon ! Je... parle... plus... lentement", reactEs:"¡Perdón! Ha-blo... más... des-pa-cio"},
+   {fr:"Attends... répète, s'il te plaît ?", es:"Espera... ¿repites, por favor?", ok:true, react:"Bien sûr ! Pas de problème", reactEs:"¡Claro! No hay problema"},
+   {fr:"Oui, oui, bien sûr !", es:"¡Sí, sí, claro!", ok:false, why:"¡Dijiste que sí sin entender NADA! 😅 El error clásico — pedir que repitan es de valientes"},
+  ]},
  /* --- encanto (v1.48) --- */
  {npc:"Vous avez un très beau sourire, vous savez ?", npcEs:"Tiene usted una sonrisa muy linda, ¿sabe?", themes:["charme"],
   options:[
@@ -1441,6 +1474,9 @@ const IMPROV=[
  {t:"Invita a alguien a un café, con encanto y sin presión",
   keys:[["inviter","un café"],["plaisir","si tu veux","je peux"]],
   model:"Je peux t'inviter à un café ? Ce serait un plaisir."},
+ {t:"Te quedaste en blanco a mitad de frase: compra tiempo y pide que hable más despacio — sin pena",
+  keys:[["attends","un moment","laisse-moi"],["lentement","répète","comment on dit"]],
+  model:"Attends, un moment... parle plus lentement, s'il te plaît !"},
 ];
 
 /* Frases motivadoras de Coco */
