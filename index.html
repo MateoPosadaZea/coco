@@ -280,6 +280,12 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .wordchip.used{opacity:.22; pointer-events:none;}
 .builtline{min-height:46px; background:var(--card); border-radius:12px; border:2px dashed var(--soft2); padding:8px 10px; font-weight:800; margin:8px 0; text-align:left; font-size:1.05rem;}
 
+/* 🔗 parejas de verbos (v1.51) */
+.matchcols{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
+.mcell{background:var(--card); border:3px solid var(--soft); border-radius:14px; padding:12px 8px;
+  font-weight:800; text-align:center; cursor:pointer; font-size:.95rem; margin-bottom:8px; transition:transform .1s;}
+.mcell.sel{border-color:var(--blue); transform:scale(1.03);}
+.mcell.done{opacity:.35; pointer-events:none; border-color:var(--green);}
 .footer-note{text-align:center; font-size:.75rem; opacity:.55; font-weight:700; margin-top:20px;}
 
 /* ---------- progreso ---------- */
@@ -371,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.50 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.51 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1276,6 +1282,18 @@ const VERB_FAMILIES=[
   {fr:"Prendre — tomar / coger", ex:[{fr:"Prendre",es:"Tomar / coger"},{fr:"Je prends",es:"Yo tomo"}], f:"je prends · tu prends · il prend"},
   {fr:"Donner — dar", ex:[{fr:"Donner",es:"Dar"},{fr:"Je donne",es:"Yo doy"}], f:"je donne · tu donnes · il donne"},
  ]},
+ {name:"🧰 Más esenciales (v1.51)", verbs:[
+  {fr:"Parler — hablar", ex:[{fr:"Parler",es:"Hablar"},{fr:"Je parle",es:"Yo hablo"}], f:"je parle · tu parles · il parle"},
+  {fr:"Écouter — escuchar", ex:[{fr:"Écouter",es:"Escuchar"},{fr:"J'écoute",es:"Yo escucho"}], f:"j'écoute · tu écoutes · il écoute"},
+  {fr:"Habiter — vivir (en un lugar)", ex:[{fr:"Habiter",es:"Vivir (en un lugar)"},{fr:"J'habite",es:"Yo vivo"}], f:"j'habite · tu habites · il habite"},
+  {fr:"Travailler — trabajar", ex:[{fr:"Travailler",es:"Trabajar"},{fr:"Je travaille",es:"Yo trabajo"}], f:"je travaille · tu travailles · il travaille"},
+  {fr:"Manger — comer", ex:[{fr:"Manger",es:"Comer"},{fr:"Je mange",es:"Yo como"}], f:"je mange · tu manges · il mange"},
+  {fr:"Boire — beber", ex:[{fr:"Boire",es:"Beber"},{fr:"Je bois",es:"Yo bebo"}], f:"je bois · tu bois · il boit"},
+  {fr:"Sortir — salir", ex:[{fr:"Sortir",es:"Salir"},{fr:"Je sors",es:"Yo salgo"}], f:"je sors · tu sors · il sort"},
+  {fr:"Mettre — poner", ex:[{fr:"Mettre",es:"Poner"},{fr:"Je mets",es:"Yo pongo"}], f:"je mets · tu mets · il met"},
+  {fr:"Trouver — encontrar", ex:[{fr:"Trouver",es:"Encontrar"},{fr:"Je trouve",es:"Yo encuentro"}], f:"je trouve · tu trouves · il trouve"},
+  {fr:"Penser — pensar", ex:[{fr:"Penser",es:"Pensar"},{fr:"Je pense",es:"Yo pienso"}], f:"je pense · tu penses · il pense"},
+ ]},
  {name:"❤️ Del corazón", verbs:[
   {fr:"Aimer — amar / gustar", ex:[{fr:"Aimer",es:"Amar / gustar"},{fr:"J'aime",es:"Amo / me gusta"}], f:"j'aime · tu aimes · il aime"},
   {fr:"Adorer — encantar", ex:[{fr:"Adorer",es:"Encantar"},{fr:"J'adore",es:"Me encanta"}], f:"j'adore · tu adores · il adore"},
@@ -2013,6 +2031,7 @@ function launchGame(g){
   else if(g==="scene") gameScene();
   else if(g==="improv") gameImprov();
   else if(g==="songs") gameSongs();
+  else if(g==="match") gameMatch();
 }
 function nextGame(){
   const s=S.session;
@@ -3116,6 +3135,63 @@ function gameSongs(){
   next();
 }
 
+
+/* ================== JUEGO 7: PAREJAS DE VERBOS 🔗 (v1.51) ==================
+   Dos columnas — francés y español — y tu cerebro tendiendo puentes.
+   Ronda 1: infinitivos. Ronda 2: los MISMOS verbos en forma "je" (refuerzo doble). */
+function gameMatch(){
+  $("gameTitle").textContent="🔗 Parejas de verbos";
+  noTimer(); updateTierChip(1);
+  const area=$("gameArea");
+  const verbs=shuffle(VERB_FAMILIES.flatMap(f=>f.verbs.filter(v=>v.ex&&v.ex.length>=2))).slice(0,5);
+  let round=0, pts=0;
+  function playRound(){
+    if(round>=2){ gameDone("🔗 Parejas",pts); return; }
+    const pairs=verbs.map(v=>v.ex[round]);   // ronda 0: infinitivos · ronda 1: forma "je"
+    area.innerHTML=`<div class="prompt" style="font-size:1.05rem">Une cada verbo con su significado
+        <span class="sub">ronda ${round+1} de 2 · ${round?"ahora en forma «yo»":"toca uno de cada columna"}</span></div>
+      <div class="matchcols"><div id="colFr"></div><div id="colEs"></div></div>
+      <div class="speakresult" id="mfb"></div>`;
+    const colFr=$("colFr"), colEs=$("colEs");
+    let selL=null, selR=null, done=0;
+    const mk=(txt,i,col)=>{
+      const c=document.createElement("div"); c.className="mcell"; c.textContent=txt; c.dataset.i=i;
+      c.onclick=()=>{
+        if(c.classList.contains("done")) return;
+        const cur = col==="fr" ? selL : selR;
+        if(cur) cur.classList.remove("sel");
+        if(col==="fr") selL=c; else selR=c;
+        c.classList.add("sel");
+        if(selL&&selR) check();
+      };
+      (col==="fr"?colFr:colEs).appendChild(c);
+    };
+    shuffle(pairs.map((p,i)=>({t:p.fr,i}))).forEach(o=>mk(o.t,o.i,"fr"));
+    shuffle(pairs.map((p,i)=>({t:p.es,i}))).forEach(o=>mk(o.t,o.i,"es"));
+    function check(){
+      S.session.tries++;
+      const p=pairs[+selL.dataset.i];
+      if(selL.dataset.i===selR.dataset.i){
+        [selL,selR].forEach(c=>{ c.classList.remove("sel"); c.classList.add("done"); });
+        pts+=addPts(8); noteNew(p.fr,p.es); clearWeak(p);
+        speakFR(p.fr,0.95);
+        done++;
+        if(done===pairs.length){
+          round++;
+          $("mfb").textContent = round<2 ? "🔗 ¡Ronda completa! Ahora los mismos, en forma «yo»..." : "🔗 ¡Puentes tendidos!";
+          $("mfb").style.color="var(--green)";
+          setTimeout(playRound, 1100);
+        }
+      } else {
+        missPts(); markWeak(p);
+        [selL,selR].forEach(c=>{ c.style.animation="shake .3s"; setTimeout(()=>{ c.style.animation=""; c.classList.remove("sel"); },320); });
+      }
+      selL=selR=null;
+    }
+  }
+  playRound();
+}
+
 /* ================== RESULTADOS ================== */
 function endSession(){
   stopTimer();
@@ -3268,8 +3344,8 @@ function renderProgress(){
 /* ================== EVENTOS ================== */
 $("btnProgress").onclick=()=>{ renderProgress(); show("scr-progress"); };
 $("btnProgBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
-$("btnPlay").onclick =()=>startSession(["blitz","listen","speak","scene"]);
-$("btnLong").onclick =()=>startSession(["blitz","listen","speak","scene","improv"],{immersion:true});
+$("btnPlay").onclick =()=>startSession(["blitz", Math.random()<0.5?"match":"listen", "speak","scene"]);   // 🔗 los verbos entran a las sesiones (v1.51)
+$("btnLong").onclick =()=>startSession(["blitz","listen","match","speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnSongs").onclick=()=>startSession(["songs"]);
 $("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
