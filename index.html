@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.56 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.57 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1759,10 +1759,23 @@ function announceTier(tier, up){
 /* ---- repaso espaciado (cajas de Leitner): fallar → vuelve hoy; acertar → 1, 3, 7, 14, 30 días ---- */
 const SRS_DAYS=[1,3,7,14,30];
 function inDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return localISO(d); }
+const WEAK_MAX=40;
 function markWeak(v){
   const w=S.weak.find(x=>x.fr===v.fr);
-  if(w){ w.box=0; w.due=todayStr(); }                    // recae: vuelve a la caja 0, se repasa ya
-  else { S.weak.push({fr:v.fr, es:v.es, box:0, due:todayStr()}); if(S.weak.length>40) S.weak.shift(); }
+  if(w){ w.box=0; w.due=todayStr(); return; }            // recae: vuelve a la caja 0, se repasa ya
+  S.weak.push({fr:v.fr, es:v.es, box:0, due:todayStr()});
+  if(S.weak.length>WEAK_MAX) dropWeakest();
+}
+/* v1.56 (decisión de Mateo): cuando los repasos se llenan sale la frase MÁS FLOJA,
+   no la más antigua. Antes un shift() ciego se llevaba frases ya casi dominadas
+   (caja 4 o 5) y eso bajaba tu memoria 🎓 sin que hubieras fallado nada. */
+function dropWeakest(){
+  let idx=0, worst=Infinity;
+  for(let i=0; i<S.weak.length-1; i++){                  // la recién añadida nunca sale
+    const b=S.weak[i].box||0;
+    if(b<worst){ worst=b; idx=i; }                       // empate → la más antigua de esa caja
+  }
+  S.weak.splice(idx,1);
 }
 function clearWeak(v){
   const w=S.weak.find(x=>x.fr===v.fr);
