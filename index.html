@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.60 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.61 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1779,6 +1779,21 @@ function markWeak(v){
 /* v1.56 (decisión de Mateo): cuando los repasos se llenan sale la frase MÁS FLOJA,
    no la más antigua. Antes un shift() ciego se llevaba frases ya casi dominadas
    (caja 4 o 5) y eso bajaba tu memoria 🎓 sin que hubieras fallado nada. */
+const GRAD_MAX=60;
+/* v1.61: la lista de graduadas (munición del ⚡ quiz sorpresa) tenía el mismo
+   borrado ciego que los repasos: soltaba la más ANTIGUA, justo la que lleva más
+   tiempo sin repasarse y más falta hace volver a probar. Ahora sale la que se
+   acaba de re-probar bien — la que menos necesita volver. Las que nunca han
+   salido en el quiz no se tocan mientras haya alguna ya probada. */
+function dropGraduada(){
+  let idx=-1, masReciente="";
+  for(let i=0; i<S.gradList.length-1; i++){        // la recién graduada nunca sale
+    const q=S.gradList[i].q||"";
+    if(q && q>masReciente){ masReciente=q; idx=i; }
+  }
+  if(idx<0) idx=0;                                 // ninguna se ha re-probado aún
+  S.gradList.splice(idx,1);
+}
 function dropWeakest(){
   let idx=0, worst=Infinity;
   for(let i=0; i<S.weak.length-1; i++){                  // la recién añadida nunca sale
@@ -1796,7 +1811,7 @@ function clearWeak(v){
     S.grad=(S.grad||0)+1;                                // cuenta para "francés sólido"
     S.gradList=(S.gradList||[]);                         // ⚡ y queda en la lista: el quiz sorpresa puede RE-probarla
     if(!S.gradList.find(g=>g.fr===w.fr)) S.gradList.push({fr:w.fr, es:w.es});
-    if(S.gradList.length>60) S.gradList.shift();
+    if(S.gradList.length>GRAD_MAX) dropGraduada();
     toast(`🎓 "${esc(v.fr)}" dominada — sale de los repasos`);
     return;
   }
@@ -2403,6 +2418,7 @@ function runQuiz(qs, resume){
           el.classList.add("good");
           addPts(15,ev); S.session.score+=5; floatPoints(5);   // bono por aceptar la emboscada
           if(!q.grad) clearWeak(q);
+          else { const g=(S.gradList||[]).find(g=>g.fr===q.fr); if(g) g.q=todayStr(); }  // ⚡ re-probada hoy
           chute();
           setTimeout(()=>{qi++; ask();}, 800);
         } else {
