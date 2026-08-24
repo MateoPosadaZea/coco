@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.57 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.58 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1854,6 +1854,14 @@ function stateWeight(p){
        + (Array.isArray(p.c)  ? p.c.length*10  : 0)
        + (Array.isArray(p.gl) ? p.gl.length*10 : 0);
 }
+/* 🎯 progreso GANADO: lo que SOLO se consigue jugando (⭐, días, graduadas, racha).
+   Las frases que la app siembra sola al arrancar (la siembra del tío, v1.50) NO
+   cuentan: un arranque recién borrado ya trae esas, y confundirlas con progreso
+   dejaba el candado dormido justo cuando más falta hacía. */
+function earnedWeight(p){
+  if(!p || typeof p!=="object") return -1;
+  return (p.x||0) + (Array.isArray(p.h)?p.h.length*500:0) + (p.g||0)*100 + (p.s||0)*50;
+}
 function readSlot(k){
   try{ const raw=localStorage.getItem(k); if(!raw) return null;
        const p=JSON.parse(raw); return (p && typeof p==="object") ? p : null;
@@ -1882,10 +1890,10 @@ const store = {
   save(){
     const payload=packState();
     try{
-      // 🔒 CANDADO — un estado vacío NUNCA pisa un progreso real.
-      if(stateWeight(payload)<=0){
+      // 🔒 CANDADO — un estado SIN NADA GANADO nunca pisa un progreso real.
+      if(earnedWeight(payload)<=0){
         const prev=readSlot(SAFE_MAIN)||readSlot(SAFE_BAK);
-        if(stateWeight(prev)>0){ this.ok=true; this.locked=true; return; }
+        if(earnedWeight(prev)>0){ this.ok=true; this.locked=true; return; }
       }
       const raw=JSON.stringify(payload);
       localStorage.setItem(SAFE_MAIN, raw);
@@ -3678,7 +3686,22 @@ $("saveCode").onclick=()=>{
   );
 };
 $("saveCopy").onclick=()=>$("saveCode").onclick();
+/* 🚨 v1.58: el respaldo también hay que protegerlo DE UNO MISMO.
+   Si el navegador borró los datos (iOS limpia el sitio, o se borra el historial),
+   la app arranca en blanco — y copiar el código en ese momento genera un código
+   VACÍO que, pegado encima del bueno, remata el desastre. Aquí se avisa antes. */
+function progresoVacio(){ return earnedWeight(packState())<=0; }
+function avisoCodigoVacio(){
+  return confirm(
+    "⚠️ Ahora mismo no hay progreso que respaldar (0 ⭐, sin días jugados).\n\n"+
+    "Este código NO te sirve de copia de seguridad. Si tienes uno guardado de antes, "+
+    "NO lo reemplaces con este: ese viejo es tu progreso.\n\n¿Copiarlo de todos modos?");
+}
 $("btnShowCode").onclick=()=>{
+  if(progresoVacio() && !avisoCodigoVacio()){
+    cocoSay("👍 Buena decisión. Busca tu código anterior y pégalo en «🔑 Tengo un código de guardado» — ahí está tu progreso.");
+    return;
+  }
   const code=makeCode();
   (navigator.clipboard? navigator.clipboard.writeText(code) : Promise.reject()).then(
     ()=>{ cocoSay("💾 ¡Código copiado! Pégalo en tu otro dispositivo con «🔑 Tengo un código de guardado». Es tu progreso COMPLETO."); toast("📋 Copiado al portapapeles"); },
@@ -3688,9 +3711,25 @@ $("btnShowCode").onclick=()=>{
 $("btnLoadCode").onclick=()=>{
   const c=prompt("Pega tu código de guardado (empieza por COCO-):");
   if(!c) return;
+  // ⚖️ si el código trae MENOS progreso del que ya tienes, se pregunta antes de pisar
+  const ahora=stateWeight(packState()), entra=pesoDeCodigo(c);
+  if(entra!==null && ahora>0 && entra<ahora){
+    if(!confirm("⚠️ Ese código tiene MENOS progreso del que ya tienes aquí.\n\n"+
+                "Si lo cargas, se queda el del código. ¿Seguro?")) {
+      cocoSay("Listo, no toqué nada 👍 Tu progreso de aquí sigue intacto.");
+      return;
+    }
+  }
   if(loadCode(c)) cocoSay("¡Progreso restaurado! 🎉 Racha: "+S.streak+" 🔥 · "+S.xp+" ⭐");
   else cocoSay("Hmm, ese código no funciona 🤔 Revisa que esté completo.");
 };
+/* cuánto progreso trae un código, sin cargarlo (null si no es válido) */
+function pesoDeCodigo(code){
+  try{
+    const m=String(code).trim().match(/^COCO-(.+)-(\d{2})$/); if(!m) return null;
+    return earnedWeight(JSON.parse(decodeURIComponent(escape(atob(m[1])))));
+  }catch(e){ return null; }
+}
 
 /* ================== 🔎 PREGÚNTALE A COCO (buscador offline) ================== */
 function searchLex(qraw){
