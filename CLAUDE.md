@@ -13,7 +13,14 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 - Personalización = contenido jugable, nunca encuestas.
 
 ## Reglas técnicas (NO regresionar)
-- `localStorage` clave **`lingualab_fr`** — NO renombrar. El saver es de LISTA FIJA: todo campo nuevo de S debe añadirse a save() Y load() (claves cortas: pc=paracaídas, sg=canciones, gl=graduadas, nm=nombre). makeCode/loadCode (v2) también.
+- 🔒 **LA CAJA FUERTE (v1.56-v1.59) — el progreso es intocable, esto es lo más delicado del archivo.**
+  - La LISTA FIJA de campos vive en **`packState()`/`applyState()`** y en NINGÚN otro sitio. Todo campo nuevo de S se añade a las DOS. El guardado, el espejo, las fotos y makeCode/loadCode beben de ahí, así que ya no se pueden desincronizar (era el fallo clásico). Claves cortas: pc=paracaídas, sg=canciones, gl=graduadas, nm=nombre, lt=giros vistos.
+  - Tres copias: **`lingualab_fr`** (NO renombrar NUNCA) · `lingualab_fr_bak` (espejo) · `lingualab_fr_snap` (7 fotos diarias, la del día solo mejora).
+  - **`earnedWeight()` mide progreso GANADO** (⭐, días, graduadas, racha) y es lo que usa el CANDADO. NO usar `stateWeight()` (peso bruto) para decidir si un estado está vacío: la app siembra 11 frases sola al arrancar, así que un arranque recién borrado pesa ~220 y el candado se queda dormido — ese bug ya pasó una vez (v1.58).
+  - Al cargar gana la copia con MÁS progreso, no la más nueva. Si el principal venía dañado, `store.rescued` avisa al arrancar.
+  - 🗄️ Respaldo fuera del teléfono (Ajustes): 📄 archivo .txt (privado, recomendado) y ☁️ issue de GitHub. **El repo es PÚBLICO y el código va en base64, que no es cifrado** — el botón de GitHub debe seguir avisando de eso antes de abrir nada.
+- 📴 **`sw.js` — RED PRIMERO para el HTML.** No cambiar a caché-primero: con red primero un deploy se ve al instante y el footer se puede seguir verificando en vivo. Caché-primero solo para iconos y manifest. El progreso NO vive en el caché.
+- Los topes con borrado suelta **lo que menos falta hace**, nunca lo más antiguo: repasos (40) → `dropWeakest()`, caja más baja; graduadas (60) → `dropGraduada()`, la re-probada más recientemente. Un `shift()` ciego se lleva frases dominadas y baja la puerta sin que Mateo falle nada (bug real, v1.57/v1.61).
 - CSS: TODO color de superficie por variables en `:root` + redefinición en `body.dark`. PROHIBIDO hardcodear colores claros, también en estilos inline de JS (rompe el modo oscuro).
 - Fechas siempre con `localISO()`/`todayStr()` (zona horaria local, no UTC).
 - Voz: no tocar la maquinaria de speakFR/getMic/releaseMic sin leer los comentarios (12 arreglos acumulados). `releaseMic()` al terminar juegos de hablar y al ir a background (iOS mata la app si no).
@@ -25,5 +32,15 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 ## Flujo de trabajo
 Mateo manda ideas/bugs por el 🪶 buzón de la app (→ issues de este repo, revisarlos cada sesión) o por chat. Claude construye, prueba, publica (push a main → Pages ~1-2 min) y verifica el footer en vivo con query anticaché.
 
+## La puerta al portugués (para no volver a diagnosticarla desde cero)
+`pct` = promedio de 4 partes, cada una tope 100%: 🗓️ días/21 · ⭐/26.000 · 🌶️ tier de "mix"/3 · 🎓 memoria/30.
+Las dos primeras **solo suben**. Las otras dos **bajan por diseño**: el 🌶️ baja con <50% de acierto en una tanda, y la memoria baja al recaer en una frase de caja ≥3 **y también** al fallar una graduada en el ⚡ quiz (ahí `S.grad` resta uno — CERO INFLAR). Una caída de ~25 puntos = una parte entera. Si Mateo pregunta por su %, pedirle los 4 números (salen al tocar la tarjeta 🇵🇹) antes de tocar nada.
+
 ## Estado (ago-2026)
-v1.54: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro. Próximos: modo aventura, portugués (pt-PT) al cruzar la puerta, números/comida/passé composé, conversación libre.
+v1.61: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal.
+Próximos: modo aventura, portugués (pt-PT) al cruzar la puerta, números/comida/passé composé, conversación libre.
+
+## Aprendido a la mala (ago-2026)
+- Mateo **perdió su progreso** cuando el navegador borró los datos del sitio (posiblemente por una "recarga forzada" que en iPhone significa borrar datos del sitio — cuidado con sugerirle eso). La caja fuerte nació después y no pudo rescatarlo. Recordarle guardar el 📄 archivo de vez en cuando: es lo único que sobrevive a eso.
+- El entorno remoto de Claude Code **bloquea `github.io`** por política de red: no se puede verificar el footer en vivo desde la sesión. Se verifica el deploy por la API de GitHub (workflow "pages build and deployment" del commit) y se le pide a Mateo la confirmación visual.
+- No encadenar varias suites de Playwright en un solo comando: se queda sin memoria. Una por una.
