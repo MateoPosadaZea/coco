@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.55 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.56 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -494,6 +494,13 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
         <button class="btn small purple" id="saveCopy" style="flex:0 0 auto;" title="Copiar código">📋</button>
       </div>
       <div class="hint" id="copyHint">👆 toca 📋 para copiarlo</div>
+    </div>
+
+    <div class="card">
+      <h3>🔒 La caja fuerte</h3>
+      <p style="font-weight:700; opacity:.7; font-size:.85rem; margin:4px 0;">Tu progreso se guarda por triplicado y se fotografía cada día. Ninguna actualización lo puede pisar.</p>
+      <div class="hint" id="safeInfo">…</div>
+      <button class="btn small ghost" id="btnSafeRestore" style="margin-top:8px;">↩️ Volver a una copia anterior</button>
     </div>
     <button class="btn big" id="btnHome">🏠 Volver al laboratorio</button>
   </div>
@@ -1780,36 +1787,114 @@ function toast(txt){
   clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),2800);
 }
 
-/* ---- guardado automático (si el navegador lo permite; en la vista previa no) ---- */
+/* ================== 🔒 LA CAJA FUERTE DEL PROGRESO (v1.55) ==================
+   Petición de Mateo: "que mi progreso sea intocable, protegido ante cualquier
+   update, no perder el progreso". Tres copias y tres defensas.
+
+   COPIAS (las tres con la MISMA lista fija de campos: ver packState)
+     1. lingualab_fr        — el guardado de siempre. NO renombrar NUNCA.
+     2. lingualab_fr_bak    — espejo, se escribe en el mismo instante.
+     3. lingualab_fr_snap   — hasta 7 fotos diarias (una por día).
+
+   DEFENSAS
+     · 🔒 CANDADO: jamás se sobrescribe un progreso real con uno en blanco.
+       (era el agujero grave: si load() fallaba, el primer save() borraba todo)
+     · 🛟 RESCATE: si el principal viene corrupto, se lee el espejo o la mejor foto.
+     · ⚖️ PESO: entre varias copias gana la que tiene MÁS progreso, no la más nueva.
+
+   REGLA DE ORO (la de siempre): todo campo nuevo de S se añade a packState() Y a
+   applyState(). Son la única lista fija que hay que tocar — save/load/fotos y
+   makeCode beben todos de aquí, así que ya no se pueden desincronizar.        */
+const SAFE_MAIN="lingualab_fr", SAFE_BAK="lingualab_fr_bak", SAFE_SNAP="lingualab_fr_snap", SAFE_KEEP=7;
+
+/* ---- LISTA FIJA: el estado entero, en claves cortas ---- */
+function packState(){
+  return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
+    f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
+    pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
+    nm:S.name||"", lt:S.lastTwists||[]};
+}
+function applyState(p){
+  if(!p || typeof p!=="object") return false;
+  S.xp=p.x||0; S.streak=p.s||0; S.bestStreak=p.b||0; S.lastDay=p.d||null;
+  S.hist=Array.isArray(p.h)?p.h:[]; if(p.t) S.theme=p.t;
+  S.diff=(p.f&&typeof p.f==="object")?p.f:{}; S.weak=Array.isArray(p.w)?p.w:[];
+  S.lastScenes=Array.isArray(p.ls)?p.ls:[];
+  S.custom=Array.isArray(p.c)?p.c:[]; S.pending=Array.isArray(p.p)?p.p:[];
+  S.grad=p.g||0;
+  S.prefs=Object.assign({vg:"auto",slow:false}, p.pr||{});
+  S.inbox=Array.isArray(p.ib)?p.ib:[];
+  if(p.pc && p.pc.score) S.ps=p.pc;   // ☂️ paracaídas de sesión interrumpida
+  S.songs=Array.isArray(p.sg)?p.sg:[];
+  S.gradList=Array.isArray(p.gl)?p.gl:[];
+  S.name=typeof p.nm==="string"?p.nm:"";
+  S.lastTwists=Array.isArray(p.lt)?p.lt:[];   // v1.55: faltaba en el guardado
+  return true;
+}
+/* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
+function stateWeight(p){
+  if(!p || typeof p!=="object") return -1;
+  return (p.x||0)
+       + (Array.isArray(p.h)  ? p.h.length*500 : 0)
+       + (p.g||0)*100
+       + (Array.isArray(p.w)  ? p.w.length*10  : 0)
+       + (Array.isArray(p.c)  ? p.c.length*10  : 0)
+       + (Array.isArray(p.gl) ? p.gl.length*10 : 0);
+}
+function readSlot(k){
+  try{ const raw=localStorage.getItem(k); if(!raw) return null;
+       const p=JSON.parse(raw); return (p && typeof p==="object") ? p : null;
+  }catch(e){ return null; }
+}
+function readSnaps(){
+  try{ const a=JSON.parse(localStorage.getItem(SAFE_SNAP)); return Array.isArray(a)?a:[]; }
+  catch(e){ return []; }
+}
+/* 📸 una foto por día; la del día solo se reemplaza si la nueva trae MÁS progreso,
+   así una mala tarde nunca borra la mejor versión de ese día */
+function writeSnap(payload){
+  try{
+    const snaps=readSnaps(), t=todayStr(), w=stateWeight(payload);
+    const i=snaps.findIndex(s=>s && s.d===t);
+    if(i>=0){ if(w>=stateWeight(snaps[i].s)) snaps[i]={d:t, w, s:payload}; }
+    else snaps.push({d:t, w, s:payload});
+    while(snaps.length>SAFE_KEEP) snaps.shift();
+    localStorage.setItem(SAFE_SNAP, JSON.stringify(snaps));
+  }catch(e){ /* sin espacio para fotos: el guardado principal manda */ }
+}
 const store = {
   ok: false,
+  locked: false,     // 🔒 el candado frenó una escritura en blanco
+  rescued: false,    // 🛟 el arranque tuvo que tirar de copia
   save(){
+    const payload=packState();
     try{
-      // La clave "lingualab_fr" no cambia entre versiones: al actualizar la app, el progreso se conserva
-      localStorage.setItem("lingualab_fr", JSON.stringify({v:2,x:S.xp,s:S.streak,b:S.bestStreak,d:S.lastDay,h:S.hist,t:S.theme,f:S.diff,w:S.weak,ls:S.lastScenes||[],c:S.custom||[],p:S.pending||[],g:S.grad||0,pr:S.prefs||{},ib:S.inbox||[],pc:S.ps||null,sg:S.songs||[],gl:S.gradList||[],nm:S.name||""}));
-      this.ok = true;
-    }catch(e){ this.ok = false; }
+      // 🔒 CANDADO — un estado vacío NUNCA pisa un progreso real.
+      if(stateWeight(payload)<=0){
+        const prev=readSlot(SAFE_MAIN)||readSlot(SAFE_BAK);
+        if(stateWeight(prev)>0){ this.ok=true; this.locked=true; return; }
+      }
+      const raw=JSON.stringify(payload);
+      localStorage.setItem(SAFE_MAIN, raw);
+      localStorage.setItem(SAFE_BAK, raw);   // espejo
+      writeSnap(payload);
+      this.ok=true; this.locked=false;
+    }catch(e){ this.ok=false; }
   },
   load(){
-    try{
-      const p = JSON.parse(localStorage.getItem("lingualab_fr"));
-      this.ok = true;   // localStorage accesible
-      if(!p) return false;
-      S.xp=p.x||0; S.streak=p.s||0; S.bestStreak=p.b||0; S.lastDay=p.d||null;
-      S.hist=Array.isArray(p.h)?p.h:[]; if(p.t) S.theme=p.t;
-      S.diff=(p.f&&typeof p.f==="object")?p.f:{}; S.weak=Array.isArray(p.w)?p.w:[];
-      S.lastScenes=Array.isArray(p.ls)?p.ls:[];
-      S.custom=Array.isArray(p.c)?p.c:[]; S.pending=Array.isArray(p.p)?p.p:[];
-      S.grad=p.g||0;
-      S.prefs=Object.assign({vg:"auto",slow:false}, p.pr||{});
-      S.inbox=Array.isArray(p.ib)?p.ib:[];
-      if(p.pc && p.pc.score) S.ps=p.pc;   // ☂️ paracaídas de sesión interrumpida
-      S.songs=Array.isArray(p.sg)?p.sg:[];
-      S.gradList=Array.isArray(p.gl)?p.gl:[];
-      S.name=typeof p.nm==="string"?p.nm:"";
-      return true;
-    }catch(e){ this.ok = false; return false; }
-  }
+    try{ localStorage.setItem("lingualab_probe","1"); localStorage.removeItem("lingualab_probe"); this.ok=true; }
+    catch(e){ this.ok=false; }
+    const main=readSlot(SAFE_MAIN);
+    const cands=[main, readSlot(SAFE_BAK), ...readSnaps().map(s=>s&&s.s)];
+    let best=null, bw=-1;
+    for(const c of cands){ const w=stateWeight(c); if(c && w>bw){ best=c; bw=w; } }
+    if(!best) return false;
+    this.rescued = (best!==main);   // 🛟 el principal no era el mejor: hubo rescate
+    applyState(best);
+    return true;
+  },
+  /* 🗓️ las fotos disponibles, de la más nueva a la más vieja */
+  snapshots(){ return readSnaps().slice().reverse(); }
 };
 /* v1.34 — niveles CERO INFLAR (regla de Mateo): títulos con gracia que no
    prometen fluidez. Nada de "casi nativo" en el día 2: la puerta es la que
@@ -1876,10 +1961,11 @@ function refreshTop(){
 
 /* ================== CÓDIGO DE GUARDADO ================== */
 function makeCode(){
-  // respaldo COMPLETO (v2): sirve para mudar el progreso entero a otro navegador u origen
-  const payload = JSON.stringify({v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay,
-    h:S.hist.slice(-60), t:S.theme, f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0, sg:S.songs||[], gl:S.gradList||[], nm:S.name||""});
-  const b = btoa(unescape(encodeURIComponent(payload)));
+  // respaldo COMPLETO (v2): usa la MISMA lista fija que la caja fuerte (packState),
+  // así el código y el guardado ya no se pueden desincronizar nunca.
+  // El historial se recorta a 60 días para que el código quepa en un mensaje.
+  const p = packState(); p.h=(p.h||[]).slice(-60); p.pc=null;   // el paracaídas no se muda de aparato
+  const b = btoa(unescape(encodeURIComponent(JSON.stringify(p))));
   let sum=0; for(const c of b) sum=(sum+c.charCodeAt(0))%97;
   return "COCO-"+b+"-"+String(sum).padStart(2,"0");
 }
@@ -1890,21 +1976,13 @@ function loadCode(code){
     let sum=0; for(const c of m[1]) sum=(sum+c.charCodeAt(0))%97;
     if(String(sum).padStart(2,"0")!==m[2]) return false;
     const p = JSON.parse(decodeURIComponent(escape(atob(m[1]))));
-    S.xp=p.x||0; S.streak=p.s||0; S.bestStreak=p.b||S.streak; S.lastDay=p.d||null;
     if(p.v===2){
-      // código completo: restaura TODO (repasos, dificultad, cuaderno, escenas, graduadas)
-      S.hist=Array.isArray(p.h)?p.h:[];
-      if(p.t) S.theme=p.t;
-      S.diff=(p.f&&typeof p.f==="object")?p.f:{};
-      S.weak=Array.isArray(p.w)?p.w:[];
-      S.lastScenes=Array.isArray(p.ls)?p.ls:[];
-      S.custom=Array.isArray(p.c)?p.c:[];
-      S.pending=Array.isArray(p.p)?p.p:[];
-      S.grad=p.g||0;
-      S.songs=Array.isArray(p.sg)?p.sg:[];
-      S.gradList=Array.isArray(p.gl)?p.gl:[];
-      S.name=typeof p.nm==="string"?p.nm:"";
-    } else {
+      // los códigos viejos no traían ajustes: si no vienen, los tuyos se quedan como están
+      const keepPrefs = ("pr" in p) ? null : S.prefs;
+      applyState(p);                       // restaura TODO por la lista fija
+      if(keepPrefs) S.prefs=keepPrefs;
+    } else {                               // código v1 antiguo: solo lo básico
+      S.xp=p.x||0; S.streak=p.s||0; S.bestStreak=p.b||S.streak; S.lastDay=p.d||null;
       S.hist = Array.isArray(p.h) ? p.h.map(e=>({d:e[0],p:e[1],a:e[2],n:e[3]||1})) : [];
     }
     store.save(); renderNotes();
@@ -3765,6 +3843,20 @@ function paintSettings(){
   $("vgHint").textContent = p.vg==="self"
     ? "Grabas, te escuchas y te calificas tú — cero peleas con el reconocedor 😌"
     : "Coco intenta reconocer tu voz y puntuar solo (a veces el servicio se pone terco)";
+  paintSafe();
+}
+/* 🔒 estado de la caja fuerte: cuántas copias hay y de cuándo */
+function paintSafe(){
+  const info=$("safeInfo"), btn=$("btnSafeRestore"); if(!info) return;
+  const snaps=store.snapshots();
+  if(!store.ok){
+    info.innerHTML="⚠️ Este navegador no deja guardar solo — copia tu código de arriba y guárdalo tú.";
+    if(btn) btn.style.display="none"; return;
+  }
+  info.innerHTML = snaps.length
+    ? `✅ ${snaps.length} ${snaps.length===1?"copia guardada":"copias guardadas"} · la última, del <b>${snaps[0].d}</b>`
+    : "✅ Guardado activo — la primera copia se hace al terminar tu próxima sesión.";
+  if(btn) btn.style.display = snaps.length>1 ? "" : "none";
 }
 function renderInbox(){
   const box=$("ideaList"); if(!box) return;
@@ -3793,6 +3885,23 @@ $("nameEdit").onclick=()=>{
   toast("🪪 Enchanté, "+esc(n)+" — la app ahora es tuya");
 };
 /* 🎭 modo libre en escenas (v1.43) */
+$("btnSafeRestore").onclick=()=>{
+  // ↩️ volver a una foto anterior. Nunca borra: la copia actual también es una foto,
+  // así que si te arrepientes, sigue ahí.
+  const snaps=store.snapshots();
+  if(snaps.length<2){ toast("Todavía no hay copias anteriores 🔒"); return; }
+  const menu=snaps.map((s,i)=>`${i+1}) ${s.d} — ${(s.s&&s.s.x)||0} ⭐`).join("\n");
+  const pick=prompt("¿A qué copia quieres volver?\n\n"+menu+"\n\nEscribe el número:");
+  if(!pick) return;
+  const n=parseInt(pick,10);
+  if(!(n>=1 && n<=snaps.length)){ toast("Ese número no está en la lista 🤔"); return; }
+  const chosen=snaps[n-1];
+  if(!confirm(`Vas a volver a la copia del ${chosen.d} (${(chosen.s&&chosen.s.x)||0} ⭐).\n\nTu estado de ahora queda guardado como copia de hoy, así que puedes deshacerlo.`)) return;
+  store.save();                       // la foto de hoy conserva el estado actual antes de cambiar
+  applyState(chosen.s);
+  store.save(); refreshTop(); renderNotes(); paintSettings();
+  cocoSay(`↩️ Listo, volviste a tu copia del <b>${chosen.d}</b> — ${S.xp} ⭐ y racha de ${S.streak} 🔥`);
+};
 $("scOpt").onclick =()=>{ S.prefs.free=false; store.save(); paintSettings(); };
 $("scFree").onclick=()=>{ S.prefs.free=true;  store.save(); paintSettings(); toast("🎭 Modo libre: en las escenas responderás con tu voz, sin opciones a la vista"); };
 /* 🎵 cancionero (v1.43) */
@@ -3889,6 +3998,14 @@ document.addEventListener("keydown",e=>{
 
 /* ================== ARRANQUE ================== */
 const restored = store.load();
+/* 🛟 v1.55: si el guardado principal venía dañado, la caja fuerte ya tiró de copia.
+   Se avisa sin drama y sin culpa: el progreso está, que es lo que importa. */
+if(store.rescued){
+  setTimeout(()=>{
+    cocoSay("🛟 El guardado principal se había dañado, así que tiré de <b>copia de seguridad</b>. Tu progreso está a salvo — no perdiste nada.");
+    toast("🔒 Progreso recuperado de la caja fuerte");
+  }, 1200);
+}
 /* reparación del bug de zona horaria: días "del futuro" creados en UTC se funden con hoy */
 (function fixTZ(){
   const t=todayStr();
