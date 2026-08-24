@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.58 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.59 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -501,6 +501,16 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <p style="font-weight:700; opacity:.7; font-size:.85rem; margin:4px 0;">Tu progreso se guarda por triplicado y se fotografía cada día. Ninguna actualización lo puede pisar.</p>
       <div class="hint" id="safeInfo">…</div>
       <button class="btn small ghost" id="btnSafeRestore" style="margin-top:8px;">↩️ Volver a una copia anterior</button>
+    </div>
+
+    <div class="card">
+      <h3>🗄️ Respaldo fuera del teléfono</h3>
+      <p style="font-weight:700; opacity:.7; font-size:.85rem; margin:4px 0;">La caja fuerte vive DENTRO del navegador. Si iOS borra los datos del sitio, se lleva las tres copias de una. Esto saca tu progreso afuera.</p>
+      <div class="saverow" style="flex-wrap:wrap;">
+        <button class="btn small purple" id="bkFile">📄 Guardar como archivo</button>
+        <button class="btn small ghost" id="bkGit">☁️ Guardar en GitHub</button>
+      </div>
+      <div class="hint" id="bkHint">📄 se guarda en tus Archivos y es PRIVADO · ☁️ queda en tu repo, que es PÚBLICO</div>
     </div>
     <button class="btn big" id="btnHome">🏠 Volver al laboratorio</button>
   </div>
@@ -3722,6 +3732,59 @@ $("btnLoadCode").onclick=()=>{
   }
   if(loadCode(c)) cocoSay("¡Progreso restaurado! 🎉 Racha: "+S.streak+" 🔥 · "+S.xp+" ⭐");
   else cocoSay("Hmm, ese código no funciona 🤔 Revisa que esté completo.");
+};
+/* ================== 🗄️ RESPALDO FUERA DEL TELÉFONO (v1.59) ==================
+   La caja fuerte protege de bugs y de updates, pero vive dentro del navegador:
+   si iOS borra los datos del sitio se lleva las tres copias juntas. Esto es lo
+   único que sobrevive a eso. Petición de Mateo tras perder su progreso.       */
+function textoRespaldo(){
+  return `Respaldo de Coco 🦜 — ${todayStr()}\n`+
+    `${S.name? S.name+" · ":""}${S.xp} ⭐ · racha ${S.streak} 🔥 · ${S.hist.length} días jugados\n\n`+
+    `Para restaurarlo: abre Coco → ⚙️ Ajustes → «🔑 Tengo un código de guardado» y pega la línea de abajo.\n\n`+
+    makeCode()+"\n";
+}
+$("bkFile").onclick=()=>{
+  if(progresoVacio() && !avisoCodigoVacio()) return;
+  try{
+    const blob=new Blob([textoRespaldo()],{type:"text/plain;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=`coco-respaldo-${todayStr()}.txt`;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    cocoSay("📄 Respaldo generado — guárdalo en <b>Archivos</b> o iCloud. Ese archivo sobrevive aunque el navegador borre todo.<br><br>Si no pasó nada (a veces iOS bloquea la descarga desde la app instalada), usa «💾 Ver mi código» y pégalo en tus notas.");
+  }catch(e){
+    cocoSay("Este navegador no dejó descargar el archivo 🤔 Usa «💾 Ver mi código» y pégalo en tus notas.");
+  }
+};
+$("bkGit").onclick=()=>{
+  if(progresoVacio() && !avisoCodigoVacio()) return;
+  // ⚠️ el repo es PÚBLICO: el código lleva el nombre y las frases del cuaderno,
+  // y va en base64, que NO es cifrado — cualquiera lo puede leer. Se avisa claro.
+  if(!confirm(
+    "⚠️ Tu repositorio de GitHub es PÚBLICO.\n\n"+
+    "El código de respaldo lleva dentro tu nombre y las frases de tu cuaderno, "+
+    "y no va cifrado: cualquiera que entre al repo puede leerlo.\n\n"+
+    "Si prefieres algo privado, cancela y usa «📄 Guardar como archivo».\n\n"+
+    "¿Abrir GitHub de todos modos?")){
+    cocoSay("👍 Cancelado. «📄 Guardar como archivo» hace lo mismo y no lo ve nadie.");
+    return;
+  }
+  const title=`🗄️ Respaldo de progreso — ${todayStr()}`;
+  const body="```\n"+textoRespaldo()+"```";
+  const url="https://github.com/MateoPosadaZea/coco/issues/new?title="+
+            encodeURIComponent(title)+"&body="+encodeURIComponent(body);
+  if(url.length>7000){
+    // demasiado largo para una URL: se copia y se abre un issue en blanco
+    (navigator.clipboard? navigator.clipboard.writeText(textoRespaldo()) : Promise.reject()).then(
+      ()=>{ window.open("https://github.com/MateoPosadaZea/coco/issues/new?title="+encodeURIComponent(title),"_blank");
+            cocoSay("📋 Tu respaldo es largo, así que lo copié al portapapeles y abrí GitHub. Pégalo en el cuerpo del issue y dale a «Submit new issue»."); },
+      ()=>{ prompt("Copia tu respaldo y pégalo en el issue de GitHub:", textoRespaldo()); }
+    );
+    return;
+  }
+  window.open(url,"_blank");
+  cocoSay("☁️ Se abrió GitHub con tu respaldo ya escrito. Toca «Submit new issue» y queda guardado fuera del teléfono, con fecha.");
 };
 /* cuánto progreso trae un código, sin cargarlo (null si no es válido) */
 function pesoDeCodigo(code){
