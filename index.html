@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.59 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.60 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -4199,6 +4199,12 @@ ayúdame a mejorar = Aide-moi à progresser`);
   store.save();
   if(added) setTimeout(()=>toast(`🎁 ${added} frases para tu tío sembradas en el cuaderno — ya están en tus repasos`), 1200);
 })();
+/* 📴 v1.60: que Coco abra sin señal (metro, avión, mala cobertura).
+   El service worker usa RED PRIMERO para el HTML, así que un deploy se sigue
+   viendo al instante cuando hay señal — no te quedas con una versión vieja. */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
 applyTheme();   // 🌙 el tema elegido se aplica desde el arranque
 if(S.name) applyName(); else setTimeout(askName, 600);   // 🪪 una sola pregunta, una sola vez
 refreshTop();
