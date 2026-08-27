@@ -33,11 +33,21 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 Mateo manda ideas/bugs por el 🪶 buzón de la app (→ issues de este repo, revisarlos cada sesión) o por chat. Claude construye, prueba, publica (push a main → Pages ~1-2 min) y verifica el footer en vivo con query anticaché.
 
 ## La puerta al portugués (para no volver a diagnosticarla desde cero)
-`pct` = promedio de 4 partes, cada una tope 100%: 🗓️ días/21 · ⭐/26.000 · 🌶️ tier de "mix"/3 · 🎓 memoria/30.
-Las dos primeras **solo suben**. Las otras dos **bajan por diseño**: el 🌶️ baja con <50% de acierto en una tanda, y la memoria baja al recaer en una frase de caja ≥3 **y también** al fallar una graduada en el ⚡ quiz (ahí `S.grad` resta uno — CERO INFLAR). Una caída de ~25 puntos = una parte entera. Si Mateo pregunta por su %, pedirle los 4 números (salen al tocar la tarjeta 🇵🇹) antes de tocar nada.
+`pct` = promedio de **5** partes (v1.62), cada una tope 100%: 🗓️ días/21 · ⭐/26.000 · 🌶️ tier de "mix"/3 · 🎓 memoria/30 · 🎙️ misiones de Improvisa clavadas/15.
+Las tres primeras **solo suben**. Las otras **bajan por diseño**: el 🌶️ baja con <50% de acierto en una tanda, y la memoria baja al recaer en una frase de caja ≥3 **y también** al fallar una graduada en el ⚡ quiz (ahí `S.grad` resta uno — CERO INFLAR). Una caída de ~20 puntos = una parte entera. Si Mateo pregunta por su %, pedirle los 5 números (salen al tocar la tarjeta 🇵🇹) antes de tocar nada.
+
+**El % ya no abre el portugués: lo abre el 📜 examen** (`S.exam.passed`). El % es solo el medidor del día a día.
+
+## 📜 El examen de salida (v1.62)
+Cuatro secciones de 4: 🎧 entender · 🧩 armar · 🎙️ decir · ⚡ improvisar con reloj de 25 s.
+- **Se aprueba con 3/4 en CADA sección, NUNCA por promedio.** Promediando se pasa a punta de reconocimiento, que es justo lo flojo de Mateo ("muy nulo para una conversación espontánea"). No tocar esta regla.
+- **No da ⭐** — un examen se aprueba, no se farmea. Y lo fallado entra solo a repasos (CERO CULPA: es un mapa, no un portazo).
+- Califica el habla por **familias de palabras clave** (`IMPROV[].keys`), no por frase exacta: es lo que aguanta que el reconocedor de voz falle. Si no hay micrófono se autocalifica y el informe lo dice.
+- 🎙️ Improvisa ya medía producción y la puerta lo ignoraba (bug de diseño hasta v1.61). `markSpoken()` alimenta `S.spoken`.
+- Lo que falta para llevar esto más lejos: **más misiones en `IMPROV`** (hoy 23) — es el cuello de botella del examen y del entrenamiento. Conversación libre de verdad exigiría devolver la API de Claude, que está PODADA: es decisión de Mateo, no se hace por iniciativa propia.
 
 ## Estado (ago-2026)
-v1.61: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal.
+v1.62: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
 Próximos: modo aventura, portugués (pt-PT) al cruzar la puerta, números/comida/passé composé, conversación libre.
 
 ## Aprendido a la mala (ago-2026)
