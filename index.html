@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.61 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.62 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1744,6 +1744,8 @@ const S = {
   inbox: [],           // 🪶 buzón de ideas/bugs para Claude [{d,t}]
   songs: [],           // 🎵 cancionero: versos de canciones [{fr,es,d}]
   gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
+  spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
+  exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
   theme: THEMES[0].id,
   session: null,
@@ -1850,7 +1852,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[]};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1867,6 +1869,8 @@ function applyState(p){
   S.gradList=Array.isArray(p.gl)?p.gl:[];
   S.name=typeof p.nm==="string"?p.nm:"";
   S.lastTwists=Array.isArray(p.lt)?p.lt:[];   // v1.55: faltaba en el guardado
+  S.spoken=Array.isArray(p.sp)?p.sp:[];       // 🎙️ v1.62
+  S.exam=(p.ex&&typeof p.ex==="object")?p.ex:null;
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -2277,30 +2281,65 @@ function theme(){ return THEMES.find(t=>t.id===S.theme) || THEMES[0]; }
 /* un idioma a la vez: el PORTUGUÉS se GANA con francés sólido — de verdad.
    Puerta recalibrada con Mateo (2026-07-17): mide TIEMPO y MEMORIA, no volumen:
    21 días jugados · Filósofo de café (26.000⭐) · 🌶️🌶️🌶️ en Mezcla · 30 frases en cajas altas */
+/* v1.62 — la QUINTA parte: 🎙️ producción.
+   Decisión de Mateo tras darse cuenta de que estaba "muy nulo para una
+   conversación espontánea": la puerta medía días, ⭐, reto y memoria, o sea
+   puro RECONOCER. La única señal de que puede PRODUCIR francés desde cero
+   (las misiones de 🎭 Improvisa clavadas) se calculaba y se tiraba.
+   Con esto el % baja al principio — es lo correcto, no un bug. */
+const VOICE_GOAL=15;
 function solidStats(){
   return {
     days: S.hist.length,
     xp: S.xp,
     tier: diffFor("mix").tier,
     mem: (S.grad||0) + S.weak.filter(w=>(w.box||0)>=3).length,
+    voice: (S.spoken||[]).length,
   };
 }
 function frenchSolid(){
   const s=solidStats();
-  return s.days>=21 && s.xp>=26000 && s.tier>=3 && s.mem>=30;
+  return s.days>=21 && s.xp>=26000 && s.tier>=3 && s.mem>=30 && s.voice>=VOICE_GOAL;
+}
+function solidPct(){
+  const s=solidStats();
+  return Math.min(99, Math.round(100*(Math.min(s.days/21,1)+Math.min(s.xp/26000,1)+
+    Math.min(s.tier/3,1)+Math.min(s.mem/30,1)+Math.min(s.voice/VOICE_GOAL,1))/5));
 }
 function renderLangs(){
   const it=$("lang-it"), pt=$("lang-pt");
   if(!it||!pt) return;
-  if(frenchSolid()){
+  const s=solidStats();
+  const detalle=`🗓️ <b>${s.days}/21</b> días · ⭐ <b>${Math.min(s.xp,26000)}/26.000</b> · 🌶️ <b>${s.tier}/3</b> en Mezcla · 🎓 <b>${s.mem}/30</b> en memoria · 🎙️ <b>${s.voice}/${VOICE_GOAL}</b> misiones improvisadas`;
+  if(S.exam && S.exam.passed){
+    // 📜 v1.62: el portugués ya NO se abre por acumular — se abre por el examen
     pt.classList.remove("locked");
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon" class="won">¡GANADO! 🎉</div>`;
-    pt.onclick=()=>cocoSay("🎉 ¡Te ganaste el portugués con francés sólido DE VERDAD! Pídele a Claude en el chat que lo construya y aparecerá aquí.");
+    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon won">¡GANADO! 🎉</div>`;
+    pt.onclick=()=>cocoSay("🎉 Pasaste el examen: entiendes, construyes, lo dices y respondes a lo imprevisto. Nada de esto te lo regalé. Pídele a Claude que construya el portugués y aparecerá aquí.");
   } else {
-    const s=solidStats();
-    const pct=Math.min(99, Math.round(100*(Math.min(s.days/21,1)+Math.min(s.xp/26000,1)+Math.min(s.tier/3,1)+Math.min(s.mem/30,1))/4));
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon">${pct}% 🧗</div>`;
-    pt.onclick=()=>cocoSay(`Francés sólido = 🗓️ <b>${s.days}/21</b> días jugados · ⭐ <b>${Math.min(s.xp,26000)}/26.000</b> · 🌶️ <b>${s.tier}/3</b> en Mezcla · 🎓 <b>${s.mem}/30</b> frases en memoria de largo plazo. El tiempo no se puede farmear 😉🇫🇷`);
+    const listo=frenchSolid();
+    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon">${listo?"📜 AL EXAMEN":solidPct()+"% 🧗"}</div>`;
+    pt.onclick=()=>{
+      const ov=document.createElement("div"); ov.className="cheatov";
+      const marca=S.exam&&S.exam.tries ? `<p class="hint">Intentos: ${S.exam.tries} · mejor: ${S.exam.best}/${EXAM_SECS.length*EXAM_N}${S.exam.lastScores?" · último: "+S.exam.lastScores:""}</p>` : "";
+      ov.innerHTML=`<div class="cheat">
+        <h3 style="margin-top:0;">🇵🇹 La puerta al portugués</h3>
+        <p style="font-weight:700;">${detalle}</p>
+        <p class="hint">El tiempo no se puede farmear 😉 Y 🎙️ mide lo único que importa de verdad: producir francés desde cero, no reconocerlo.</p>
+        ${marca}
+        <p style="font-weight:700;margin-top:10px;">${listo
+          ? "Estás en el punto. El portugués se abre con el 📜 examen — no con el porcentaje."
+          : "Aún no estás en el punto, pero el examen está abierto: preséntalo como <b>diagnóstico</b> y sales sabiendo exactamente qué te falta, en vez de adivinar."}</p>
+        <div class="btn-row" style="margin-top:12px;">
+          <button class="btn green" id="ptExam">📜 ${listo?"Presentar el examen":"Hacer el diagnóstico"}</button>
+          <button class="btn small ghost" id="ptClose">Ahora no</button>
+        </div></div>`;
+      document.body.appendChild(ov);
+      const cerrar=()=>ov.remove();
+      ov.onclick=e=>{ if(e.target===ov) cerrar(); };
+      ov.querySelector("#ptClose").onclick=cerrar;
+      ov.querySelector("#ptExam").onclick=()=>{ cerrar(); startExam(); };
+    };
   }
   it.innerHTML=`<div class="flag">🇮🇹</div><div class="name">Italiano</div><div class="soon">TRAS PORTUGUÉS</div>`;
   it.onclick=()=>cocoSay("El italiano llega cuando el portugués esté sólido — un idioma a la vez, como tú lo pediste 😉");
@@ -3305,6 +3344,7 @@ function gameImprov(){
         noteNew(m.model, "Misión: "+m.t);
         if(ratio>=1){
           answered=true;
+          markSpoken(m.t);              // 🎙️ v1.62: cuenta para la puerta — producir, no reconocer
           pts+=addPts(40);
           noteReview("ok", m.model, m.t, "misión completa improvisando 🎬");
           fb.innerHTML=`🎉 ¡Misión completa! Coco lo diría así:<br><b>"${m.model}"</b> <button class="replaybtn">🔊</button>`;
@@ -3701,7 +3741,7 @@ $("btnPlay").onclick =()=>startSession(["blitz", rnd(["listen","match","build"])
 $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),"speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnSongs").onclick=()=>startSession(["songs"]);
-$("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
+$("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("mascot").onclick  =()=>{ speakFR(rnd(["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
 $("saveCode").onclick=()=>{
@@ -3749,6 +3789,329 @@ $("btnLoadCode").onclick=()=>{
   if(loadCode(c)) cocoSay("¡Progreso restaurado! 🎉 Racha: "+S.streak+" 🔥 · "+S.xp+" ⭐");
   else cocoSay("Hmm, ese código no funciona 🤔 Revisa que esté completo.");
 };
+/* ================== 📜 EL EXAMEN DE SALIDA (v1.62) ==================
+   Petición de Mateo: que el portugués no se abra por acumular puntos, sino por
+   un examen de verdad — "si paso, estoy listo; si no, que me digan que no".
+
+   Las reglas que lo sostienen:
+   · CERO INFLAR — se aprueba con un MÍNIMO EN CADA SECCIÓN, jamás por promedio.
+     Promediando se pasa a punta de reconocimiento, que es justo la parte floja
+     (lo dijo él: "muy nulo para una conversación espontánea"). Y NO da ⭐:
+     un examen se aprueba, no se farmea.
+   · CERO CULPA — suspender no es un portazo, es un mapa: sale el detalle por
+     sección y las frases falladas entran SOLAS a los repasos.
+   · Se puede repetir siempre, y cada intento trae material distinto.        */
+const EXAM_N=4, EXAM_MIN=3, EXAM_CLOCK=25;
+const EXAM_SECS=[
+  {id:"listen", emoji:"🎧", name:"Entender",   hint:"Coco lo dice. ¿Qué significa?"},
+  {id:"build",  emoji:"🧩", name:"Armar",      hint:"Móntalo tocando las palabras en orden."},
+  {id:"say",    emoji:"🎙️", name:"Decir",      hint:"Dilo en voz alta, sin leerlo."},
+  {id:"improv", emoji:"⚡", name:"Improvisar", hint:"Reloj corriendo. Con TUS palabras, a pelo."},
+];
+let EXAM=null;
+
+/* material del examen: lo tuyo primero (graduadas, repasos, cuaderno) y luego
+   el vocabulario de los temas que tienes abiertos */
+function examPool(){
+  const seen=new Set(), out=[];
+  const push=v=>{ if(v&&v.fr&&v.es&&!v.big&&!seen.has(norm(v.fr))){ seen.add(norm(v.fr)); out.push({fr:v.fr,es:v.es}); } };
+  (S.gradList||[]).forEach(push);
+  (S.weak||[]).forEach(push);
+  THEMES.filter(t=>t.minLvl<=level()).forEach(t=>t.vocab.forEach(push));
+  (S.custom||[]).forEach(push);
+  return out;
+}
+/* 🎙️ v1.62: las misiones que has clavado improvisando — la 5ª parte de la puerta */
+function markSpoken(t){
+  S.spoken=S.spoken||[];
+  if(!S.spoken.includes(t)){ S.spoken.push(t); if(S.spoken.length>60) S.spoken.shift(); store.save(); }
+}
+function examSR(){
+  if(EXAM && EXAM.sr!==undefined) return EXAM.sr;
+  let r=null;
+  if(SR){
+    try{
+      r=new SR(); r.lang="fr-FR"; r.continuous=true; r.interimResults=false; r.maxAlternatives=3;
+      r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(EXAM&&EXAM.onHeard) EXAM.onHeard(rl); };
+      r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ if(EXAM) EXAM.sr=null; } };
+      r.onend=()=>{ if(EXAM) EXAM.srOn=false; };
+    }catch(e){ r=null; }
+  }
+  if(EXAM) EXAM.sr=r;
+  return r;
+}
+function examSRStart(){ const r=examSR(); if(r&&EXAM&&!EXAM.srOn){ try{ r.start(); EXAM.srOn=true; }catch(e){} } }
+function examSRStop(){ const r=EXAM&&EXAM.sr; if(r){ try{ r.abort(); }catch(e){} } if(EXAM) EXAM.srOn=false; }
+
+function startExam(){
+  const pool=shuffle(examPool());
+  if(pool.length < EXAM_N*3){
+    cocoSay("Todavía no hay material suficiente para un examen honesto 🦜 Juega un poco más y vuelve.");
+    return;
+  }
+  releaseMic(); try{ speechSynthesis.cancel(); }catch(e){}
+  S.session=null;
+  EXAM={
+    items:{ listen:pool.slice(0,EXAM_N), build:pool.slice(EXAM_N,EXAM_N*2),
+            say:pool.slice(EXAM_N*2,EXAM_N*3), improv:shuffle(IMPROV).slice(0,EXAM_N) },
+    pool, res:{listen:[],build:[],say:[],improv:[]}, si:0, qi:0, selfGraded:false,
+    sr:undefined, srOn:false, onHeard:null
+  };
+  show("scr-game");
+  $("dots").innerHTML=""; $("tierChip").textContent="📜"; noTimer();
+  $("gameTitle").textContent="📜 El examen";
+  const listo=frenchSolid();
+  $("gameArea").innerHTML=`
+    <div class="prompt" style="font-size:1.15rem;">${listo?"📜 La prueba de salida":"🩺 Diagnóstico"}
+      <span class="sub">${listo
+        ? "Pásalo y el portugués se abre. Sin atajos."
+        : "Todavía no estás en el punto, y no pasa nada: esto no es para aprobar hoy, es para saber EXACTAMENTE qué te falta."}</span></div>
+    <div class="bubble" style="margin-top:14px; text-align:left;">
+      <b>4 secciones, ${EXAM_N} preguntas cada una.</b><br>
+      ${EXAM_SECS.map(s=>`${s.emoji} <b>${s.name}</b> — ${s.hint}`).join("<br>")}
+      <div style="margin-top:10px; opacity:.75; font-size:.85rem;">
+        Se aprueba con <b>${EXAM_MIN} de ${EXAM_N} en CADA sección</b>, no por promedio:
+        si te dejo promediar, pasas con puro reconocimiento y eso sería inflar.<br>
+        No da ⭐ — un examen se aprueba, no se farmea. Lo que falles va solo a tus repasos.
+      </div>
+    </div>`;
+  nextBtn($("gameArea"), examStep, "Empezar 📜");
+}
+
+function examStep(){
+  if(!EXAM) return;
+  if(EXAM.si>=EXAM_SECS.length){ examReport(); return; }
+  const sec=EXAM_SECS[EXAM.si];
+  if(EXAM.qi>=EXAM_N){ EXAM.si++; EXAM.qi=0; examStep(); return; }
+  $("gameTitle").textContent=`📜 ${sec.emoji} ${sec.name}`;
+  const area=$("gameArea");
+  const cab=`<div class="prompt" style="font-size:1rem;">${sec.emoji} ${sec.name}
+      <span class="sub">${sec.hint} · ${EXAM.qi+1} de ${EXAM_N}</span></div>`;
+  if(sec.id==="listen") examListen(area, cab);
+  else if(sec.id==="build") examBuild(area, cab);
+  else if(sec.id==="say") examSay(area, cab);
+  else examImprov(area, cab);
+}
+function examAnswer(secId, ok, item, extra){
+  EXAM.res[secId].push(Object.assign({ok}, item, extra||{}));
+  if(!ok && item.fr && item.es) markWeak({fr:item.fr, es:item.es});
+  EXAM.qi++;
+  store.save();
+}
+
+/* 🎧 entender: Coco lo dice, tú eliges qué significa */
+function examListen(area, cab){
+  noTimer();
+  const q=EXAM.items.listen[EXAM.qi];
+  const malas=shuffle(EXAM.pool.filter(v=>norm(v.es)!==norm(q.es))).slice(0,3);
+  const ops=shuffle([q].concat(malas));
+  area.innerHTML=cab+`<div class="btn-row" style="justify-content:center;margin:10px 0;">
+      <button class="btn small purple" id="exReplay">🔊 Oírlo otra vez</button></div>
+    <div class="options" id="exOpts"></div>`;
+  setTimeout(()=>speakFR(q.fr,0.85),250);
+  $("exReplay").onclick=()=>speakFR(q.fr,0.75);
+  const box=$("exOpts");
+  ops.forEach(o=>{
+    const b=document.createElement("div"); b.className="opt"; b.textContent=o.es;
+    b.onclick=()=>{
+      if(box.dataset.done) return; box.dataset.done="1";
+      const ok=norm(o.es)===norm(q.es);
+      b.classList.add(ok?"good":"bad");
+      if(!ok) [...box.children].forEach((c,i)=>{ if(norm(ops[i].es)===norm(q.es)) c.classList.add("good"); });
+      ding(ok);
+      examAnswer("listen", ok, q, {dijo:o.es});
+      nextBtn(area, examStep);
+    };
+    box.appendChild(b);
+  });
+}
+/* 🧩 armar: del español al francés, tocando las palabras en orden */
+function examBuild(area, cab){
+  noTimer();
+  const q=EXAM.items.build[EXAM.qi];
+  const senuelos=shuffle(EXAM.pool.filter(v=>norm(v.fr)!==norm(q.fr))
+      .flatMap(v=>v.fr.split(/\s+/)).filter(w=>w.length>2 && !q.fr.split(/\s+/).includes(w))).slice(0,2);
+  area.innerHTML=cab+`<div class="prompt" style="font-size:1.25rem;margin-top:6px;">${esc(q.es)}</div>
+    <div id="exChips" style="margin-top:12px;"></div>
+    <div style="text-align:center;margin-top:10px;">
+      <button class="linkish" id="exSkip">No me sale — pasar</button></div>`;
+  let cerrado=false;
+  const cerrar=(ok,errs)=>{
+    if(cerrado) return; cerrado=true;
+    ding(ok);
+    const fb=document.createElement("div"); fb.className="speakresult";
+    fb.innerHTML= ok ? `✅ <b>${esc(q.fr)}</b>` : `La respuesta era: <b>${esc(q.fr)}</b>`;
+    fb.style.color = ok? "var(--green)" : "var(--ink)";
+    area.appendChild(fb);
+    examAnswer("build", ok, q, {errs});
+    nextBtn(area, examStep);
+  };
+  chipBuilder($("exChips"), q.fr, senuelos, (errs)=>cerrar(errs<=1, errs));
+  $("exSkip").onclick=()=>cerrar(false, -1);
+}
+/* 🎙️ decir: producir la frase en voz alta */
+function examSay(area, cab){
+  noTimer();
+  const q=EXAM.items.say[EXAM.qi];
+  const auto = S.prefs.vg!=="self" && !!examSR();
+  area.innerHTML=cab+`<div class="prompt" style="font-size:1.25rem;margin-top:6px;">${esc(q.es)}
+      <span class="sub">Dilo en francés — no está escrito a propósito</span></div>
+    <div class="btn-row" id="exCtl" style="justify-content:center;margin-top:14px;">
+      ${auto?'<button class="btn red" id="exMic">🎙️ Grabar</button>':""}
+      <button class="linkish" id="exSelf">${auto?"El micrófono no me oye":"Me califico yo"}</button>
+    </div>
+    <div class="speakresult" id="exFb"></div>`;
+  const fb=$("exFb");
+  let cerrado=false;
+  const cerrar=(ok, oido)=>{
+    if(cerrado) return; cerrado=true;
+    EXAM.onHeard=null; examSRStop(); releaseMic();
+    const ctl=$("exCtl"); if(ctl) ctl.remove();   // fuera los controles: solo queda «Seguir»
+    ding(ok);
+    fb.innerHTML=(ok?"✅ ":"")+`Coco lo dice así: <b>${esc(q.fr)}</b>`+(oido?`<br><span style="opacity:.6;font-size:.85rem;">te oí: "${esc(oido)}"</span>`:"");
+    fb.style.color= ok? "var(--green)":"var(--ink)";
+    speakFR(q.fr,0.8);
+    examAnswer("say", ok, q, {oido:oido||""});
+    nextBtn(area, examStep);
+  };
+  const mic=$("exMic");
+  if(mic){
+    let grabando=false, mejor=-1, oido="";
+    mic.onclick=()=>{
+      if(!grabando){
+        grabando=true; mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
+        mejor=-1; oido=""; fb.textContent="🎙️ escuchando…"; fb.style.color="var(--ink)";
+        getMic().catch(()=>{}); examSRStop(); setTimeout(examSRStart,150);
+        EXAM.onHeard=(rl)=>{
+          for(let i=0;i<rl.length;i++){ const s=similarity(rl[i].transcript,q.fr); if(s>mejor){mejor=s; oido=rl[i].transcript;} }
+        };
+      } else {
+        grabando=false; mic.classList.remove("rec"); mic.textContent="🎙️ Grabar";
+        setTimeout(()=>{
+          if(mejor<0){ fb.innerHTML="No te oí 🤔 Toca «El micrófono no me oye» y te calificas tú."; return; }
+          cerrar(mejor>=.6, oido);
+        }, 700);
+      }
+    };
+  }
+  $("exSelf").onclick=()=>{
+    EXAM.selfGraded=true;
+    fb.innerHTML=`<div style="margin-bottom:8px;">Se dice: <b>${esc(q.fr)}</b> — sé honesto contigo 😉</div>`;
+    speakFR(q.fr,0.8);
+    const row=document.createElement("div"); row.className="btn-row"; row.style.justifyContent="center";
+    [["Me salió ✔",true],["No me salió ✖",false]].forEach(([t,ok])=>{
+      const b=document.createElement("button"); b.className="btn small "+(ok?"green":"ghost");
+      b.textContent=t; b.onclick=()=>cerrar(ok,""); row.appendChild(b);
+    });
+    fb.appendChild(row);
+  };
+}
+/* ⚡ improvisar: la sección que mide lo que de verdad falta — reloj corriendo */
+function examImprov(area, cab){
+  const m=EXAM.items.improv[EXAM.qi];
+  const auto = S.prefs.vg!=="self" && !!examSR();
+  area.innerHTML=cab+`<div class="prompt" style="font-size:1.15rem;margin-top:6px;">🎬 ${esc(m.t)}
+      <span class="sub">${EXAM_CLOCK} segundos. Con tus palabras.</span></div>
+    <div class="btn-row" id="exCtl" style="justify-content:center;margin-top:14px;">
+      ${auto?'<button class="btn red" id="exMic">🎙️ Hablar</button>':""}
+      <button class="linkish" id="exWrite">✏️ Escribirlo</button>
+    </div>
+    <div id="exWzone"></div>
+    <div class="speakresult" id="exFb"></div>`;
+  const fb=$("exFb");
+  let cerrado=false, dicho="";
+  const cerrar=()=>{
+    if(cerrado) return; cerrado=true;
+    stopTimer(); EXAM.onHeard=null; examSRStop(); releaseMic();
+    const ctl=$("exCtl"); if(ctl) ctl.remove();
+    const wz=$("exWzone"); if(wz) wz.innerHTML="";   // fuera el textarea y su botón
+    const said=norm(dicho);
+    const hits=m.keys.filter(k=>k.some(v=>said.includes(norm(v))));
+    const ratio=m.keys.length? hits.length/m.keys.length : 0;
+    const ok=ratio>=.67;
+    if(ratio>=1) markSpoken(m.t);
+    recordAnswer("improv", ok);
+    ding(ok);
+    const falto=m.keys.filter(k=>!k.some(v=>said.includes(norm(v)))).map(k=>k[0]);
+    fb.innerHTML=`<div style="line-height:1.7;text-align:left;">
+      <div>📝 Tú: "${esc(dicho.trim()||"— nada —")}"</div>
+      <div>${hits.length} de ${m.keys.length}${falto.length?` · te faltó: ${falto.map(x=>`<span class="dw-miss">${esc(x)}</span>`).join(" · ")}`:""}</div>
+      <div>🦜 Coco: <b>${esc(m.model)}</b></div></div>`;
+    fb.style.color= ok? "var(--green)":"var(--ink)";
+    speakFR(m.model,0.8);
+    if(!ok) markWeak({fr:m.model, es:m.t});
+    EXAM.res.improv.push({ok, fr:m.model, es:m.t, hits:hits.length, total:m.keys.length, dicho:dicho.trim()});
+    EXAM.qi++; store.save();
+    nextBtn(area, examStep);
+  };
+  runTimer(EXAM_CLOCK, cerrar);
+  const mic=$("exMic");
+  if(mic){
+    let on=false;
+    mic.onclick=()=>{
+      if(cerrado) return;
+      if(!on){
+        on=true; mic.classList.add("rec"); mic.textContent="🛑 Ya está";
+        getMic().catch(()=>{}); examSRStop(); setTimeout(examSRStart,150);
+        EXAM.onHeard=(rl)=>{ dicho=(dicho+" "+rl[0].transcript).trim(); };
+      } else { on=false; setTimeout(cerrar,600); }
+    };
+  }
+  $("exWrite").onclick=()=>{
+    if(cerrado) return;
+    EXAM.selfGraded=true;
+    $("exWzone").innerHTML=`<textarea class="textinput" id="exTa" rows="2" spellcheck="false" autocorrect="off" placeholder="Improvise en français..."></textarea>`;
+    const ta=$("exTa"); ta.focus();
+    ta.oninput=()=>{ dicho=ta.value; };
+    nextBtn($("exWzone"), cerrar, "Así lo digo ✔");
+  };
+}
+
+/* 📋 el informe: el mapa, no el portazo */
+function examReport(){
+  stopTimer(); noTimer(); releaseMic(); examSRStop();
+  const filas=EXAM_SECS.map(s=>{
+    const r=EXAM.res[s.id]||[];
+    const n=r.filter(x=>x.ok).length;
+    return {s, n, total:r.length, paso:n>=EXAM_MIN, fallos:r.filter(x=>!x.ok)};
+  });
+  const paso=filas.every(f=>f.paso);
+  const total=filas.reduce((a,f)=>a+f.n,0);
+  S.exam=S.exam||{tries:0,passed:false,best:0};
+  S.exam.tries=(S.exam.tries||0)+1;
+  S.exam.last=todayStr();
+  S.exam.best=Math.max(S.exam.best||0, total);
+  S.exam.lastScores=filas.map(f=>`${f.s.emoji}${f.n}/${f.total}`).join(" ");
+  if(paso) S.exam.passed=true;
+  store.save();
+
+  const flojas=filas.filter(f=>!f.paso).map(f=>f.s);
+  $("gameTitle").textContent="📜 El resultado";
+  $("gameArea").innerHTML=`
+    <div class="prompt" style="font-size:1.3rem;">${paso?"✅ Pasaste":"📋 Todavía no"}
+      <span class="sub">${total} de ${EXAM_SECS.length*EXAM_N} · intento ${S.exam.tries}</span></div>
+    <div class="card" style="margin-top:14px;">
+      ${filas.map(f=>`<div class="resultrow"><span style="flex:1;">${f.s.emoji} <b>${f.s.name}</b></span>
+        <span style="font-weight:800;color:var(--${f.paso?"green":"orange"});">${f.n}/${f.total} ${f.paso?"✔":"✖"}</span></div>`).join("")}
+      <p class="hint" style="margin-top:8px;">Se necesita ${EXAM_MIN}/${EXAM_N} en cada una${EXAM.selfGraded?" · algo lo calificaste tú":""}</p>
+    </div>
+    <div class="bubble" style="margin-top:14px;text-align:left;">${
+      paso
+      ? "🎉 Lo hiciste con las cuatro patas: entiendes, construyes, lo dices y respondes a lo imprevisto. <b>El portugués queda abierto.</b> Nada de esto te lo regalé."
+      : `Esto no es un portazo, es el mapa que pediste. Lo que falló ya está en tus <b>repasos</b>.<br><br>
+         <b>Tu foco ahora:</b> ${flojas.map(s=>s.emoji+" "+s.name).join(" y ")}.
+         ${flojas.some(s=>s.id==="improv"||s.id==="say")
+            ? "<br>Ahí está el cuello de botella que tú mismo detectaste: producir, no reconocer. Juega 🎭 <b>Improvisa</b> y pon las escenas en <b>modo libre</b> (Ajustes) — se responde con la voz, sin ver opciones."
+            : "<br>Refuerza con 🌀 Mezcla y el ⚡ quiz sorpresa."}`
+    }</div>`;
+  const row=document.createElement("div"); row.className="btn-row"; row.style.marginTop="14px";
+  const b1=document.createElement("button"); b1.className="btn big"; b1.textContent="🏠 Volver al laboratorio";
+  b1.onclick=()=>{ EXAM=null; refreshTop(); renderNotes(); show("scr-home"); cocoSay(paso?"🇵🇹 El portugués está abierto. Cuando quieras, lo construimos.":"Ya sabes qué entrenar 💪 Sin culpa: volver es la mitad del juego."); };
+  row.appendChild(b1);
+  $("gameArea").appendChild(row);
+  EXAM.done=true;
+}
+
 /* ================== 🗄️ RESPALDO FUERA DEL TELÉFONO (v1.59) ==================
    La caja fuerte protege de bugs y de updates, pero vive dentro del navegador:
    si iOS borra los datos del sitio se lleva las tres copias juntas. Esto es lo
