@@ -377,7 +377,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.62 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.63 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -3843,6 +3843,60 @@ function examSR(){
 function examSRStart(){ const r=examSR(); if(r&&EXAM&&!EXAM.srOn){ try{ r.start(); EXAM.srOn=true; }catch(e){} } }
 function examSRStop(){ const r=EXAM&&EXAM.sr; if(r){ try{ r.abort(); }catch(e){} } if(EXAM) EXAM.srOn=false; }
 
+/* 🎙️ v1.63 — EL MICRÓFONO DEL EXAMEN, con la MISMA receta del juego 3 ¡SUÉLTALO!
+   (12 arreglos acumulados ahí; en v1.62 reinventé el flujo y salió mudo).
+   Mateo: "no está cogiendo mi voz". Lo que faltaba:
+     · ESPERAR a getMic() antes de arrancar el oído — en iPhone, si el
+       reconocedor arranca antes de que exista el permiso, se queda mudo. (la gorda)
+     · Callar a Coco antes de grabar: su voz por el parlante entraba en la toma.
+     · El segundo empujón a los 700 ms — en iOS el oído se duerme solo.
+     · Gracia de ~1,8 s al parar: sin ella se decide antes de que llegue el resultado.
+   NO tocar esto sin leer el juego 3 primero.                                    */
+function wireExamMic(mic, fb, cfg){
+  let grabando=false, pressAt=0, tope=null, tomas=[];
+  const empujar=()=>{ const r=examSR(); if(r&&EXAM&&!EXAM.srOn){ try{ r.start(); EXAM.srOn=true; }catch(e){} } };
+  async function start(){
+    grabando=true; tomas=[]; pressAt=Date.now();
+    mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
+    fb.innerHTML="🔴 Grabando… habla ahora"; fb.style.color="var(--ink)";
+    try{ speechSynthesis.cancel(); }catch(e){}          // que Coco no se puntúe a sí mismo
+    try{ await getMic(); }                              // ⬅️ ESPERAR el permiso
+    catch(err){
+      grabando=false; mic.classList.remove("rec");
+      if(cfg.onBloqueado) cfg.onBloqueado();
+      return;
+    }
+    if(!grabando) return;                               // paró mientras se pedía el permiso
+    const r=examSR();
+    if(r){ try{ r.abort(); }catch(e){} if(EXAM) EXAM.srOn=false; setTimeout(empujar,150); }
+    setTimeout(()=>{ if(grabando) empujar(); }, 700);   // segundo empujón
+    clearTimeout(tope);
+    tope=setTimeout(()=>{ if(grabando) stop(); }, cfg.maxMs||10000);
+    if(EXAM) EXAM.onHeard=(rl)=>{
+      if(Date.now()-pressAt<400) return;                // eco o resto de una toma vieja
+      if(speechSynthesis.speaking) return;              // no puntuar la voz de Coco
+      for(let i=0;i<rl.length;i++) if(rl[i]&&rl[i].transcript) tomas.push(rl[i].transcript);
+      if(tomas.length){ fb.innerHTML=`Coco escuchó: "${esc(String(rl[0].transcript).trim())}"`; }
+    };
+  }
+  function stop(){
+    if(!grabando) return; grabando=false;
+    mic.classList.remove("rec"); mic.textContent="🎙️ Otra vez";
+    clearTimeout(tope);
+    if(cfg.onParar) cfg.onParar();   // ya habló: el reloj no debe cortar la gracia
+    setTimeout(()=>{                                    // gracia: deja llegar el resultado final
+      if(EXAM) EXAM.onHeard=null;
+      if(tomas.length) cfg.onTomas(tomas);
+      else {
+        S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
+        if(cfg.onMudo) cfg.onMudo(S.prefs.srFails>=2);
+      }
+    }, 1800);
+  }
+  mic.onclick=()=>{ if(grabando) stop(); else start(); };
+  return {stop, activo:()=>grabando};
+}
+
 function startExam(){
   const pool=shuffle(examPool());
   if(pool.length < EXAM_N*3){
@@ -3962,6 +4016,9 @@ function examSay(area, cab){
     </div>
     <div class="speakresult" id="exFb"></div>`;
   const fb=$("exFb");
+  // el aviso va ENCIMA de lo que ya haya pintado, para no perderlo
+  const avisar=(txt)=>fb.insertAdjacentHTML("afterbegin",
+    `<div style="color:var(--orange);font-weight:800;margin-bottom:8px;">${txt}</div>`);
   let cerrado=false;
   const cerrar=(ok, oido)=>{
     if(cerrado) return; cerrado=true;
@@ -3976,23 +4033,24 @@ function examSay(area, cab){
   };
   const mic=$("exMic");
   if(mic){
-    let grabando=false, mejor=-1, oido="";
-    mic.onclick=()=>{
-      if(!grabando){
-        grabando=true; mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
-        mejor=-1; oido=""; fb.textContent="🎙️ escuchando…"; fb.style.color="var(--ink)";
-        getMic().catch(()=>{}); examSRStop(); setTimeout(examSRStart,150);
-        EXAM.onHeard=(rl)=>{
-          for(let i=0;i<rl.length;i++){ const s=similarity(rl[i].transcript,q.fr); if(s>mejor){mejor=s; oido=rl[i].transcript;} }
-        };
-      } else {
-        grabando=false; mic.classList.remove("rec"); mic.textContent="🎙️ Grabar";
-        setTimeout(()=>{
-          if(mejor<0){ fb.innerHTML="No te oí 🤔 Toca «El micrófono no me oye» y te calificas tú."; return; }
-          cerrar(mejor>=.6, oido);
-        }, 700);
+    wireExamMic(mic, fb, {
+      onTomas:(tomas)=>{
+        let mejor=-1, oido="";
+        tomas.forEach(t=>{ const s=similarity(t,q.fr); if(s>mejor){ mejor=s; oido=t; } });
+        if(mejor>=.3){ S.prefs.srFails=0; store.save(); }   // el oído sí sirve en este equipo
+        cerrar(mejor>=.6, oido);
+      },
+      onMudo:(insiste)=>{
+        $("exSelf").click();   // pinta el autocalificado…
+        avisar(insiste         // …y el porqué va ENCIMA, que si no se pierde
+          ? "🎧 Este equipo no está cogiendo tu voz. Dilo en voz alta igual y califícate:"
+          : "No te capté 🎧 Puedes tocar 🎙️ otra vez, o calificarte:");
+      },
+      onBloqueado:()=>{
+        $("exSelf").click();
+        avisar("🎙️ El micrófono está bloqueado en este navegador. Dilo en voz alta y califícate:");
       }
-    };
+    });
   }
   $("exSelf").onclick=()=>{
     EXAM.selfGraded=true;
@@ -4014,7 +4072,7 @@ function examImprov(area, cab){
       <span class="sub">${EXAM_CLOCK} segundos. Con tus palabras.</span></div>
     <div class="btn-row" id="exCtl" style="justify-content:center;margin-top:14px;">
       ${auto?'<button class="btn red" id="exMic">🎙️ Hablar</button>':""}
-      <button class="linkish" id="exWrite">✏️ Escribirlo</button>
+      <button class="linkish" id="exWrite"${auto?' style="display:none;"':''}>✏️ Escribirlo</button>
     </div>
     <div id="exWzone"></div>
     <div class="speakresult" id="exFb"></div>`;
@@ -4047,15 +4105,24 @@ function examImprov(area, cab){
   runTimer(EXAM_CLOCK, cerrar);
   const mic=$("exMic");
   if(mic){
-    let on=false;
-    mic.onclick=()=>{
-      if(cerrado) return;
-      if(!on){
-        on=true; mic.classList.add("rec"); mic.textContent="🛑 Ya está";
-        getMic().catch(()=>{}); examSRStop(); setTimeout(examSRStart,150);
-        EXAM.onHeard=(rl)=>{ dicho=(dicho+" "+rl[0].transcript).trim(); };
-      } else { on=false; setTimeout(cerrar,600); }
-    };
+    wireExamMic(mic, fb, {
+      maxMs: EXAM_CLOCK*1000,
+      onParar: ()=>stopTimer(),          // ya habló: el reloj deja de correr
+      onTomas: (tomas)=>{ dicho=tomas.join(" ").trim(); if(dicho) S.prefs.srFails=0; cerrar(); },
+      onMudo: (insiste)=>{
+        // sin voz capturada no se cierra a ciegas: se le da la salida escrita
+        fb.innerHTML = insiste
+          ? "🎧 Este equipo no está cogiendo tu voz. Escríbelo para no perder la pregunta 👇"
+          : "No te capté 🎧 Toca 🎙️ y prueba otra vez, o escríbelo 👇";
+        fb.style.color="var(--orange)";
+        const w=$("exWrite"); if(w){ w.style.display=""; w.click(); }
+      },
+      onBloqueado: ()=>{
+        fb.innerHTML="🎙️ Micrófono bloqueado en este navegador. Escríbelo 👇";
+        fb.style.color="var(--orange)";
+        const w=$("exWrite"); if(w){ w.style.display=""; w.click(); }
+      }
+    });
   }
   $("exWrite").onclick=()=>{
     if(cerrado) return;
