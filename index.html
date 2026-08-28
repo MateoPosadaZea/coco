@@ -137,6 +137,20 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .lang .flag{font-size:1.8rem;}
 .lang .name{font-weight:800; font-size:.85rem;}
 .lang .soon{font-size:.65rem; font-weight:800; color:var(--purple); background:var(--tintp); border-radius:8px; padding:1px 6px; display:inline-block; margin-top:2px;}
+/* 🇵🇹 v1.64: las 5 partes de la puerta, a la vista. Un solo número no dice
+   QUÉ se movió; cinco barritas sí. (Mateo: "no da confianza el porcentaje") */
+.ptbars{display:flex; gap:3px; justify-content:center; align-items:flex-end; height:20px; margin-top:3px;}
+.ptbar{width:6px; height:100%; background:var(--soft); border-radius:3px; display:flex; align-items:flex-end; overflow:hidden;}
+.ptbar i{display:block; width:100%; background:var(--purple); border-radius:3px; transition:height .5s cubic-bezier(.2,1.2,.4,1);}
+.ptbar.full i{background:var(--green);}
+.ptnum{font-size:.6rem; font-weight:800; opacity:.6; margin-top:1px;}
+/* barras con etiqueta, para la hoja de detalle */
+.ptrow{display:flex; align-items:center; gap:8px; margin:6px 0; font-weight:800; font-size:.8rem;}
+.ptrow .lab{flex:0 0 auto; width:1.2rem; text-align:center;}
+.ptrow .track{flex:1; height:9px; background:var(--soft); border-radius:5px; overflow:hidden;}
+.ptrow .fill{display:block; height:100%; background:var(--purple); border-radius:5px;}
+.ptrow .fill.full{background:var(--green);}
+.ptrow .val{flex:0 0 auto; opacity:.7; font-size:.72rem; min-width:5.2rem; text-align:right;}
 
 /* ---------- XP / progress ---------- */
 .xpwrap{margin:8px 0 4px;}
@@ -335,6 +349,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <div class="xpwrap">
         <div class="xplabel"><span id="lvlLabel">Nivel 1 · Aprendiz</span><span id="xpLabel">0 / 100</span></div>
         <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+        <div class="hint" id="xpHint" style="margin-top:6px;"></div>
       </div>
       <h3 style="text-align:center; margin-top:14px;">Tu misión de hoy 🎯</h3>
       <p style="text-align:center; font-weight:700; opacity:.7; margin:4px 0 6px;">4 mini-juegos · ~5 minutos · un ladrillo más del viaje 🧳</p>
@@ -377,7 +392,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.63 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.64 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1961,7 +1976,9 @@ const LVLS=[
  {xp:18000, name:"Cantante de jam"},
  {xp:26000, name:"Filósofo de café"},
  {xp:36000, name:"Contador de blagues"},
- {xp:48000, name:"Leyenda del Laboratorio"},
+ {xp:48000, name:"Ratón de laboratorio"},   // v1.64: "Leyenda" sonaba a maestría y
+ // Mateo lo cazó: "no soy leyenda, ni mucho menos". Este apodo celebra las horas,
+ // que es lo que ⭐ mide de verdad, sin prometer que ya hablas francés.
 ];
 const $ = id => document.getElementById(id);
 const rnd = a => a[Math.floor(Math.random()*a.length)];
@@ -1993,9 +2010,16 @@ function refreshTop(){
     $("xpLabel").textContent = `${gained} / ${span} → ${next.name}`;
     $("xpFill").style.width = Math.min(100, Math.round(gained/span*100))+"%";
   } else {
-    $("xpLabel").textContent = `${S.xp} pts · ¡MAX! 🏆`;
+    // v1.64 (CERO INFLAR, lo cazó Mateo): "¡MAX! 🏆" decía "ya terminaste", que es
+    // falso — la escala ⭐ mide horas de laboratorio, no conversación. El tope de
+    // la escala no es el tope del francés: eso lo mide la 🇵🇹 puerta y el 📜 examen.
+    $("xpLabel").textContent = `${S.xp} ⭐ · tope de la escala`;
     $("xpFill").style.width = "100%";
   }
+  const xh=$("xpHint");
+  if(xh) xh.innerHTML = next
+    ? "⭐ mide constancia: cuánto has jugado. Lo que sabes hablar lo mide la 🇵🇹 puerta."
+    : "Llegaste al tope de esta escala — pero ⭐ mide <b>horas de laboratorio, no conversación</b>. Lo que sabes hablar lo mide la 🇵🇹 puerta y el 📜 examen.";
   const wl=$("weakLine");
   if(wl){
     const nd=dueWeak().length, later=S.weak.length-nd;
@@ -2310,7 +2334,19 @@ function renderLangs(){
   const it=$("lang-it"), pt=$("lang-pt");
   if(!it||!pt) return;
   const s=solidStats();
-  const detalle=`🗓️ <b>${s.days}/21</b> días · ⭐ <b>${Math.min(s.xp,26000)}/26.000</b> · 🌶️ <b>${s.tier}/3</b> en Mezcla · 🎓 <b>${s.mem}/30</b> en memoria · 🎙️ <b>${s.voice}/${VOICE_GOAL}</b> misiones improvisadas`;
+  // las 5 partes, cada una con su meta: lo que de verdad mueve el medidor
+  const PARTES=[
+    {e:"🗓️", n:"días jugados",          v:s.days,  meta:21,         txt:`${s.days}/21`},
+    {e:"⭐", n:"puntos",                 v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`},
+    {e:"🌶️", n:"nivel de reto en Mezcla",v:s.tier,  meta:3,          txt:`${s.tier}/3`},
+    {e:"🎓", n:"frases en memoria",      v:s.mem,   meta:30,         txt:`${s.mem}/30`},
+    {e:"🎙️", n:"misiones improvisadas",  v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`},
+  ].map(p=>Object.assign(p,{pct:Math.min(100, Math.round(p.v/p.meta*100))}));
+  const detalle=PARTES.map(p=>
+    `<div class="ptrow"><span class="lab">${p.e}</span>
+       <span class="track"><span class="fill${p.pct>=100?" full":""}" style="width:${p.pct}%"></span></span>
+       <span class="val">${p.txt}</span></div>
+     <div style="font-size:.7rem;opacity:.55;font-weight:700;margin:-4px 0 6px 1.9rem;">${p.n}</div>`).join("");
   if(S.exam && S.exam.passed){
     // 📜 v1.62: el portugués ya NO se abre por acumular — se abre por el examen
     pt.classList.remove("locked");
@@ -2318,14 +2354,19 @@ function renderLangs(){
     pt.onclick=()=>cocoSay("🎉 Pasaste el examen: entiendes, construyes, lo dices y respondes a lo imprevisto. Nada de esto te lo regalé. Pídele a Claude que construya el portugués y aparecerá aquí.");
   } else {
     const listo=frenchSolid();
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon">${listo?"📜 AL EXAMEN":solidPct()+"% 🧗"}</div>`;
+    // 5 barritas en vez de un solo número: cuando algo se mueve, se ve CUÁL
+    const barras=`<div class="ptbars" title="días · puntos · reto · memoria · voz">`+
+      PARTES.map(p=>`<span class="ptbar${p.pct>=100?" full":""}"><i style="height:${Math.max(6,p.pct)}%"></i></span>`).join("")+
+      `</div><div class="ptnum">${solidPct()}% 🧗</div>`;
+    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div>`+
+      (listo?`<div class="soon">📜 AL EXAMEN</div>`:barras);
     pt.onclick=()=>{
       const ov=document.createElement("div"); ov.className="cheatov";
       const marca=S.exam&&S.exam.tries ? `<p class="hint">Intentos: ${S.exam.tries} · mejor: ${S.exam.best}/${EXAM_SECS.length*EXAM_N}${S.exam.lastScores?" · último: "+S.exam.lastScores:""}</p>` : "";
       ov.innerHTML=`<div class="cheat">
         <h3 style="margin-top:0;">🇵🇹 La puerta al portugués</h3>
-        <p style="font-weight:700;">${detalle}</p>
-        <p class="hint">El tiempo no se puede farmear 😉 Y 🎙️ mide lo único que importa de verdad: producir francés desde cero, no reconocerlo.</p>
+        <div style="margin:10px 0;">${detalle}</div>
+        <p class="hint">El % es el promedio de estas 5. 🗓️ ⭐ y 🎙️ solo suben; 🌶️ y 🎓 <b>pueden bajar</b> — el 🌶️ si fallas mucho en una tanda, la 🎓 si recaes en una frase que ya dominabas. Que baje no es un castigo: es el medidor diciendo la verdad.</p>
         ${marca}
         <p style="font-weight:700;margin-top:10px;">${listo
           ? "Estás en el punto. El portugués se abre con el 📜 examen — no con el porcentaje."
