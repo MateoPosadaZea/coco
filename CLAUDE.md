@@ -6,7 +6,7 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 
 ## Reglas de oro del producto (decisiones de Mateo — NO cambiar sin su OK)
 - **CERO CULPA**: jamás avergonzar por racha rota o errores; se celebra volver.
-- **CERO INFLAR**: nada de títulos ni métricas que prometan de más; la "puerta" al portugués puede BAJAR si baja la solidez (es diseño, no bug).
+- **CERO INFLAR**: nada de títulos ni métricas que prometan de más; la "puerta" al siguiente idioma puede BAJAR si baja la solidez (es diseño, no bug).
 - **LA PODA**: solo se agrega lo que él pide; lo podado no vuelve (podados: botón reto rápido, API de Claude en la app, tarjeta "frases de la sesión", ejercicios de teclear en blitz/listen).
 - **TODO ES EJERCITABLE**: todo contenido visible lleva ⭐ → repasos; nada entra solo al SRS.
 - Onboarding = UNA pregunta (el nombre). Sin formularios.
@@ -32,11 +32,13 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 ## Flujo de trabajo
 Mateo manda ideas/bugs por el 🪶 buzón de la app (→ issues de este repo, revisarlos cada sesión) o por chat. Claude construye, prueba, publica (push a main → Pages ~1-2 min) y verifica el footer en vivo con query anticaché.
 
-## La puerta al portugués (para no volver a diagnosticarla desde cero)
+## La puerta al siguiente idioma (para no volver a diagnosticarla desde cero)
 `pct` = promedio de **5** partes (v1.62), cada una tope 100%: 🗓️ días/21 · ⭐/26.000 · 🌶️ tier de "mix"/3 · 🎓 memoria/30 · 🎙️ misiones de Improvisa clavadas/15.
-Las tres primeras **solo suben**. Las otras **bajan por diseño**: el 🌶️ baja con <50% de acierto en una tanda, y la memoria baja al recaer en una frase de caja ≥3 **y también** al fallar una graduada en el ⚡ quiz (ahí `S.grad` resta uno — CERO INFLAR). Una caída de ~20 puntos = una parte entera. Si Mateo pregunta por su %, pedirle los 5 números (salen al tocar la tarjeta 🇵🇹) antes de tocar nada.
+Las tres primeras **solo suben**. Las otras **bajan por diseño**: el 🌶️ baja con <50% de acierto en una tanda, y la memoria baja al recaer en una frase de caja ≥3 **y también** al fallar una graduada en el ⚡ quiz (ahí `S.grad` resta uno — CERO INFLAR). Una caída de ~20 puntos = una parte entera. Si Mateo pregunta por su %, mirar las 5 barras (salen al tocar la tarjeta de la puerta) antes de tocar nada.
 
-**El % ya no abre el portugués: lo abre el 📜 examen** (`S.exam.passed`). El % es solo el medidor del día a día.
+**El % ya no abre el siguiente idioma: lo abre el 📜 examen** (`S.exam.passed`). El % es solo el medidor del día a día.
+
+**Orden de idiomas (v1.65, cambio de prioridades de Mateo): 🇫🇷 francés → 🇮🇹 ITALIANO → 🇵🇹 portugués.** Antes era portugués primero. La puerta y el examen apuntan al italiano. Para volver a cambiar el orden solo se intercambian los objetos `META` y `LUEGO` en `renderLangs()` — todos los textos salen de ahí. Sigue siendo UN idioma a la vez.
 
 ## 📜 El examen de salida (v1.62)
 Cuatro secciones de 4: 🎧 entender · 🧩 armar · 🎙️ decir · ⚡ improvisar con reloj de 25 s.
@@ -47,8 +49,8 @@ Cuatro secciones de 4: 🎧 entender · 🧩 armar · 🎙️ decir · ⚡ impro
 - Lo que falta para llevar esto más lejos: **más misiones en `IMPROV`** (hoy 23) — es el cuello de botella del examen y del entrenamiento. Conversación libre de verdad exigiría devolver la API de Claude, que está PODADA: es decisión de Mateo, no se hace por iniciativa propia.
 
 ## Estado (ago-2026)
-v1.62: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
-Próximos: modo aventura, portugués (pt-PT) al cruzar la puerta, números/comida/passé composé, conversación libre.
+v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
+Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/passé composé, conversación libre.
 
 ## Aprendido a la mala (ago-2026)
 - Mateo **perdió su progreso** cuando el navegador borró los datos del sitio (posiblemente por una "recarga forzada" que en iPhone significa borrar datos del sitio — cuidado con sugerirle eso). La caja fuerte nació después y no pudo rescatarlo. Recordarle guardar el 📄 archivo de vez en cuando: es lo único que sobrevive a eso.

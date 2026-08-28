@@ -392,7 +392,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.64 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.65 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2302,7 +2302,7 @@ function openCheat(t){
 }
 function theme(){ return THEMES.find(t=>t.id===S.theme) || THEMES[0]; }
 
-/* un idioma a la vez: el PORTUGUÉS se GANA con francés sólido — de verdad.
+/* un idioma a la vez: el SIGUIENTE IDIOMA se GANA con francés sólido — de verdad.
    Puerta recalibrada con Mateo (2026-07-17): mide TIEMPO y MEMORIA, no volumen:
    21 días jugados · Filósofo de café (26.000⭐) · 🌶️🌶️🌶️ en Mezcla · 30 frases en cajas altas */
 /* v1.62 — la QUINTA parte: 🎙️ producción.
@@ -2347,29 +2347,35 @@ function renderLangs(){
        <span class="track"><span class="fill${p.pct>=100?" full":""}" style="width:${p.pct}%"></span></span>
        <span class="val">${p.txt}</span></div>
      <div style="font-size:.7rem;opacity:.55;font-weight:700;margin:-4px 0 6px 1.9rem;">${p.n}</div>`).join("");
+  // 🇮🇹 v1.65 — CAMBIO DE PRIORIDADES DE MATEO: el idioma que se gana es ahora el
+  // ITALIANO; el portugués pasa a segundo. Sigue siendo UN idioma a la vez.
+  // Para volver a cambiar el orden solo se intercambian estos dos objetos.
+  const META  = {el:it, flag:"🇮🇹", name:"Italiano",  art:"el italiano"};
+  const LUEGO = {el:pt, flag:"🇵🇹", name:"Portugués", art:"El portugués", tras:"ITALIANO", antes:"el italiano"};
+  const meta=META.el;
   if(S.exam && S.exam.passed){
-    // 📜 v1.62: el portugués ya NO se abre por acumular — se abre por el examen
-    pt.classList.remove("locked");
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon won">¡GANADO! 🎉</div>`;
-    pt.onclick=()=>cocoSay("🎉 Pasaste el examen: entiendes, construyes, lo dices y respondes a lo imprevisto. Nada de esto te lo regalé. Pídele a Claude que construya el portugués y aparecerá aquí.");
+    // 📜 v1.62: el siguiente idioma ya NO se abre por acumular — se abre por el examen
+    meta.classList.remove("locked");
+    meta.innerHTML=`<div class="flag">${META.flag}</div><div class="name">${META.name}</div><div class="soon won">¡GANADO! 🎉</div>`;
+    meta.onclick=()=>cocoSay(`🎉 Pasaste el examen: entiendes, construyes, lo dices y respondes a lo imprevisto. Nada de esto te lo regalé. Pídele a Claude que construya ${META.art} y aparecerá aquí.`);
   } else {
     const listo=frenchSolid();
     // 5 barritas en vez de un solo número: cuando algo se mueve, se ve CUÁL
     const barras=`<div class="ptbars" title="días · puntos · reto · memoria · voz">`+
       PARTES.map(p=>`<span class="ptbar${p.pct>=100?" full":""}"><i style="height:${Math.max(6,p.pct)}%"></i></span>`).join("")+
       `</div><div class="ptnum">${solidPct()}% 🧗</div>`;
-    pt.innerHTML=`<div class="flag">🇵🇹</div><div class="name">Portugués</div>`+
+    meta.innerHTML=`<div class="flag">${META.flag}</div><div class="name">${META.name}</div>`+
       (listo?`<div class="soon">📜 AL EXAMEN</div>`:barras);
-    pt.onclick=()=>{
+    meta.onclick=()=>{
       const ov=document.createElement("div"); ov.className="cheatov";
       const marca=S.exam&&S.exam.tries ? `<p class="hint">Intentos: ${S.exam.tries} · mejor: ${S.exam.best}/${EXAM_SECS.length*EXAM_N}${S.exam.lastScores?" · último: "+S.exam.lastScores:""}</p>` : "";
       ov.innerHTML=`<div class="cheat">
-        <h3 style="margin-top:0;">🇵🇹 La puerta al portugués</h3>
+        <h3 style="margin-top:0;">${META.flag} La puerta al ${META.name.toLowerCase()}</h3>
         <div style="margin:10px 0;">${detalle}</div>
         <p class="hint">El % es el promedio de estas 5. 🗓️ ⭐ y 🎙️ solo suben; 🌶️ y 🎓 <b>pueden bajar</b> — el 🌶️ si fallas mucho en una tanda, la 🎓 si recaes en una frase que ya dominabas. Que baje no es un castigo: es el medidor diciendo la verdad.</p>
         ${marca}
         <p style="font-weight:700;margin-top:10px;">${listo
-          ? "Estás en el punto. El portugués se abre con el 📜 examen — no con el porcentaje."
+          ? `Estás en el punto. ${META.art.charAt(0).toUpperCase()+META.art.slice(1)} se abre con el 📜 examen — no con el porcentaje.`
           : "Aún no estás en el punto, pero el examen está abierto: preséntalo como <b>diagnóstico</b> y sales sabiendo exactamente qué te falta, en vez de adivinar."}</p>
         <div class="btn-row" style="margin-top:12px;">
           <button class="btn green" id="ptExam">📜 ${listo?"Presentar el examen":"Hacer el diagnóstico"}</button>
@@ -2382,8 +2388,8 @@ function renderLangs(){
       ov.querySelector("#ptExam").onclick=()=>{ cerrar(); startExam(); };
     };
   }
-  it.innerHTML=`<div class="flag">🇮🇹</div><div class="name">Italiano</div><div class="soon">TRAS PORTUGUÉS</div>`;
-  it.onclick=()=>cocoSay("El italiano llega cuando el portugués esté sólido — un idioma a la vez, como tú lo pediste 😉");
+  LUEGO.el.innerHTML=`<div class="flag">${LUEGO.flag}</div><div class="name">${LUEGO.name}</div><div class="soon">TRAS ${LUEGO.tras}</div>`;
+  LUEGO.el.onclick=()=>cocoSay(`${LUEGO.art} llega cuando ${LUEGO.antes} esté sólido — un idioma a la vez, como tú lo pediste 😉`);
 }
 /* en inmersión se mezclan TODOS los temas desbloqueados (interleaving) */
 function gameSource(){
@@ -3831,7 +3837,7 @@ $("btnLoadCode").onclick=()=>{
   else cocoSay("Hmm, ese código no funciona 🤔 Revisa que esté completo.");
 };
 /* ================== 📜 EL EXAMEN DE SALIDA (v1.62) ==================
-   Petición de Mateo: que el portugués no se abra por acumular puntos, sino por
+   Petición de Mateo: que el siguiente idioma no se abra por acumular puntos, sino
    un examen de verdad — "si paso, estoy listo; si no, que me digan que no".
 
    Las reglas que lo sostienen:
@@ -3959,7 +3965,7 @@ function startExam(){
   $("gameArea").innerHTML=`
     <div class="prompt" style="font-size:1.15rem;">${listo?"📜 La prueba de salida":"🩺 Diagnóstico"}
       <span class="sub">${listo
-        ? "Pásalo y el portugués se abre. Sin atajos."
+        ? "Pásalo y el italiano se abre. Sin atajos."
         : "Todavía no estás en el punto, y no pasa nada: esto no es para aprobar hoy, es para saber EXACTAMENTE qué te falta."}</span></div>
     <div class="bubble" style="margin-top:14px; text-align:left;">
       <b>4 secciones, ${EXAM_N} preguntas cada una.</b><br>
@@ -4205,7 +4211,7 @@ function examReport(){
     </div>
     <div class="bubble" style="margin-top:14px;text-align:left;">${
       paso
-      ? "🎉 Lo hiciste con las cuatro patas: entiendes, construyes, lo dices y respondes a lo imprevisto. <b>El portugués queda abierto.</b> Nada de esto te lo regalé."
+      ? "🎉 Lo hiciste con las cuatro patas: entiendes, construyes, lo dices y respondes a lo imprevisto. <b>El italiano queda abierto.</b> Nada de esto te lo regalé."
       : `Esto no es un portazo, es el mapa que pediste. Lo que falló ya está en tus <b>repasos</b>.<br><br>
          <b>Tu foco ahora:</b> ${flojas.map(s=>s.emoji+" "+s.name).join(" y ")}.
          ${flojas.some(s=>s.id==="improv"||s.id==="say")
@@ -4214,7 +4220,7 @@ function examReport(){
     }</div>`;
   const row=document.createElement("div"); row.className="btn-row"; row.style.marginTop="14px";
   const b1=document.createElement("button"); b1.className="btn big"; b1.textContent="🏠 Volver al laboratorio";
-  b1.onclick=()=>{ EXAM=null; refreshTop(); renderNotes(); show("scr-home"); cocoSay(paso?"🇵🇹 El portugués está abierto. Cuando quieras, lo construimos.":"Ya sabes qué entrenar 💪 Sin culpa: volver es la mitad del juego."); };
+  b1.onclick=()=>{ EXAM=null; refreshTop(); renderNotes(); show("scr-home"); cocoSay(paso?"🇮🇹 El italiano está abierto. Cuando quieras, lo construimos.":"Ya sabes qué entrenar 💪 Sin culpa: volver es la mitad del juego."); };
   row.appendChild(b1);
   $("gameArea").appendChild(row);
   EXAM.done=true;
