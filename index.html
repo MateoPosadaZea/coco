@@ -151,6 +151,12 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .ptrow .fill{display:block; height:100%; background:var(--purple); border-radius:5px;}
 .ptrow .fill.full{background:var(--green);}
 .ptrow .val{flex:0 0 auto; opacity:.7; font-size:.72rem; min-width:5.2rem; text-align:right;}
+/* v1.68: una línea corta por barra; el detalle solo si lo pides (Mateo: "demasiado texto") */
+.ptrow{cursor:pointer;}
+.ptmini{font-size:.72rem; font-weight:700; opacity:.6; margin:-3px 0 8px 1.9rem;}
+.ptmini .mas{opacity:.8; text-decoration:underline;}
+.ptcomo{font-size:.75rem; font-weight:600; opacity:.85; line-height:1.5; margin:-4px 0 10px 1.9rem;
+        border-left:3px solid var(--soft); padding-left:8px;}
 
 /* ---------- XP / progress ---------- */
 .xpwrap{margin:8px 0 4px;}
@@ -392,7 +398,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.67 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.68 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2360,27 +2366,33 @@ function renderLangs(){
   // v1.66: cada barra dice CÓMO se llena. Mateo: "siento que he jugado bastante
   // y aún no entiendo cómo se llenan". Tenía razón: mostrábamos el número sin
   // decir nunca qué hacer, y dos de las cinco no se mueven jugando más hoy.
+  // v1.68: UNA línea corta por barra. El detalle solo si lo pides tocando la fila.
+  // (Mateo, viendo la hoja de v1.66: "demasiado texto, demasiado" — y tenía razón.)
   const PARTES=[
-    {e:"🗓️", n:"días jugados",          v:s.days,  meta:21,         txt:`${s.days}/21`,
-     como:"Vuelve otro día. Solo suma 1 por día — esta no se puede acelerar."},
-    {e:"⭐", n:"puntos",                 v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`,
-     como:"Jugando cualquier cosa. Los ⭐ siguen subiendo aunque esta parte ya esté llena."},
-    {e:"🌶️", n:"nivel de reto en Mezcla",v:s.tier,  meta:3,          txt:`${s.tier}/3`,
-     como:`Se calibra sola: acierta 85% o más en 🌀 Mezcla y sube; si caes por debajo del 50%, baja.`+
-          (s.tier>3 ? ` Vas en <b>${"🌶️".repeat(s.tier)} ${s.tier}</b> — por encima de 3 es reto extra y <b>no</b> cambia el %.`
-                    : ` El reto llega hasta <b>${TIER_MAX}</b>: del 4 en adelante hay frases más largas, más fichas señuelo, 6 opciones y audio a velocidad real.`)},
-    {e:"🎓", n:"frases en memoria",      v:s.mem,   meta:30,         txt:`${s.mem}/30`,
-     como:"Acertando una frase <b>el día que toca repasarla</b>. Cada acierto la manda 1 → 3 → 7 → 14 → 30 días más allá; fallarla la devuelve al principio. Por eso son mínimo 11 días por frase: no se llena jugando más hoy, se llena volviendo."},
-    {e:"🎙️", n:"misiones improvisadas",  v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`,
-     como:"Clavando al 100% una misión de 🎭 Improvisa (decir la idea con tus palabras, tocando todas las claves)."},
+    {e:"🗓️", n:"días jugados",     v:s.days,  meta:21,         txt:`${s.days}/21`,
+     mini:"1 por día · no se acelera",
+     como:"Vuelve otro día y ya está. Es la única parte que no depende de cuánto juegues, sino de cuántas veces vuelvas."},
+    {e:"⭐", n:"puntos",            v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`,
+     mini:"jugando cualquier cosa",
+     como:"Tus ⭐ siguen subiendo aunque esta parte ya esté llena: lo que se llenó es el tramo que mide la puerta, no el contador."},
+    {e:"🌶️", n:"reto en Mezcla",   v:s.tier,  meta:3,          txt:`${s.tier}/3`,
+     mini:"se calibra sola con tu acierto",
+     como:`Acierta 85% o más en 🌀 Mezcla y sube; por debajo del 50%, baja. `+
+          (s.tier>3 ? `Vas en <b>${"🌶️".repeat(s.tier)}</b> — pasar de 3 es reto extra y <b>no</b> cambia el %.`
+                    : `Llega hasta ${TIER_MAX}: del 4 en adelante, frases más largas, más fichas señuelo, 6 opciones y audio a velocidad real.`)},
+    {e:"🎓", n:"frases en memoria", v:s.mem,   meta:30,         txt:`${s.mem}/30`,
+     mini:"acertar el día que toca · mín. 11 días",
+     como:"Cada acierto manda la frase 1 → 3 → 7 → 14 → 30 días más allá, y solo cuentan las que pasan de la caja 3. Fallarla la devuelve al principio. No se llena jugando más hoy: se llena volviendo."},
+    {e:"🎙️", n:"misiones improvisadas", v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`,
+     mini:"clavar una misión de 🎭 Improvisa",
+     como:"Decir la idea con TUS palabras tocando todas las claves. Sale en la sesión de hoy y en Inmersión — o toca «Entrenar la parte más floja» aquí abajo."},
   ].map(p=>Object.assign(p,{pct:Math.min(100, Math.round(p.v/p.meta*100))}));
-  const detalle=PARTES.map(p=>
-    `<div class="ptrow"><span class="lab">${p.e}</span>
+  const detalle=PARTES.map((p,i)=>
+    `<div class="ptrow" data-fila="${i}"><span class="lab">${p.e}</span>
        <span class="track"><span class="fill${p.pct>=100?" full":""}" style="width:${p.pct}%"></span></span>
        <span class="val">${p.pct>=100?"✅ ":""}${p.txt}</span></div>
-     <div style="font-size:.72rem;opacity:.6;font-weight:700;margin:-4px 0 2px 1.9rem;">${p.n}</div>
-     <div style="font-size:.72rem;opacity:.75;font-weight:600;margin:0 0 10px 1.9rem;line-height:1.45;">
-       ${p.pct>=100?"✅ <b>Parte completa.</b> ":""}${p.como}</div>`).join("");
+     <div class="ptmini" data-fila="${i}">${p.n} · ${p.mini} <span class="mas">▾</span></div>
+     <div class="ptcomo" data-detalle="${i}" hidden>${p.como}</div>`).join("");
   // 🇮🇹 v1.65 — CAMBIO DE PRIORIDADES DE MATEO: el idioma que se gana es ahora el
   // ITALIANO; el portugués pasa a segundo. Sigue siendo UN idioma a la vez.
   // Para volver a cambiar el orden solo se intercambian estos dos objetos.
@@ -2406,11 +2418,11 @@ function renderLangs(){
       ov.innerHTML=`<div class="cheat">
         <h3 style="margin-top:0;">${META.flag} La puerta al ${META.name.toLowerCase()}</h3>
         <div style="margin:10px 0;">${detalle}</div>
-        <p class="hint">El % es el promedio de estas 5. 🗓️ ⭐ y 🎙️ solo suben; 🌶️ y 🎓 <b>pueden bajar</b> — el 🌶️ si fallas mucho en una tanda, la 🎓 si recaes en una frase que ya dominabas. Que baje no es un castigo: es el medidor diciendo la verdad.</p>
+        <p class="hint">Promedio de las 5. Toca una barra para ver cómo se llena.</p>
         ${marca}
         <p style="font-weight:700;margin-top:10px;">${listo
-          ? `Estás en el punto. ${META.art.charAt(0).toUpperCase()+META.art.slice(1)} se abre con el 📜 examen — no con el porcentaje.`
-          : "Aún no estás en el punto, pero el examen está abierto: preséntalo como <b>diagnóstico</b> y sales sabiendo exactamente qué te falta, en vez de adivinar."}</p>
+          ? `Estás en el punto: ${META.art} se abre con el 📜 examen, no con el %.`
+          : "El examen ya está abierto: preséntalo como <b>diagnóstico</b> y sabrás qué te falta."}</p>
         <div class="btn-row" style="margin-top:12px;">
           <button class="btn green" id="ptExam">📜 ${listo?"Presentar el examen":"Hacer el diagnóstico"}</button>
           <button class="btn small ghost" id="ptClose">Ahora no</button>
@@ -2421,6 +2433,17 @@ function renderLangs(){
       ov.onclick=e=>{ if(e.target===ov) cerrar(); };
       ov.querySelector("#ptClose").onclick=cerrar;
       ov.querySelector("#ptExam").onclick=()=>{ cerrar(); startExam(); };
+      // tocar una barra abre su explicación (y cierra las demás: una a la vez)
+      ov.querySelectorAll("[data-fila]").forEach(el=>{
+        el.onclick=()=>{
+          const i=el.dataset.fila;
+          const d=ov.querySelector(`[data-detalle="${i}"]`);
+          const abierto=!d.hidden;
+          ov.querySelectorAll("[data-detalle]").forEach(x=>x.hidden=true);
+          ov.querySelectorAll(".ptmini .mas").forEach(x=>x.textContent="▾");
+          if(!abierto){ d.hidden=false; ov.querySelector(`.ptmini[data-fila="${i}"] .mas`).textContent="▴"; }
+        };
+      });
       // 🎭 acción directa: la barra más baja de las que SÍ se pueden entrenar hoy
       // (🗓️ no se acelera y ⭐ se llena sola, así que quedan 🌶️, 🎓 y 🎙️)
       ov.querySelector("#ptTrain").onclick=()=>{
