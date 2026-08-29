@@ -392,7 +392,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.65 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.66 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2335,18 +2335,28 @@ function renderLangs(){
   if(!it||!pt) return;
   const s=solidStats();
   // las 5 partes, cada una con su meta: lo que de verdad mueve el medidor
+  // v1.66: cada barra dice CÓMO se llena. Mateo: "siento que he jugado bastante
+  // y aún no entiendo cómo se llenan". Tenía razón: mostrábamos el número sin
+  // decir nunca qué hacer, y dos de las cinco no se mueven jugando más hoy.
   const PARTES=[
-    {e:"🗓️", n:"días jugados",          v:s.days,  meta:21,         txt:`${s.days}/21`},
-    {e:"⭐", n:"puntos",                 v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`},
-    {e:"🌶️", n:"nivel de reto en Mezcla",v:s.tier,  meta:3,          txt:`${s.tier}/3`},
-    {e:"🎓", n:"frases en memoria",      v:s.mem,   meta:30,         txt:`${s.mem}/30`},
-    {e:"🎙️", n:"misiones improvisadas",  v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`},
+    {e:"🗓️", n:"días jugados",          v:s.days,  meta:21,         txt:`${s.days}/21`,
+     como:"Vuelve otro día. Solo suma 1 por día — esta no se puede acelerar."},
+    {e:"⭐", n:"puntos",                 v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`,
+     como:"Jugando cualquier cosa. Los ⭐ siguen subiendo aunque esta parte ya esté llena."},
+    {e:"🌶️", n:"nivel de reto en Mezcla",v:s.tier,  meta:3,          txt:`${s.tier}/3`,
+     como:"Sube sola al acertar 85% o más en 🌀 Mezcla; baja si caes por debajo del 50%."},
+    {e:"🎓", n:"frases en memoria",      v:s.mem,   meta:30,         txt:`${s.mem}/30`,
+     como:"Acertando una frase <b>el día que toca repasarla</b>. Cada acierto la manda 1 → 3 → 7 → 14 → 30 días más allá; fallarla la devuelve al principio. Por eso son mínimo 11 días por frase: no se llena jugando más hoy, se llena volviendo."},
+    {e:"🎙️", n:"misiones improvisadas",  v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`,
+     como:"Clavando al 100% una misión de 🎭 Improvisa (decir la idea con tus palabras, tocando todas las claves)."},
   ].map(p=>Object.assign(p,{pct:Math.min(100, Math.round(p.v/p.meta*100))}));
   const detalle=PARTES.map(p=>
     `<div class="ptrow"><span class="lab">${p.e}</span>
        <span class="track"><span class="fill${p.pct>=100?" full":""}" style="width:${p.pct}%"></span></span>
-       <span class="val">${p.txt}</span></div>
-     <div style="font-size:.7rem;opacity:.55;font-weight:700;margin:-4px 0 6px 1.9rem;">${p.n}</div>`).join("");
+       <span class="val">${p.pct>=100?"✅ ":""}${p.txt}</span></div>
+     <div style="font-size:.72rem;opacity:.6;font-weight:700;margin:-4px 0 2px 1.9rem;">${p.n}</div>
+     <div style="font-size:.72rem;opacity:.75;font-weight:600;margin:0 0 10px 1.9rem;line-height:1.45;">
+       ${p.pct>=100?"✅ <b>Parte completa.</b> ":""}${p.como}</div>`).join("");
   // 🇮🇹 v1.65 — CAMBIO DE PRIORIDADES DE MATEO: el idioma que se gana es ahora el
   // ITALIANO; el portugués pasa a segundo. Sigue siendo UN idioma a la vez.
   // Para volver a cambiar el orden solo se intercambian estos dos objetos.
@@ -2380,12 +2390,25 @@ function renderLangs(){
         <div class="btn-row" style="margin-top:12px;">
           <button class="btn green" id="ptExam">📜 ${listo?"Presentar el examen":"Hacer el diagnóstico"}</button>
           <button class="btn small ghost" id="ptClose">Ahora no</button>
-        </div></div>`;
+        </div>
+        <button class="btn small purple" id="ptTrain" style="margin-top:8px;">🎭 Entrenar la parte más floja</button></div>`;
       document.body.appendChild(ov);
       const cerrar=()=>ov.remove();
       ov.onclick=e=>{ if(e.target===ov) cerrar(); };
       ov.querySelector("#ptClose").onclick=cerrar;
       ov.querySelector("#ptExam").onclick=()=>{ cerrar(); startExam(); };
+      // 🎭 acción directa: la barra más baja de las que SÍ se pueden entrenar hoy
+      // (🗓️ no se acelera y ⭐ se llena sola, así que quedan 🌶️, 🎓 y 🎙️)
+      ov.querySelector("#ptTrain").onclick=()=>{
+        cerrar();
+        const entrenables=PARTES.filter(p=>["🌶️","🎓","🎙️"].includes(p.e) && p.pct<100)
+                                .sort((a,b)=>a.pct-b.pct);
+        const floja=entrenables[0];
+        if(!floja){ cocoSay("Esas tres ya están llenas 💪 Lo que queda es 🗓️ tiempo: vuelve mañana."); return; }
+        if(floja.e==="🎙️"){ cocoSay("🎭 A improvisar: di la idea con TUS palabras. Clávala entera y la barra 🎙️ sube."); startSession(["improv","improv"]); }
+        else if(floja.e==="🎓"){ cocoSay("🔁 Repasos del día: acertarlos hoy es lo ÚNICO que mueve la 🎓."); startSession(["blitz", rnd(["listen","build"])]); }
+        else { cocoSay("🌶️ A subir el reto: acierta 85% en 🌀 Mezcla y sube sola."); S.theme="mix"; store.save(); startSession(["blitz","build","speak"]); }
+      };
     };
   }
   LUEGO.el.innerHTML=`<div class="flag">${LUEGO.flag}</div><div class="name">${LUEGO.name}</div><div class="soon">TRAS ${LUEGO.tras}</div>`;
@@ -3784,7 +3807,12 @@ function renderProgress(){
 /* ================== EVENTOS ================== */
 $("btnProgress").onclick=()=>{ renderProgress(); show("scr-progress"); };
 $("btnProgBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
-$("btnPlay").onclick =()=>startSession(["blitz", rnd(["listen","match","build"]), "speak","scene"]);   // v1.52: el 2º juego rota — oído, parejas o armar frases
+// v1.66 — ARREGLO DE DISEÑO: 🎭 Improvisa solo estaba en Modo Inmersión, así que
+// la 5ª parte de la puerta (🎙️ misiones clavadas) era IMPOSIBLE de llenar jugando
+// la sesión de todos los días. Le pedí a Mateo algo que la app no le ofrecía.
+// Ahora el último juego rota entre la escena y la improvisación, y la sesión
+// sigue siendo de 4 juegos (~5 min, la promesa no se toca).
+$("btnPlay").onclick =()=>startSession(["blitz", rnd(["listen","match","build"]), "speak", rnd(["scene","scene","improv"])]);
 $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),"speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnSongs").onclick=()=>startSession(["songs"]);
