@@ -392,7 +392,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.66 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.67 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1766,21 +1766,33 @@ const S = {
   session: null,
 };
 
-/* ---- motor de dificultad adaptativa (zona de flujo) ---- */
+/* ---- motor de dificultad adaptativa (zona de flujo) ----
+   v1.67: el tope pasa de 3 a 5 chiles. Mateo: "si veo que todas las sesiones son
+   perfectas, subir; si me equivoco, bajarla — calibrarla según mi nivel". Eso ya
+   lo hacía el motor (≥85% sube, <50% baja, en ventanas de 8-12 respuestas); lo
+   que faltaba era techo. Los tiers 4 y 5 son reto de verdad, no chiles pintados:
+     · 🌶️🌶️🌶️🌶️  frases más largas para armar, el doble de fichas señuelo,
+                    6 opciones en vez de 4 y audio a velocidad real (1.0)
+     · 🌶️🌶️🌶️🌶️🌶️ el triple de señuelos y audio más rápido que un nativo (1.08)
+   OJO: la PUERTA sigue midiendo sobre 3 (min(tier/3,1)). Subir a 4 o 5 NO mueve
+   el %: es reto extra, no un requisito nuevo — su % no se toca. */
+const TIER_MAX=5;
 function diffFor(id){ if(!S.diff[id]) S.diff[id]={recent:[],tier:1}; return S.diff[id]; }
 function recordAnswer(id, ok){
   const d=diffFor(id);
   d.recent.push(ok?1:0); if(d.recent.length>12) d.recent.shift();
   if(d.recent.length>=8){
     const acc=d.recent.reduce((a,b)=>a+b,0)/d.recent.length;
-    if(acc>=.85 && d.tier<3){ d.tier++; d.recent=[]; announceTier(d.tier,true); }
+    if(acc>=.85 && d.tier<TIER_MAX){ d.tier++; d.recent=[]; announceTier(d.tier,true); }
     else if(acc<.5 && d.tier>1){ d.tier--; d.recent=[]; announceTier(d.tier,false); }
   }
 }
 function updateTierChip(tier){ const c=$("tierChip"); if(c) c.textContent="🌶️".repeat(tier); }
 function announceTier(tier, up){
   updateTierChip(tier);
-  toast(up ? "🌶️ ¡Nivel de reto SUBIÓ a "+"🌶️".repeat(tier)+"! Coco ya no se anda con juegos"
+  toast(up ? (tier>=4
+              ? "🌶️".repeat(tier)+" ¡Reto "+tier+"! Frases más largas, más señuelos y audio a velocidad real"
+              : "🌶️ ¡Nivel de reto SUBIÓ a "+"🌶️".repeat(tier)+"! Coco ya no se anda con juegos")
            : "🧯 Coco baja un poco el ritmo, ¡a afinar la base!");
 }
 /* ---- repaso espaciado (cajas de Leitner): fallar → vuelve hoy; acertar → 1, 3, 7, 14, 30 días ---- */
@@ -1979,6 +1991,16 @@ const LVLS=[
  {xp:48000, name:"Ratón de laboratorio"},   // v1.64: "Leyenda" sonaba a maestría y
  // Mateo lo cazó: "no soy leyenda, ni mucho menos". Este apodo celebra las horas,
  // que es lo que ⭐ mide de verdad, sin prometer que ya hablas francés.
+ // v1.67: peldaños nuevos para que la barra siga moviéndose (Mateo: "ya llegué al
+ // máximo, ¿qué más puedo hacer?"). Todos son apodos de CONSTANCIA — celebran las
+ // horas, que es lo que ⭐ mide, y ninguno promete que ya hablas francés.
+ // ⚠️ LA LISTA VA EN ORDEN ASCENDENTE: level() recorre y se queda con el último
+ // peldaño alcanzado. Desordenarla rompe el nivel en silencio.
+ {xp:58000,  name:"Coleccionista de frases"},
+ {xp:72000,  name:"Terco de tiempo completo"},
+ {xp:92000,  name:"Maratonista de sesiones"},
+ {xp:118000, name:"Fósil del laboratorio"},
+ {xp:150000, name:"Parte del mobiliario"},
 ];
 const $ = id => document.getElementById(id);
 const rnd = a => a[Math.floor(Math.random()*a.length)];
@@ -2344,7 +2366,9 @@ function renderLangs(){
     {e:"⭐", n:"puntos",                 v:s.xp,    meta:26000,      txt:`${Math.min(s.xp,26000).toLocaleString("es")}/26.000`,
      como:"Jugando cualquier cosa. Los ⭐ siguen subiendo aunque esta parte ya esté llena."},
     {e:"🌶️", n:"nivel de reto en Mezcla",v:s.tier,  meta:3,          txt:`${s.tier}/3`,
-     como:"Sube sola al acertar 85% o más en 🌀 Mezcla; baja si caes por debajo del 50%."},
+     como:`Se calibra sola: acierta 85% o más en 🌀 Mezcla y sube; si caes por debajo del 50%, baja.`+
+          (s.tier>3 ? ` Vas en <b>${"🌶️".repeat(s.tier)} ${s.tier}</b> — por encima de 3 es reto extra y <b>no</b> cambia el %.`
+                    : ` El reto llega hasta <b>${TIER_MAX}</b>: del 4 en adelante hay frases más largas, más fichas señuelo, 6 opciones y audio a velocidad real.`)},
     {e:"🎓", n:"frases en memoria",      v:s.mem,   meta:30,         txt:`${s.mem}/30`,
      como:"Acertando una frase <b>el día que toca repasarla</b>. Cada acierto la manda 1 → 3 → 7 → 14 → 30 días más allá; fallarla la devuelve al principio. Por eso son mínimo 11 días por frase: no se llena jugando más hoy, se llena volviendo."},
     {e:"🎙️", n:"misiones improvisadas",  v:s.voice, meta:VOICE_GOAL, txt:`${s.voice}/${VOICE_GOAL}`,
@@ -2680,7 +2704,10 @@ function gameBlitz(){
 
     // frases largas JAMÁS como ejercicio de escritura (petición de Mateo):
     // aunque el tier lo pida, caen a opción múltiple
-    const typedOK = q.fr.trim().split(/\s+/).length<=6 && q.fr.length<=45;
+    // v1.67: a partir del 🌶️4 entran frases MÁS LARGAS a armar (más vocabulario en juego)
+    const maxPal = tier>=5 ? 10 : tier>=4 ? 8 : 6;
+    const maxLen = tier>=5 ? 80 : tier>=4 ? 62 : 45;
+    const typedOK = q.fr.trim().split(/\s+/).length<=maxPal && q.fr.length<=maxLen;
     if(tier>=3 && typedOK){
       /* 🧩 v1.53: nivel alto = ARMAR la frase con fichas (el dictado tecleado aburría — poda de Mateo) */
       noTimer();   // pensar el orden ES el ejercicio: sin cronómetro
@@ -2691,7 +2718,7 @@ function gameBlitz(){
         <div id="chipZone"></div>
         <div class="speakresult" id="fb"></div>`;
       const distract=[...new Set(t.vocab.filter(v=>v.fr!==q.fr).flatMap(v=>v.fr.split(/\s+/)).map(w=>w.replace(/[^\p{L}''-]/gu,"")).filter(w=>w.length>=3 && !norm(q.fr).includes(norm(w))))];
-      chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0,2), (errs)=>{
+      chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0, tier>=5?6:tier>=4?4:2), (errs)=>{   // v1.67: más señuelos al subir el reto
         answered=true; S.session.tries++;
         const ok=errs===0;
         if(!q.retry) recordAnswer(t.id, ok);
@@ -2714,7 +2741,8 @@ function gameBlitz(){
       const dir = Math.random()<.5;   // true: FR→ES, false: ES→FR
       // si el tema es pequeño (p.ej. el cuaderno 📓), completar opciones con todo el vocabulario
       const wrongPool = t.vocab.length>=8 ? t.vocab : t.vocab.concat(THEMES.flatMap(x=>x.vocab));
-      const wrong = shuffle(wrongPool.filter(v=>v.fr!==q.fr)).slice(0,3);
+      // v1.67: en 🌶️4+ salen 6 opciones en vez de 4 — adivinar deja de ser negocio
+      const wrong = shuffle(wrongPool.filter(v=>v.fr!==q.fr)).slice(0, tier>=4?5:3);
       const opts = shuffle([q,...wrong]);
       area.innerHTML=`
         <div class="prompt">${dir?q.fr:q.es}
@@ -2778,10 +2806,13 @@ function gameListen(){
     if(!q.retry && !S.session.asked.includes(q.fr)) S.session.asked.push(q.fr);
     const tier=diffFor(t.id).tier;
 
-    if(tier>=2 && q.fr.trim().split(/\s+/).length<=6 && q.fr.length<=45){
+    // v1.67: en 🌶️4+ entran frases más largas y el audio va a velocidad real de nativo
+    const maxPalL = tier>=5 ? 10 : tier>=4 ? 8 : 6;
+    const maxLenL = tier>=5 ? 80 : tier>=4 ? 62 : 45;
+    if(tier>=2 && q.fr.trim().split(/\s+/).length<=maxPalL && q.fr.length<=maxLenL){
       /* 🧩 v1.53: escucha y ÁRMALA con fichas (antes: dictado tecleado — tedioso) */
-      const rate = tier>=3 ? 0.95 : 0.8;
-      const base = tier>=3 ? 25 : 20;
+      const rate = tier>=5 ? 1.08 : tier>=4 ? 1.0 : tier>=3 ? 0.95 : 0.8;
+      const base = 15 + tier*5;
       const tag = q.retry ? "🔁 segunda oportunidad" : `${qi+1} de ${qs.length}`;
       area.innerHTML=`
         <div class="prompt">🔊
@@ -2793,7 +2824,7 @@ function gameListen(){
       speakFR(q.fr, rate);
       $("replay").onclick=()=>speakFR(q.fr, Math.max(.65, rate-.15));
       const distract=[...new Set(t.vocab.filter(v=>v.fr!==q.fr).flatMap(v=>v.fr.split(/\s+/)).map(w=>w.replace(/[^\p{L}''-]/gu,"")).filter(w=>w.length>=3 && !norm(q.fr).includes(norm(w))))];
-      chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0,2), (errs)=>{
+      chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0, tier>=5?6:tier>=4?4:2), (errs)=>{   // v1.67: más señuelos al subir el reto
         S.session.tries++;
         const ok=errs===0;
         if(!q.retry) recordAnswer(t.id, ok);
