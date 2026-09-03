@@ -404,7 +404,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.71 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.72 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -490,6 +490,21 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <p class="hint" style="text-align:left; margin:0 0 8px;">Últimos 14 días · toca una barra para ver el detalle</p>
       <div class="chart" id="chart"></div>
       <p class="hint" id="chartEmpty" style="display:none;">Aún no hay datos. ¡Juega tu primera sesión y aquí aparecerá tu primera barra! 🌱</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px;">💪 Tus destrezas</h3>
+      <p class="hint" style="text-align:left; margin:0 0 10px;">Acierto en tus últimas respuestas de cada tipo</p>
+      <div id="skillRows"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px;">🗂️ Por categoría</h3>
+      <p class="hint" style="text-align:left; margin:0 0 10px;">Dónde vas fuerte y dónde flojo, tema por tema</p>
+      <div id="temaRows"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px;">🔁 Lo que más te cuesta</h3>
+      <p class="hint" style="text-align:left; margin:0 0 10px;">Las frases que siguen volviendo a la caja 0</p>
+      <div id="duroRows"></div>
     </div>
     <div class="card">
       <h3>🗓️ Historial de sesiones</h3>
@@ -1775,11 +1790,34 @@ const S = {
   gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
   spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
   read: {},            // 📖 v1.71: por qué trozo va cada lectura {idTexto:indice}
+  skills: {},          // 💪 v1.72: acierto por destreza {id:{n,ok,rec[]}}
   exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
   theme: THEMES[0].id,
   session: null,
 };
+
+/* 💪 v1.72 — ACIERTO POR DESTREZA. Mateo pidió ver sus puntos fuertes y flojos
+   por tipo de ejercicio, no solo por tema. El motor de dificultad ya guardaba
+   precisión, pero SIEMPRE bajo el id del TEMA: "pronunciación" o "lectura" no se
+   podían reconstruir hacia atrás, no existían como dato. Desde aquí sí se miden.
+   Se guarda una ventana de las últimas 30 respuestas de cada destreza: interesa
+   cómo vas AHORA, no un promedio de por vida que ya no dice nada. */
+const DESTREZAS=[
+  {id:"vocab",   e:"📚", n:"Vocabulario",   donde:"⚡ Rayo léxico y 🔗 Parejas"},
+  {id:"oido",    e:"👂", n:"Oído",          donde:"👂 Oído fino"},
+  {id:"hablar",  e:"🎤", n:"Pronunciación", donde:"🎤 ¡Suéltalo!"},
+  {id:"armar",   e:"🧩", n:"Armar frases",  donde:"🧩 Arma la frase"},
+  {id:"escena",  e:"💬", n:"Conversación",  donde:"💬 Escenas"},
+  {id:"improv",  e:"🎭", n:"Improvisar",    donde:"🎭 Improvisa"},
+  {id:"lectura", e:"📖", n:"Lectura",       donde:"📖 Lectura"},
+];
+function recordSkill(id, ok){
+  S.skills=S.skills||{};
+  const d=S.skills[id]||(S.skills[id]={n:0,ok:0,rec:[]});
+  d.n++; if(ok) d.ok++;
+  d.rec.push(ok?1:0); if(d.rec.length>30) d.rec.shift();
+}
 
 /* ---- motor de dificultad adaptativa (zona de flujo) ----
    v1.67: el tope pasa de 3 a 5 chiles. Mateo: "si veo que todas las sesiones son
@@ -1894,7 +1932,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1914,6 +1952,7 @@ function applyState(p){
   S.spoken=Array.isArray(p.sp)?p.sp:[];       // 🎙️ v1.62
   S.exam=(p.ex&&typeof p.ex==="object")?p.ex:null;
   S.read=(p.rd&&typeof p.rd==="object")?p.rd:{};   // 📖 v1.71
+  S.skills=(p.sk&&typeof p.sk==="object")?p.sk:{};  // 💪 v1.72
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -2785,7 +2824,7 @@ function gameBlitz(){
       chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0, tier>=5?6:tier>=4?4:2), (errs)=>{   // v1.67: más señuelos al subir el reto
         answered=true; S.session.tries++;
         const ok=errs===0;
-        if(!q.retry) recordAnswer(t.id, ok);
+        if(!q.retry){ recordAnswer(t.id, ok); recordSkill("armar", ok); }
         const fb=$("fb");
         if(ok){
           pts+=addPts(q.retry?Math.ceil(base/2):base+5); clearWeak(q);
@@ -2820,7 +2859,7 @@ function gameBlitz(){
           const ok=opts[i]===q;
           stopTimer();
           S.session.tries++;
-          if(!q.retry) recordAnswer(t.id, ok);
+          if(!q.retry){ recordAnswer(t.id, ok); recordSkill("vocab", ok); }
           let audio=Promise.resolve();
           if(ok){
             el.classList.add("good"); pts+=addPts(q.retry?Math.ceil(base/2):base,ev); clearWeak(q);
@@ -2839,7 +2878,7 @@ function gameBlitz(){
       runTimer(tier===2?7:10, ()=>{
         if(answered) return; answered=true;
         missPts(); S.session.tries++;
-        if(!q.retry){ recordAnswer(t.id,false); qs.push({fr:q.fr, es:q.es, retry:true}); }
+        if(!q.retry){ recordAnswer(t.id,false); recordSkill("vocab", false); qs.push({fr:q.fr, es:q.es, retry:true}); }
         markWeak(q);
         noteReview("fail", q.fr, q.es, "se agotó el tiempo ⏱");
         area.querySelectorAll(".opt").forEach((e2,j)=>{ if(opts[j]===q) e2.classList.add("good"); else e2.classList.add("dim"); });
@@ -2891,7 +2930,7 @@ function gameListen(){
       chipBuilder($("chipZone"), q.fr, shuffle(distract).slice(0, tier>=5?6:tier>=4?4:2), (errs)=>{   // v1.67: más señuelos al subir el reto
         S.session.tries++;
         const ok=errs===0;
-        if(!q.retry) recordAnswer(t.id, ok);
+        if(!q.retry){ recordAnswer(t.id, ok); recordSkill("oido", ok); }
         const fb=$("fb");
         if(ok){
           pts+=addPts(q.retry?Math.ceil(base/2):base); clearWeak(q);
@@ -2926,7 +2965,7 @@ function gameListen(){
           if(answered) return; answered=true;
           const ok=opts[i]===q;
           S.session.tries++;
-          if(!q.retry) recordAnswer(t.id, ok);
+          if(!q.retry){ recordAnswer(t.id, ok); recordSkill("oido", ok); }
           area.querySelectorAll(".opt").forEach((e2,j)=>{
             e2.querySelector("div").textContent = opts[j].es;
           });
@@ -3025,7 +3064,7 @@ function gameSpeak(){
       if(scored) return; scored=true;
       S.session.tries++;
       const nStars = sim>=.8?3 : sim>=.55?2 : sim>=.3?1 : 0;
-      if(!q._recorded){ recordAnswer(t.id, nStars>=2); q._recorded=true; }
+      if(!q._recorded){ recordAnswer(t.id, nStars>=2); recordSkill("hablar", nStars>=2); q._recorded=true; }
       stars.textContent = "⭐".repeat(nStars) + "☆".repeat(3-nStars);
       if(nStars>=2){
         q._adv=true;
@@ -3332,7 +3371,7 @@ function gameScene(){
       el.innerHTML=`${o.fr}<div class="optTr" style="font-size:.8rem;opacity:.55;font-weight:700;${noTr?"display:none":""}">${o.es}</div>`;
       el.onclick=(ev)=>{
         S.session.tries++;
-        recordAnswer("scene", !!o.ok);
+        recordAnswer("scene", !!o.ok); recordSkill("escena", !!o.ok);
         if(o.ok){
           el.classList.add("good");
           pts+=addPts(hinted?10:20,ev);
@@ -3513,7 +3552,7 @@ function gameImprov(){
         const hits=m.keys.filter(k=>k.some(v=>said.includes(norm(v))));
         const ratio=hits.length/m.keys.length;
         S.session.tries++;
-        recordAnswer("improv", ratio>=.67);
+        recordAnswer("improv", ratio>=.67); recordSkill("improv", ratio>=.67);
         noteNew(m.model, "Misión: "+m.t);
         if(ratio>=1){
           answered=true;
@@ -3772,7 +3811,7 @@ function gameBuild(){
           c.classList.add("used"); $("built").textContent+=(pos?" ":"")+words[pos]; pos++;
           if(pos===words.length){
             done=true; S.session.tries++;
-            recordAnswer(t.id, errs===0);
+            recordAnswer(t.id, errs===0); recordSkill("armar", errs===0);
             const base=errs===0?22:12;
             pts+=addPts(q.weak&&errs===0?Math.ceil(base*1.2):base);
             if(errs===0) clearWeak(q); else markWeak(q);
@@ -3865,7 +3904,68 @@ function endSession(){
 
 /* ================== PANTALLA DE PROGRESO ================== */
 function fmtDay(iso){ const [y,m,d]=iso.split("-"); return d+"/"+m; }
+/* 💪🗂️🔁 v1.72 — el detalle que pidió Mateo: "que la pestaña de mi progreso
+   tuviera muchos más detalles, información útil, no por capricho".
+   Solo se pinta lo que existe de verdad. Donde aún no hay datos se dice, en vez
+   de inventar una barra bonita: eso sería inflar. */
+function barraPct(pct, n, meta){
+  const col = pct>=80 ? "green" : pct>=55 ? "purple" : "orange";
+  return `<div class="ptrow" style="cursor:default;">
+      <span class="lab">${meta.e}</span>
+      <span class="track"><span class="fill" style="width:${pct}%;background:var(--${col});"></span></span>
+      <span class="val">${pct}%</span></div>
+    <div class="ptmini">${meta.n} · ${n} respuesta${n===1?"":"s"}</div>`;
+}
+function renderDestrezas(){
+  const box=$("skillRows"); if(!box) return;
+  const sk=S.skills||{};
+  const conDatos=DESTREZAS.filter(d=>sk[d.id] && sk[d.id].rec.length>=3);
+  const sinDatos=DESTREZAS.filter(d=>!sk[d.id] || sk[d.id].rec.length<3);
+  const filas=conDatos.map(d=>{
+    const r=sk[d.id].rec;
+    return {d, pct:Math.round(r.reduce((a,b)=>a+b,0)/r.length*100), n:sk[d.id].n};
+  }).sort((a,b)=>a.pct-b.pct);   // lo más flojo arriba: es lo que hay que reforzar
+  let html = filas.map(f=>barraPct(f.pct, f.n, f.d)).join("");
+  if(filas.length>=2){
+    const flojo=filas[0], fuerte=filas[filas.length-1];
+    html = `<p style="font-weight:800;margin:0 0 10px;">Tu punto fuerte es ${fuerte.d.e} <b>${fuerte.d.n}</b> · lo que más te falta reforzar es ${flojo.d.e} <b>${flojo.d.n}</b></p>` + html;
+  }
+  if(sinDatos.length) html += `<p class="hint" style="text-align:left;margin-top:10px;">Sin datos todavía: ${sinDatos.map(d=>d.e+" "+d.n).join(" · ")}. Se llenan jugando ${sinDatos.map(d=>d.donde).join(", ")}.</p>`;
+  if(!filas.length) html = `<p class="hint">Esto empieza a medirse desde la v1.72 — juega una sesión y aquí aparecen tus destrezas. Lo de antes no se puede reconstruir: se guardaba por tema, no por tipo de ejercicio.</p>` + html;
+  html += `<p class="hint" style="text-align:left;margin-top:8px;">✂️ <b>Escritura</b> no sale porque está podada a propósito: aquí se arma con fichas, no se teclea.</p>`;
+  box.innerHTML=html;
+}
+function renderTemas(){
+  const box=$("temaRows"); if(!box) return;
+  const nom={mix:{e:"🌀",n:"Mezcla de todo"}, notes:{e:"📓",n:"Tu cuaderno"}, scene:{e:"💬",n:"Escenas"},
+             improv:{e:"🎭",n:"Improvisar"}, lectura:{e:"📖",n:"Lectura"}};
+  const filas=Object.entries(S.diff||{})
+    .map(([id,d])=>{
+      const t=THEMES.find(x=>x.id===id);
+      const meta = t ? {e:t.emoji, n:t.name} : (nom[id]||{e:"•",n:id});
+      const r=d.recent||[];
+      return {meta, n:r.length, tier:d.tier||1, pct:r.length?Math.round(r.reduce((a,b)=>a+b,0)/r.length*100):null};
+    })
+    .filter(f=>f.pct!==null && f.n>=3)
+    .sort((a,b)=>a.pct-b.pct);
+  box.innerHTML = filas.length
+    ? filas.map(f=>barraPct(f.pct, f.n, f.meta)+`<div class="ptmini" style="margin-top:-6px;">reto ${"🌶️".repeat(f.tier)}</div>`).join("")
+    : `<p class="hint">Aún no hay suficientes respuestas por categoría. Juega un par de sesiones y aquí verás en cuáles vas fuerte.</p>`;
+}
+function renderDuras(){
+  const box=$("duroRows"); if(!box) return;
+  const duras=(S.weak||[]).filter(w=>(w.box||0)===0).slice(0,6);
+  box.innerHTML = duras.length
+    ? duras.map(w=>`<div class="resultrow"><span style="flex:1;text-align:left;">
+         <b>${esc(w.fr)}</b><div class="tr" style="opacity:.6;font-size:.78rem;">${esc(w.es)}</div></span>
+         <button class="replaybtn" data-say="${esc(w.fr)}">🔊</button></div>`).join("")
+      + `<p class="hint" style="text-align:left;margin-top:8px;">Están en la caja 0: se repasan hoy. Acertarlas el día que toca es lo único que sube tu 🎓.</p>`
+    : `<p class="hint">Nada atascado ahora mismo 💪 Todas tus frases van avanzando de caja.</p>`;
+  box.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speakFR(b.dataset.say,0.8));
+}
+
 function renderProgress(){
+  renderDestrezas(); renderTemas(); renderDuras();
   // tiles
   const days = S.hist.length;
   const avgAcc = days ? Math.round(S.hist.reduce((t,e)=>t+e.a,0)/days) : 0;
@@ -4185,7 +4285,8 @@ function gameRead(){
         b.classList.add(ok?"good":"bad");
         if(!ok) [...box.children].forEach((c,i)=>{ if(ops[i].es===p.es) c.classList.add("good"); });
         ding(ok);
-        if(S.session){ S.session.tries++; recordAnswer("lectura", ok); }
+        if(S.session) S.session.tries++;
+        recordAnswer("lectura", ok); recordSkill("lectura", ok);
         pts += ok ? addPts(15) : 0;
         if(!ok) markWeak({fr:p.fr, es:p.es});
         const fb=$("lecFb");
@@ -4513,7 +4614,7 @@ function examImprov(area, cab){
     const ratio=m.keys.length? hits.length/m.keys.length : 0;
     const ok=ratio>=.67;
     if(ratio>=1) markSpoken(m.t);
-    recordAnswer("improv", ok);
+    recordAnswer("improv", ok); recordSkill("improv", ok);
     ding(ok);
     const falto=m.keys.filter(k=>!k.some(v=>said.includes(norm(v)))).map(k=>k[0]);
     fb.innerHTML=`<div style="line-height:1.7;text-align:left;">
