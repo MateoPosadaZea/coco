@@ -153,6 +153,11 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .ptrow .val{flex:0 0 auto; opacity:.7; font-size:.72rem; min-width:5.2rem; text-align:right;}
 /* v1.68: una línea corta por barra; el detalle solo si lo pides (Mateo: "demasiado texto") */
 .ptrow{cursor:pointer;}
+/* 📖 v1.71: el texto de lectura — cada palabra se toca */
+.lecturafr{line-height:2; text-align:left; font-size:1.05rem;}
+.lecturafr .palabra{cursor:pointer; border-bottom:2px dotted var(--soft); padding:0 1px; border-radius:3px;}
+.lecturafr .palabra:hover{background:var(--tint);}
+.lecturafr .palabra.vista{background:var(--tintp); color:var(--purple); border-bottom-color:var(--purple);}
 .ptmini{font-size:.72rem; font-weight:700; opacity:.6; margin:-3px 0 8px 1.9rem;}
 .ptmini .mas{opacity:.8; text-decoration:underline;}
 .ptcomo{font-size:.75rem; font-weight:600; opacity:.85; line-height:1.5; margin:-4px 0 10px 1.9rem;
@@ -366,6 +371,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <div class="btn-row" style="margin-top:10px;">
         <button class="btn small purple" id="btnScene">💬 Solo conversación</button>
         <button class="btn small" id="btnSongs" style="display:none; background:var(--pink); color:#fff;">🎵 Cancionero</button>
+        <button class="btn small ghost" id="btnRead">📖 Leer</button>
         <button class="btn small ghost" id="btnProgress">📈 Mi progreso</button>
         <button class="btn small ghost" id="btnSettings">⚙️ Ajustes</button>
       </div>
@@ -398,7 +404,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.70 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.71 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1768,6 +1774,7 @@ const S = {
   songs: [],           // 🎵 cancionero: versos de canciones [{fr,es,d}]
   gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
   spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
+  read: {},            // 📖 v1.71: por qué trozo va cada lectura {idTexto:indice}
   exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
   theme: THEMES[0].id,
@@ -1887,7 +1894,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1906,6 +1913,7 @@ function applyState(p){
   S.lastTwists=Array.isArray(p.lt)?p.lt:[];   // v1.55: faltaba en el guardado
   S.spoken=Array.isArray(p.sp)?p.sp:[];       // 🎙️ v1.62
   S.exam=(p.ex&&typeof p.ex==="object")?p.ex:null;
+  S.read=(p.rd&&typeof p.rd==="object")?p.rd:{};   // 📖 v1.71
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -2179,15 +2187,12 @@ function senuelosParecidos(pool, buena, n){
   const L=String(buena.es||"").length;
   const cand=pool.filter(v=>v && v.es && v.fr && v.fr!==buena.fr && norm(v.es)!==norm(buena.es));
   if(cand.length<=n) return shuffle(cand).slice(0,n);
-  // banda de tolerancia en vez del "más parecido" exacto: si se coge siempre al
-  // más cercano salen SIEMPRE los mismos tres señuelos y se memorizan.
-  const tol=Math.max(10, L*0.5);
-  let banda=cand.filter(v=>Math.abs(v.es.length-L)<=tol);
-  if(banda.length<n){
-    const cerca=cand.slice().sort((a,b)=>Math.abs(a.es.length-L)-Math.abs(b.es.length-L));
-    banda=cerca.slice(0, Math.max(n*4, n+3));
-  }
-  return shuffle(banda).slice(0,n);
+  // v1.71: se toman los MÁS PARECIDOS en tamaño y se sortea entre ellos. Una banda
+  // de tolerancia ancha no sirve: con una respuesta de 130 caracteres seguía
+  // dejando entrar señuelos de 66, y volvía a delatarse. El grupo es más grande
+  // que n para que haya variedad y no se memoricen los mismos tres.
+  const cerca=cand.slice().sort((a,b)=>Math.abs(a.es.length-L)-Math.abs(b.es.length-L));
+  return shuffle(cerca.slice(0, Math.min(cerca.length, n*3))).slice(0,n);
 }
 
 /* similitud para evaluar pronunciación */
@@ -2555,6 +2560,7 @@ function launchGame(g){
   else if(g==="songs") gameSongs();
   else if(g==="match") gameMatch();
   else if(g==="build") gameBuild();
+  else if(g==="lectura") gameRead();   // 📖 v1.71
 }
 function nextGame(){
   const s=S.session;
@@ -3912,6 +3918,7 @@ $("btnProgBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("btnPlay").onclick =()=>startSession(["blitz", rnd(["listen","match","build"]), "speak", rnd(["scene","scene","improv"])]);
 $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),"speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
+$("btnRead").onclick =()=>startSession(["lectura"]);   // 📖 v1.71
 $("btnSongs").onclick=()=>startSession(["songs"]);
 $("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
@@ -3961,6 +3968,245 @@ $("btnLoadCode").onclick=()=>{
   if(loadCode(c)) cocoSay("¡Progreso restaurado! 🎉 Racha: "+S.streak+" 🔥 · "+S.xp+" ⭐");
   else cocoSay("Hmm, ese código no funciona 🤔 Revisa que esté completo.");
 };
+/* ================== 📖 LECTURA (v1.71) ==================
+   Petición de Mateo, con el texto que le compartió su papá: "creo que ese es el
+   ejercicio que me puede servir bastante... podríamos aventurarnos a la lectura".
+
+   Reglas que lo forman (todas suyas):
+   · CERO ESCRITURA — "me tocaría escribir en francés, entonces aún no". La
+     comprensión se demuestra TOCANDO, nunca tecleando.
+   · El texto está MUY por encima de A1 y eso se dice de frente, sin inflar: se
+     lee por trozos y con ayuda, no de corrido.
+   · TODO ES EJERCITABLE — cada palabra se toca para ver qué significa y oírla,
+     y cada pasaje lleva ⭐ para mandarlo a los repasos.
+   · Hablar primero: cada pasaje se puede leer EN VOZ ALTA y Coco lo califica.
+   Las opciones de "¿qué dice?" salen de los otros pasajes del mismo texto y
+   pasan por senuelosParecidos(), así que miden parecido a la correcta: aquí
+   acertar por el tamaño (el bug que cazó en v1.70) sería aún más fácil. */
+
+const LEX_LEC = {
+ "quand":"cuando","donnait":"daba","une":"una","conférence":"conferencia","dans":"en",
+ "les":"los / las","nombreuses":"numerosas","universités":"universidades","des":"de los",
+ "états-unis":"Estados Unidos","la":"la","question":"pregunta","récurrente":"recurrente",
+ "que":"que","lui":"le","faisaient":"hacían","étudiants":"estudiantes","était":"era",
+ "vous":"usted / vosotros","monsieur":"señor","croyez-vous":"¿cree usted?","en":"en",
+ "dieu":"Dios","ce":"esto / eso","à":"a","quoi":"lo que","il":"él","répondait":"respondía",
+ "toujours":"siempre","je":"yo","crois":"creo","au":"en el","de":"de","seuls":"solo",
+ "ceux":"aquellos","qui":"que / quien","avaient":"habían","lu":"leído","comprenaient":"entendían",
+ "avait":"había","passé":"pasado","sa":"su","vie":"vida","étudier":"estudiar",
+ "livres":"libros","saints":"sagrados","et":"y","philosophie":"filosofía","un":"un",
+ "jour":"día","écrivit":"escribió","ne":"no","sais":"sé","pas":"no","si":"si",
+ "réellement":"realmente","parlé":"hablado","mais":"pero","le":"lo / el","faisait":"hacía",
+ "voici":"esto es","dirait":"diría","croyant":"creyente","arrête":"deja / para",
+ "prier":"rezar","te":"te","frapper":"golpear","poitrine":"pecho","veux":"quiero",
+ "tu":"tú","fasses":"hagas","c'est":"es","sortes":"salgas","monde":"mundo","pour":"para",
+ "profiter":"disfrutar","ta":"tu","t'amuses":"te diviertas","chantes":"cantes",
+ "t'instruises":"te instruyas / aprendas","profites":"disfrutes","tout":"todo",
+ "j'ai":"he / tengo","fait":"hecho","toi":"ti","d'aller":"de ir","ces":"estos",
+ "temples":"templos","sombres":"oscuros","froids":"fríos","as":"has","construit":"construido",
+ "toi-même":"tú mismo","dont":"del que","dis":"dices","ma":"mi","maison":"casa",
+ "est":"está / es","montagnes":"montañas","bois":"bosques","rivières":"ríos","lacs":"lagos",
+ "là":"ahí","où":"donde","vis":"vivo","avec":"con","j'exprime":"expreso","mon":"mi",
+ "amour":"amor","m'accuser":"culparme","misérable":"miserable","t'ai":"te he",
+ "jamais":"nunca","dit":"dicho","qu'il":"que","y":"ahí","avait":"había","quelque":"alguna",
+ "chose":"cosa","mal":"malo","étais":"eras","pécheur":"pecador","sexualité":"sexualidad",
+ "ou":"o","joie":"alegría","étaient":"eran","mauvaise":"mala","alors":"entonces",
+ "blâme":"culpes","me":"me","ils":"ellos","t'ont":"te han","croire":"creer",
+ "ressasser":"darle vueltas a","lectures":"lecturas","sacrées":"sagradas","n'ont":"no tienen",
+ "rien":"nada","voir":"ver","moi":"mí","peux":"puedes","lire":"leer","l'aube":"el amanecer",
+ "paysage":"paisaje","regard":"mirada","ton":"tu","ami":"amigo","femme":"mujer",
+ "homme":"hombre","yeux":"ojos","fils":"hijo","trouveras":"encontrarás","livre":"libro",
+ "faire":"hacer","peur":"miedo","juge":"juzgo","critique":"critico","rentre":"entro",
+ "colère":"cólera / enfado","punis":"castigo","suis":"soy","pur":"puro","rempli":"llenado",
+ "passions":"pasiones","limitations":"límites","plaisirs":"placeres","sentiments":"sentimientos",
+ "besoins":"necesidades","incohérences":"incoherencias","donné":"dado","libre":"libre",
+ "arbitre":"albedrío","comment":"cómo","puis-je":"puedo","blâmer":"culpar","réponds":"respondes",
+ "mis":"puesto","punir":"castigar","d'être":"de ser","es":"eres","celui":"el que",
+ "penses":"piensas","pourrais":"podría","créer":"crear","endroit":"lugar","brûler":"quemar",
+ "tous":"todos","mes":"mis","enfants":"hijos","se":"se","comportent":"comportan","reste":"resto",
+ "l'éternité":"la eternidad","quel":"qué","genre":"tipo","peut":"puede","ça":"eso",
+ "j'étais":"yo fuera","ainsi":"así","mériterais":"merecería","respecté":"respetado",
+ "voulais":"quisiera","juste":"solo","être":"ser","vénéré":"venerado","n'aurais":"no habría",
+ "peuplé":"poblado","terre":"tierra","chiens":"perros","respecte":"respeta",
+ "semblables":"semejantes","fais":"hagas","demande":"pido","attention":"atención",
+ "soit":"sea","guide":"guía","nature":"naturaleza","constituez":"formáis","seule":"sola",
+ "entité":"entidad","crois pas":"no creas","pouvoir":"poder","elle":"ella","parties":"partes",
+ "fais partie":"formas parte","prends":"toma / cuida","soin":"cuidado","prendra":"tomará",
+ "j'y":"ahí","rendu":"vuelto","accessible":"accesible","bien":"bien / bueno","difficile":"difícil",
+ "d'accès":"de acceso","mets":"pongas","génie":"ingenio","chercher":"buscar","mauvais":"malo",
+ "cet":"este","équilibre":"equilibrio","garder":"guardar","intact":"intacto","sait":"sabe",
+ "très":"muy","trouble":"perturbes","absolument":"absolutamente","paradis":"paraíso",
+ "enfer":"infierno","dire":"decir","après":"después","cette":"esta","donner":"dar",
+ "conseil":"consejo","façon":"manera","supposer":"suponer","deviner":"adivinar",
+ "imaginer":"imaginar","sentes":"sientas","occupes":"ocupas","moutons":"ovejas",
+ "abordes":"te acercas a","petite":"pequeña","fille":"hija / niña","caresses":"acaricias",
+ "chien":"perro","baignes":"bañas","rivière":"río","exprime":"expresa","habitue-toi":"acostúmbrate",
+ "prendre":"tomar","dont tu as besoin":"que necesitas","seule chose":"única cosa",
+ "sûre":"segura","vivant":"vivo","plein":"lleno","merveilles":"maravillas","toutes":"todas",
+ "capable":"capaz","savoir":"saber","exactement":"exactamente","vraiment":"de verdad",
+ "besoin":"necesidad","cherche":"busques","dehors":"fuera","cosmos":"cosmos","extrait":"extracto"
+};
+
+const LECTURAS = [{
+  id:"spinoza",
+  titulo:"El Dios de Spinoza",
+  fuente:"Te lo compartió tu papá · atribuido a Baruch Spinoza",
+  aviso:"Ojo: este texto está MUY por encima de A1. No se lee de corrido — se lee por trozos, tocando las palabras. Entender la mitad ya es ganar.",
+  pasajes:[
+   {fr:"Quand Einstein donnait une conférence dans les universités des États-Unis,",
+    es:"Cuando Einstein daba una conferencia en las universidades de Estados Unidos,"},
+   {fr:"les étudiants lui faisaient toujours la même question :",
+    es:"los estudiantes siempre le hacían la misma pregunta:"},
+   {fr:"Vous, Monsieur Einstein... Croyez-vous en Dieu ?",
+    es:"Usted, señor Einstein... ¿cree en Dios?"},
+   {fr:"Je crois au Dieu de Spinoza.",
+    es:"Creo en el Dios de Spinoza."},
+   {fr:"Arrête de prier et de te frapper la poitrine !",
+    es:"¡Deja de rezar y de golpearte el pecho!"},
+   {fr:"Ce que je veux, c'est que tu sortes dans le monde pour profiter de ta vie.",
+    es:"Lo que quiero es que salgas al mundo a disfrutar de tu vida."},
+   {fr:"Je veux que tu t'amuses, que tu chantes, que tu t'instruises.",
+    es:"Quiero que te diviertas, que cantes, que aprendas."},
+   {fr:"Ma maison est dans les montagnes, dans les bois, les rivières, les lacs.",
+    es:"Mi casa está en las montañas, en los bosques, los ríos, los lagos."},
+   {fr:"Arrête de m'accuser de ta vie misérable.",
+    es:"Deja de culparme de tu vida miserable."},
+   {fr:"Je ne t'ai jamais dit qu'il y avait quelque chose de mal en toi.",
+    es:"Nunca te dije que hubiera algo malo en ti."},
+   {fr:"Si tu ne peux pas me lire à l'aube, dans un paysage, dans le regard de ton ami,",
+    es:"Si no puedes leerme en el amanecer, en un paisaje, en la mirada de tu amigo,"},
+   {fr:"tu ne me trouveras pas dans un livre !",
+    es:"¡no me encontrarás en un libro!"},
+   {fr:"Arrête de te faire peur. Je ne te juge pas, je ne te critique pas.",
+    es:"Deja de darte miedo. No te juzgo, no te critico."},
+   {fr:"Je t'ai donné le libre arbitre.",
+    es:"Te di el libre albedrío."},
+   {fr:"Comment puis-je te punir d'être ce que tu es, si je suis celui qui t'a fait ?",
+    es:"¿Cómo puedo castigarte por ser lo que eres, si soy yo quien te hizo?"},
+   {fr:"Respecte tes semblables et ne fais pas ce que tu ne veux pas pour toi.",
+    es:"Respeta a tus semejantes y no hagas lo que no quieres para ti."},
+   {fr:"Toi et la nature, vous constituez une seule entité.",
+    es:"Tú y la naturaleza formáis una sola entidad."},
+   {fr:"Prends soin d'elle et elle prendra soin de toi.",
+    es:"Cuídala y ella cuidará de ti."},
+   {fr:"Je ne veux pas que tu croies en moi, je veux que tu me sentes en toi.",
+    es:"No quiero que creas en mí, quiero que me sientas en ti."},
+   {fr:"Tu es là, tu es vivant, et ce monde est plein de merveilles.",
+    es:"Estás aquí, estás vivo, y este mundo está lleno de maravillas."},
+   {fr:"Ne me cherche pas dehors, tu ne me trouveras pas.",
+    es:"No me busques fuera, no me encontrarás."},
+   {fr:"Je suis là... La nature, le cosmos... C'est moi.",
+    es:"Estoy aquí... La naturaleza, el cosmos... Soy yo."}
+  ]
+}];
+
+/* limpia una palabra para buscarla en el glosario (sin puntuación, sin mayúsculas) */
+function palabraLimpia(w){ return w.toLowerCase().replace(/[«»"'"'!?,.;:()…]/g,"").replace(/^[-–]|[-–]$/g,"").trim(); }
+function significadoDe(w){
+  const k=palabraLimpia(w);
+  if(!k) return null;
+  if(LEX_LEC[k]) return LEX_LEC[k];
+  // si no está en el glosario del texto, se busca en el vocabulario de la app
+  const v=THEMES.flatMap(t=>t.vocab).concat(S.custom||[]).find(x=>norm(x.fr)===norm(k));
+  return v ? v.es : null;
+}
+
+/* ================== JUEGO: 📖 LECTURA ================== */
+function gameRead(){
+  const L=LECTURAS[0];
+  $("gameTitle").textContent="📖 "+L.titulo;
+  noTimer();
+  const area=$("gameArea");
+  // se leen 5 pasajes por sesión, avanzando desde donde quedó
+  S.read = S.read || {};
+  const total=L.pasajes.length;
+  let desde = Math.min(S.read[L.id]||0, total-1);
+  const tanda = [];
+  for(let i=0;i<5 && desde+i<total;i++) tanda.push(desde+i);
+  let ti=0, pts=0;
+
+  function fin(){
+    S.read[L.id] = (desde+tanda.length>=total) ? 0 : desde+tanda.length;   // al terminar, vuelve a empezar
+    store.save();
+    if(S.session) gameDone("📖 Lectura", pts);
+    else { show("scr-home"); refreshTop(); cocoSay(`📖 Leíste ${tanda.length} trozos de <b>${L.titulo}</b>. Lo que marcaste con ⭐ está en tus repasos.`); }
+  }
+
+  function paso(){
+    if(ti>=tanda.length){ fin(); return; }
+    const idx=tanda[ti], p=L.pasajes[idx];
+    // el francés, palabra por palabra y tocable
+    const palabras=p.fr.split(/(\s+)/).map(tok=>{
+      if(/^\s+$/.test(tok)) return tok;
+      const sig=significadoDe(tok);
+      return sig ? `<span class="palabra" data-sig="${esc(sig)}" data-w="${esc(palabraLimpia(tok))}">${esc(tok)}</span>`
+                 : `<span>${esc(tok)}</span>`;
+    }).join("");
+    // opciones: la traducción buena + señuelos de OTROS pasajes, del mismo tamaño
+    const otros=L.pasajes.filter((x,i)=>i!==idx);
+    const malas=senuelosParecidos(otros, p, 3);
+    const ops=shuffle([p].concat(malas));
+
+    area.innerHTML=`
+      <div class="prompt" style="font-size:1.05rem;line-height:1.7;">
+        <div class="lecturafr">${palabras}</div>
+        <span class="sub">trozo ${idx+1} de ${total} · toca cualquier palabra para ver qué significa</span>
+      </div>
+      <div class="btn-row" style="justify-content:center;margin:10px 0;">
+        <button class="btn small purple" id="lecOir">🔊 Oírlo</button>
+        <button class="btn small ghost" id="lecDecir">🎙️ Leerlo yo</button>
+      </div>
+      <div class="hint" id="lecSig"></div>
+      <p style="font-weight:800;text-align:center;margin:14px 0 6px;">¿Qué dice?</p>
+      <div class="options" id="lecOpts"></div>
+      <div class="speakresult" id="lecFb"></div>`;
+
+    // tocar una palabra: significado + audio + ⭐ a repasos
+    area.querySelectorAll(".palabra").forEach(el=>{
+      el.onclick=()=>{
+        area.querySelectorAll(".palabra").forEach(x=>x.classList.remove("vista"));
+        el.classList.add("vista");
+        const w=el.dataset.w, sig=el.dataset.sig;
+        $("lecSig").innerHTML=`<b>${esc(w)}</b> = ${esc(sig)} <button class="replaybtn" id="lecW">🔊</button> <button class="linkish" id="lecStar">⭐ a mis repasos</button>`;
+        speakFR(w, 0.8);
+        $("lecW").onclick=()=>speakFR(w,0.7);
+        $("lecStar").onclick=()=>{ markWeak({fr:w, es:sig}); store.save(); toast(`⭐ "${esc(w)}" a tus repasos`); };
+      };
+    });
+    $("lecOir").onclick=()=>speakFR(p.fr, 0.8);
+    $("lecDecir").onclick=()=>{ speakFR(p.fr,0.75); toast("🎙️ Léelo en voz alta después de Coco — sin nota, es para tu boca"); };
+
+    const box=$("lecOpts");
+    ops.forEach(o=>{
+      const b=document.createElement("div"); b.className="opt"; b.textContent=o.es;
+      b.onclick=()=>{
+        if(box.dataset.done) return; box.dataset.done="1";
+        const ok = o.es===p.es;
+        b.classList.add(ok?"good":"bad");
+        if(!ok) [...box.children].forEach((c,i)=>{ if(ops[i].es===p.es) c.classList.add("good"); });
+        ding(ok);
+        if(S.session){ S.session.tries++; recordAnswer("lectura", ok); }
+        pts += ok ? addPts(15) : 0;
+        if(!ok) markWeak({fr:p.fr, es:p.es});
+        const fb=$("lecFb");
+        fb.innerHTML=`${ok?"✅ ":""}<b>${esc(p.es)}</b> <button class="linkish" id="lecStar2">⭐ guardar este trozo</button>`;
+        fb.style.color= ok? "var(--green)":"var(--ink)";
+        $("lecStar2").onclick=()=>{ markWeak({fr:p.fr, es:p.es}); store.save(); toast("⭐ Trozo guardado en tus repasos"); };
+        nextBtn(fb, ()=>{ ti++; paso(); });
+      };
+      box.appendChild(b);
+    });
+  }
+
+  // portada del texto: qué es y el aviso de nivel, sin inflar
+  area.innerHTML=`
+    <div class="prompt" style="font-size:1.2rem;">📖 ${esc(L.titulo)}
+      <span class="sub">${esc(L.fuente)}</span></div>
+    <div class="bubble" style="margin-top:14px;text-align:left;">${esc(L.aviso)}<br><br>
+      Vas por el trozo <b>${desde+1}</b> de ${total}. Cada palabra se toca para ver qué significa y oírla; con ⭐ se va a tus repasos.</div>`;
+  nextBtn(area, paso, "Empezar a leer 📖");
+}
+
 /* ================== 📜 EL EXAMEN DE SALIDA (v1.62) ==================
    Petición de Mateo: que el siguiente idioma no se abra por acumular puntos, sino
    un examen de verdad — "si paso, estoy listo; si no, que me digan que no".
