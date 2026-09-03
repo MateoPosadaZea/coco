@@ -398,7 +398,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.69 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.70 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2168,6 +2168,28 @@ function srNecesitaMicExclusivo(recog){
   return IOS && !!recog && !(S.prefs && S.prefs.vg==="self");
 }
 
+/* 🎯 v1.70 — SEÑUELOS DEL MISMO TAMAÑO QUE LA RESPUESTA.
+   Lo cazó Mateo: si la buena es "Di que aún no hablas muy bien, PERO que tienes
+   una meta" y las otras son "El trabajo", "Tienes razón"… se acierta sin saber
+   una palabra de francés. Se acierta por la FORMA, no por el idioma, y eso
+   infla: el ejercicio parece superado cuando no lo está.
+   Se eligen los señuelos cuya traducción mide parecido a la correcta, tomando
+   al azar de un grupo amplio para que no salgan siempre los mismos. */
+function senuelosParecidos(pool, buena, n){
+  const L=String(buena.es||"").length;
+  const cand=pool.filter(v=>v && v.es && v.fr && v.fr!==buena.fr && norm(v.es)!==norm(buena.es));
+  if(cand.length<=n) return shuffle(cand).slice(0,n);
+  // banda de tolerancia en vez del "más parecido" exacto: si se coge siempre al
+  // más cercano salen SIEMPRE los mismos tres señuelos y se memorizan.
+  const tol=Math.max(10, L*0.5);
+  let banda=cand.filter(v=>Math.abs(v.es.length-L)<=tol);
+  if(banda.length<n){
+    const cerca=cand.slice().sort((a,b)=>Math.abs(a.es.length-L)-Math.abs(b.es.length-L));
+    banda=cerca.slice(0, Math.max(n*4, n+3));
+  }
+  return shuffle(banda).slice(0,n);
+}
+
 /* similitud para evaluar pronunciación */
 function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim(); }
 function lev(a,b){
@@ -2571,7 +2593,7 @@ function runQuiz(qs, resume){
   function ask(){
     if(qi>=qs.length){ toast("⚡ ¡Quiz sorpresa superado! Memoria de acero"); resume(); return; }
     const q=qs[qi];
-    const wrong=shuffle(allVocab.filter(v=>v.fr!==q.fr && v.es!==q.es)).slice(0,3);
+    const wrong=senuelosParecidos(allVocab, q, 3);   // v1.70: señuelos del mismo tamaño
     const opts=shuffle([q,...wrong]);
     area.innerHTML=`<div class="prompt">${q.fr}
         <span class="sub">⚡ ${qi+1} de ${qs.length} · ¿Qué significa?${q.grad?" · 🎓 graduada: ¿la sigues teniendo?":""}</span></div>
@@ -2778,7 +2800,7 @@ function gameBlitz(){
       // si el tema es pequeño (p.ej. el cuaderno 📓), completar opciones con todo el vocabulario
       const wrongPool = t.vocab.length>=8 ? t.vocab : t.vocab.concat(THEMES.flatMap(x=>x.vocab));
       // v1.67: en 🌶️4+ salen 6 opciones en vez de 4 — adivinar deja de ser negocio
-      const wrong = shuffle(wrongPool.filter(v=>v.fr!==q.fr)).slice(0, tier>=4?5:3);
+      const wrong = senuelosParecidos(wrongPool, q, tier>=4?5:3);   // v1.70
       const opts = shuffle([q,...wrong]);
       area.innerHTML=`
         <div class="prompt">${dir?q.fr:q.es}
@@ -2881,7 +2903,7 @@ function gameListen(){
     } else {
       /* 🌶️ elige lo que dijo */
       const wrongPool = t.vocab.length>=8 ? t.vocab : t.vocab.concat(THEMES.flatMap(x=>x.vocab));
-      const wrong=shuffle(wrongPool.filter(v=>v.fr!==q.fr)).slice(0,2);
+      const wrong=senuelosParecidos(wrongPool, q, 2);   // v1.70
       const opts=shuffle([q,...wrong]);
       const tag = q.retry ? "🔁 segunda oportunidad" : `${qi+1} de ${qs.length}`;
       area.innerHTML=`
@@ -4114,7 +4136,7 @@ function examAnswer(secId, ok, item, extra){
 function examListen(area, cab){
   noTimer();
   const q=EXAM.items.listen[EXAM.qi];
-  const malas=shuffle(EXAM.pool.filter(v=>norm(v.es)!==norm(q.es))).slice(0,3);
+  const malas=senuelosParecidos(EXAM.pool, q, 3);   // v1.70: en el examen, más aún
   const ops=shuffle([q].concat(malas));
   area.innerHTML=cab+`<div class="btn-row" style="justify-content:center;margin:10px 0;">
       <button class="btn small purple" id="exReplay">🔊 Oírlo otra vez</button></div>
