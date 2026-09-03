@@ -398,7 +398,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.68 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.69 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -428,6 +428,8 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
         <button class="btn small" id="vgSelf">Yo me califico</button>
       </div>
       <p class="hint" id="vgHint"></p>
+      <button class="btn small ghost" id="micTest" style="margin-top:6px;">🔧 Probar el micrófono</button>
+      <div class="hint" id="micTestOut" style="margin-top:6px;"></div>
       <p style="font-weight:800; margin:16px 0 4px;">🔊 Voz de Coco</p>
       <div class="btn-row" style="justify-content:center;">
         <button class="btn small" id="spNormal">Normal</button>
@@ -2154,6 +2156,17 @@ function getMic(){
 function releaseMic(){
   if(micStream){ micStream.getTracks().forEach(t=>t.stop()); micStream=null; }
 }
+/* 🎙️ v1.69 — EL CONFLICTO DE iOS, la causa de "no está cogiendo mi voz".
+   En iPhone el sistema le da el micrófono a UN SOLO consumidor: si hay un
+   getUserMedia/MediaRecorder abierto, webkitSpeechRecognition arranca pero
+   recibe SILENCIO. Por eso Mateo veía el punto naranja de "grabando" en la barra
+   de estado y la app le pedía autocalificarse SIEMPRE: el oído estaba encendido
+   y sordo. El fallback de "yo me califico" tapaba el síntoma, no la causa.
+   Regla: si vamos a reconocer en iOS, el reconocedor va SOLO. La grabadora
+   (para "👂 Escucharme") se usa cuando NO hay reconocedor o ya te calificas tú. */
+function srNecesitaMicExclusivo(recog){
+  return IOS && !!recog && !(S.prefs && S.prefs.vg==="self");
+}
 
 /* similitud para evaluar pronunciación */
 function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim(); }
@@ -2941,8 +2954,10 @@ function gameSpeak(){
     }
   }
   // el permiso se pide al entrar, pero la ESCUCHA solo arranca cuando tocas el mic
-  // (si escuchara antes, captaría la voz del propio Coco por los parlantes)
-  getMic().catch(()=>{});
+  // (si escuchara antes, captaría la voz del propio Coco por los parlantes).
+  // v1.69: en iOS NO se pre-pide, porque dejar el micro tomado deja sordo al
+  // reconocedor — él pide su propio permiso al arrancar.
+  if(!srNecesitaMicExclusivo(recog)) getMic().catch(()=>{});
 
   function ask(){
     if(qi>=qs.length){ if(recog){ try{recog.stop();}catch(e){} } releaseMic(); gameDone("🎤 ¡Suéltalo!",pts); return; }   // v1.42: mic libre apenas termina el juego de hablar
@@ -3029,6 +3044,12 @@ function gameSpeak(){
         res.style.color="var(--orange)";
       };
       try{ speechSynthesis.cancel(); }catch(e){}   // callar a Coco: que no se puntúe su propia voz
+      // 🎙️ v1.69: en iOS la grabadora y el reconocedor NO pueden convivir (ver
+      // srNecesitaMicExclusivo). Si toca reconocer, se suelta el micro y el oído va solo.
+      if(srNecesitaMicExclusivo(recog)){
+        releaseMic();
+        const pb=$("playback"); if(pb) pb.style.display="none";
+      } else
       // grabadora para reproducirse a sí mismo (reutiliza el mismo permiso)
       try{
         const stream = await getMic();
@@ -3438,7 +3459,7 @@ function gameImprov(){
         if(!dictOn){
           dictOn=true; pressAt=Date.now();
           mb.classList.add("rec"); mb.textContent="🛑 Parar dictado";
-          getMic().catch(()=>{});
+          if(!srNecesitaMicExclusivo(recog)) getMic().catch(()=>{});   // v1.69: en iOS el oído va solo
           // flush anti-eco: solo dictar lo dicho DESPUÉS de tocar
           if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR,150); }
           setTimeout(()=>{ if(dictOn) ensureSR(); },700);
@@ -3989,11 +4010,18 @@ function wireExamMic(mic, fb, cfg){
     mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
     fb.innerHTML="🔴 Grabando… habla ahora"; fb.style.color="var(--ink)";
     try{ speechSynthesis.cancel(); }catch(e){}          // que Coco no se puntúe a sí mismo
-    try{ await getMic(); }                              // ⬅️ ESPERAR el permiso
-    catch(err){
-      grabando=false; mic.classList.remove("rec");
-      if(cfg.onBloqueado) cfg.onBloqueado();
-      return;
+    // 🎙️ v1.69: en iOS NO se pide getUserMedia si vamos a reconocer — tener el
+    // micro tomado deja SORDO al reconocedor (ver srNecesitaMicExclusivo). Fuera
+    // de iOS sí se espera el permiso antes de escuchar, como arreglamos en v1.63.
+    if(srNecesitaMicExclusivo(examSR())){
+      releaseMic();
+    } else {
+      try{ await getMic(); }
+      catch(err){
+        grabando=false; mic.classList.remove("rec");
+        if(cfg.onBloqueado) cfg.onBloqueado();
+        return;
+      }
     }
     if(!grabando) return;                               // paró mientras se pedía el permiso
     const r=examSR();
@@ -4558,6 +4586,38 @@ function renderInbox(){
 }
 $("btnSettings").onclick=()=>{ paintSettings(); renderInbox(); renderSongs(); show("scr-settings"); };
 $("btnSetBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
+/* 🔧 v1.69 — prueba del micrófono. Nació porque el reconocedor fallaba en el
+   iPhone de Mateo y desde el taller no se puede reproducir iOS: en vez de seguir
+   adivinando, que la app diga exactamente qué pasa y él manda la foto.
+   El reconocedor va SOLO, sin getUserMedia, que es justo la regla de v1.69. */
+$("micTest").onclick=()=>{
+  const out=$("micTestOut");
+  const linea=[];
+  const pinta=()=>out.innerHTML=linea.join("<br>");
+  linea.push(`Aparato: ${IOS?"iPhone/iPad":"otro"} · reconocedor: ${SR?"disponible":"NO existe en este navegador"} · modo: ${S.prefs.vg==="self"?"me califico yo":"Coco escucha"}`);
+  pinta();
+  if(!SR){ linea.push("⛔ Sin reconocedor no hay calificación automática: es el navegador, no la app."); pinta(); return; }
+  releaseMic();                          // regla de oro: el oído va solo
+  let r, oido=[], err="", termino=false;
+  try{ r=new SR(); }catch(e){ linea.push("⛔ No se pudo crear el reconocedor: "+e.message); pinta(); return; }
+  r.lang="fr-FR"; r.continuous=true; r.interimResults=true; r.maxAlternatives=3;
+  r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(rl && rl[0]) oido.push(rl[0].transcript); };
+  r.onerror=e=>{ err=e.error||"?"; };
+  r.onend=()=>{ termino=true; };
+  linea.push("🔴 Habla ahora en francés (o en lo que sea) durante 6 segundos…"); pinta();
+  try{ r.start(); }catch(e){ linea.push("⛔ No arrancó: "+e.message); pinta(); return; }
+  setTimeout(()=>{
+    try{ r.stop(); }catch(e){}
+    setTimeout(()=>{
+      linea.push(oido.length
+        ? `✅ <b>SÍ te oyó.</b> Captó: "${esc(oido[oido.length-1].trim())}"`
+        : `❌ <b>No captó nada.</b>${err?" Error: <b>"+esc(err)+"</b>":" Sin error: el oído arrancó y no recibió audio."}`);
+      linea.push(`<span style="opacity:.6">${termino?"cerró solo":"seguía abierto"} · tomas: ${oido.length}</span>`);
+      linea.push("📸 Si dice que NO, mándale esta captura a Claude.");
+      pinta();
+    }, 1200);
+  }, 6000);
+};
 $("vgAuto").onclick =()=>{ S.prefs.vg="auto"; store.save(); paintSettings(); };
 $("vgSelf").onclick =()=>{ S.prefs.vg="self"; store.save(); paintSettings(); };
 $("spNormal").onclick=()=>{ S.prefs.slow=false; store.save(); paintSettings(); speakFR("Bonjour !"); };
