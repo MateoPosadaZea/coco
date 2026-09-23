@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.76 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.77 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2167,6 +2167,19 @@ if("speechSynthesis" in window){
 }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+/* 🎙️ v1.77 — LA BANDERA DE "COCO ESTÁ HABLANDO", nuestra y no de WebKit.
+   Mateo: "el micrófono pone problema sobre todo en los ejercicios donde hay que
+   REPETIR, no tanto en la improvisación". Esa diferencia lo delató: en repetir,
+   Coco dice la frase justo antes de que grabes; en improvisar, no dice nada.
+   Los juegos descartaban lo oído mientras `speechSynthesis.speaking` fuera true
+   —para no puntuar la voz de Coco— y en iOS esa propiedad SE QUEDA PEGADA en
+   true después de hablar o cancelar. Resultado: se tiraba a la basura todo lo
+   que él decía, y la app pedía autocalificarse. En improvisar no pasaba porque
+   la bandera nunca se encendía.
+   COCO_HABLA la manejamos nosotros y se apaga por done(), que ya tiene red de
+   seguridad por onend, por intervalo y por tiempo máximo. */
+let COCO_HABLA=false;
+function callarACoco(){ COCO_HABLA=false; try{ speechSynthesis.cancel(); }catch(e){} }
 let currentUtt=null, resumeInt=null;   // referencia viva: evita que Chrome "recolecte" la frase a mitad de camino
 function speakFR(text, rate){
   return new Promise(res=>{
@@ -2181,11 +2194,13 @@ function speakFR(text, rate){
       let finished=false;
       const done=()=>{
         if(finished) return; finished=true;
+        COCO_HABLA=false;
         if(resumeInt){ clearInterval(resumeInt); resumeInt=null; }
         if(mas) mas.classList.remove("talk");
         res();
       };
       u.onend=done; u.onerror=done;
+      COCO_HABLA=true;
       speechSynthesis.speak(u);
       // Chrome a veces pausa la síntesis en frases y la corta: darle un empujón periódico.
       // En iOS ese pause/resume es contraproducente (WebKit se atraganta): allá solo vigilamos el final.
@@ -3126,7 +3141,7 @@ function gameSpeak(){
         res.textContent = err==="network" ? "Se cayó la conexión del oído de Coco 😵 reconectando..." : "No capté nada 🎧 habla un poco más fuerte";
         res.style.color="var(--orange)";
       };
-      try{ speechSynthesis.cancel(); }catch(e){}   // callar a Coco: que no se puntúe su propia voz
+      callarACoco();   // callar a Coco: que no se puntúe su propia voz
       // 🎙️ v1.69: en iOS la grabadora y el reconocedor NO pueden convivir (ver
       // srNecesitaMicExclusivo). Si toca reconocer, se suelta el micro y el oído va solo.
       if(srNecesitaMicExclusivo(recog)){
@@ -3156,11 +3171,14 @@ function gameSpeak(){
       // FLUSH anti-eco: descartar TODO lo que el oído captó antes de tu toque
       // (incluida la voz de Coco por los parlantes) y arrancar la escucha limpia.
       // Luego acumulamos resultados y calificamos LA MEJOR toma, no la primera.
-      if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR,150); }
+      // v1.77: en iOS se espera un poco más — acabamos de callar la síntesis y el
+      // sistema tarda en pasar el audio de REPRODUCIR a GRABAR. Arrancar el oído
+      // demasiado pronto lo deja escuchando el silencio de la transición.
+      if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR, IOS?400:150); }
       if(recog){
         onHeard=(rl)=>{
           if(Date.now()-pressAt<400) return;        // resultado viejo/eco: aún no has hablado
-          if(speechSynthesis.speaking) return;       // no puntuar la voz de Coco
+          if(COCO_HABLA) return;       // no puntuar la voz de Coco
           for(const alt of rl){ const s=similarity(alt.transcript,q.fr); if(s>bestSim){bestSim=s; bestHeard=alt.transcript;} }
           if(bestSim>=.3){ S.prefs.srFails=0; }      // el oído sí funciona en este equipo
           res.textContent=`Coco escuchó: "${bestHeard.trim()}"`;
@@ -3546,10 +3564,10 @@ function gameImprov(){
           // flush anti-eco: solo dictar lo dicho DESPUÉS de tocar
           if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR,150); }
           setTimeout(()=>{ if(dictOn) ensureSR(); },700);
-          try{ speechSynthesis.cancel(); }catch(e){}
+          callarACoco();
           onHeard=(txt)=>{
             if(Date.now()-pressAt<400) return;       // residuo viejo o eco de Coco
-            if(speechSynthesis.speaking) return;
+            if(COCO_HABLA) return;
             inp.value=(inp.value+" "+txt).trim();
           };
         } else {
@@ -4055,7 +4073,7 @@ $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnRead").onclick =()=>startSession(["lectura"]);   // 📖 v1.71
 $("btnSongs").onclick=()=>startSession(["songs"]);
-$("btnQuit").onclick =()=>{ stopTimer(); speechSynthesis && speechSynthesis.cancel(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
+$("btnQuit").onclick =()=>{ stopTimer(); callarACoco(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("mascot").onclick  =()=>{ speakFR(rnd(["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
 $("saveCode").onclick=()=>{
@@ -4747,7 +4765,7 @@ function wireExamMic(mic, fb, cfg){
     grabando=true; tomas=[]; pressAt=Date.now();
     mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
     fb.innerHTML="🔴 Grabando… habla ahora"; fb.style.color="var(--ink)";
-    try{ speechSynthesis.cancel(); }catch(e){}          // que Coco no se puntúe a sí mismo
+    callarACoco();          // que Coco no se puntúe a sí mismo
     // 🎙️ v1.69: en iOS NO se pide getUserMedia si vamos a reconocer — tener el
     // micro tomado deja SORDO al reconocedor (ver srNecesitaMicExclusivo). Fuera
     // de iOS sí se espera el permiso antes de escuchar, como arreglamos en v1.63.
@@ -4763,13 +4781,13 @@ function wireExamMic(mic, fb, cfg){
     }
     if(!grabando) return;                               // paró mientras se pedía el permiso
     const r=examSR();
-    if(r){ try{ r.abort(); }catch(e){} VOZ.srOn=false; setTimeout(empujar,150); }
-    setTimeout(()=>{ if(grabando) empujar(); }, 700);   // segundo empujón
+    if(r){ try{ r.abort(); }catch(e){} VOZ.srOn=false; setTimeout(empujar, IOS?400:150); }
+    setTimeout(()=>{ if(grabando) empujar(); }, 900);   // segundo empujón
     clearTimeout(tope);
     tope=setTimeout(()=>{ if(grabando) stop(); }, cfg.maxMs||10000);
     VOZ.onHeard=(rl)=>{
       if(Date.now()-pressAt<400) return;                // eco o resto de una toma vieja
-      if(speechSynthesis.speaking) return;              // no puntuar la voz de Coco
+      if(COCO_HABLA) return;              // no puntuar la voz de Coco
       for(let i=0;i<rl.length;i++) if(rl[i]&&rl[i].transcript) tomas.push(rl[i].transcript);
       if(tomas.length){ fb.innerHTML=`Coco escuchó: "${esc(String(rl[0].transcript).trim())}"`; }
     };
@@ -4798,7 +4816,7 @@ function startExam(){
     cocoSay("Todavía no hay material suficiente para un examen honesto 🦜 Juega un poco más y vuelve.");
     return;
   }
-  releaseMic(); try{ speechSynthesis.cancel(); }catch(e){}
+  releaseMic(); callarACoco();
   S.session=null;
   EXAM={
     items:{ listen:pool.slice(0,EXAM_N), build:pool.slice(EXAM_N,EXAM_N*2),
@@ -5455,7 +5473,7 @@ document.addEventListener("visibilitychange", ()=>{
   if(document.hidden){
     try{ store.save(); }catch(e){}
     try{ releaseMic(); }catch(e){}
-    try{ speechSynthesis.cancel(); }catch(e){}
+    callarACoco();
   }
 });
 window.addEventListener("pagehide", ()=>{ try{ store.save(); }catch(e){} });
