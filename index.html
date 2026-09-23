@@ -158,6 +158,10 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .lecturafr .palabra{cursor:pointer; border-bottom:2px dotted var(--soft); padding:0 1px; border-radius:3px;}
 .lecturafr .palabra:hover{background:var(--tint);}
 .lecturafr .palabra.vista{background:var(--tintp); color:var(--purple); border-bottom-color:var(--purple);}
+.lecturafr .hueco{display:inline-block; min-width:3rem; text-align:center; background:var(--soft);
+  border-radius:6px; padding:0 6px; letter-spacing:2px; color:var(--purple); font-weight:800;}
+.lecturafr .hueco.puesta{background:var(--goodbg); color:var(--green); letter-spacing:0;}
+.lecturafr .hueco.pista{outline:2px dashed var(--orange);}
 .ptmini{font-size:.72rem; font-weight:700; opacity:.6; margin:-3px 0 8px 1.9rem;}
 .ptmini .mas{opacity:.8; text-decoration:underline;}
 .ptcomo{font-size:.75rem; font-weight:600; opacity:.85; line-height:1.5; margin:-4px 0 10px 1.9rem;
@@ -404,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.72 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.73 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2808,8 +2812,10 @@ function gameBlitz(){
     // frases largas JAMÁS como ejercicio de escritura (petición de Mateo):
     // aunque el tier lo pida, caen a opción múltiple
     // v1.67: a partir del 🌶️4 entran frases MÁS LARGAS a armar (más vocabulario en juego)
-    const maxPal = tier>=5 ? 10 : tier>=4 ? 8 : 6;
-    const maxLen = tier>=5 ? 80 : tier>=4 ? 62 : 45;
+    // v1.73: en 🌶️5 casi nada se cae ya a opción múltiple — a ese nivel elegir
+    // entre opciones es reconocer, y lo que toca es PRODUCIR. Mateo: "está muy fácil".
+    const maxPal = tier>=5 ? 16 : tier>=4 ? 8 : 6;
+    const maxLen = tier>=5 ? 130 : tier>=4 ? 62 : 45;
     const typedOK = q.fr.trim().split(/\s+/).length<=maxPal && q.fr.length<=maxLen;
     if(tier>=3 && typedOK){
       /* 🧩 v1.53: nivel alto = ARMAR la frase con fichas (el dictado tecleado aburría — poda de Mateo) */
@@ -4211,6 +4217,15 @@ function significadoDe(w){
   return v ? v.es : null;
 }
 
+/* 🕳️ v1.73 — los huecos: se tapan las palabras CON CONTENIDO (las que están en el
+   glosario y miden 4+ letras), nunca los artículos, que se adivinan solos. */
+function elegirHuecos(fr){
+  const toks=fr.split(/\s+/);
+  const cand=toks.map((t,i)=>({t,i,l:palabraLimpia(t)}))
+                 .filter(x=>x.l.length>=4 && LEX_LEC[x.l]);
+  if(cand.length<2) return [];
+  return shuffle(cand).slice(0, Math.min(3, cand.length)).sort((a,b)=>a.i-b.i);
+}
 /* ================== JUEGO: 📖 LECTURA ================== */
 function gameRead(){
   const L=LECTURAS[0];
@@ -4230,6 +4245,71 @@ function gameRead(){
     store.save();
     if(S.session) gameDone("📖 Lectura", pts);
     else { show("scr-home"); refreshTop(); cocoSay(`📖 Leíste ${tanda.length} trozos de <b>${L.titulo}</b>. Lo que marcaste con ⭐ está en tus repasos.`); }
+  }
+
+  /* 🕳️ rellenar los huecos tocando fichas, en orden. Cero escritura. */
+  function pasoHuecos(p, huecos, idx, total){
+    const area=$("gameArea");
+    const toks=p.fr.split(/\s+/);
+    const pos=huecos.map(h=>h.i);
+    const texto=toks.map((t,i)=>{
+      if(!pos.includes(i)) return `<span>${esc(t)}</span>`;
+      const k=pos.indexOf(i);
+      return `<span class="hueco" data-h="${k}">${"·".repeat(Math.max(3,palabraLimpia(t).length))}</span>`;
+    }).join(" ");
+    // fichas: las palabras tapadas + señuelos del mismo texto, para que no se adivine por forma
+    const otras=[...new Set(LECTURAS[0].pasajes.flatMap(x=>x.fr.split(/\s+/))
+      .map(palabraLimpia).filter(w=>w.length>=4 && LEX_LEC[w] && !huecos.some(h=>h.l===w)))];
+    const fichas=shuffle(huecos.map(h=>({w:h.t, real:true}))
+      .concat(shuffle(otras).slice(0,3).map(w=>({w, real:false}))));
+    area.innerHTML=`
+      <div class="prompt" style="font-size:1.05rem;line-height:1.7;">
+        <div class="lecturafr">${texto}</div>
+        <span class="sub">trozo ${idx+1} de ${total} · 🕳️ completa lo que falta</span>
+      </div>
+      <div class="btn-row" style="justify-content:center;margin:10px 0;">
+        <button class="btn small purple" id="lecOir">🔊 Oírlo entero</button>
+      </div>
+      <div id="lecFichas" style="text-align:center;margin-top:8px;"></div>
+      <div class="speakresult" id="lecFb"></div>`;
+    $("lecOir").onclick=()=>speakFR(p.fr,0.8);
+    let k=0, errs=0, fin2=false;
+    const zona=$("lecFichas");
+    fichas.forEach(f=>{
+      const c=document.createElement("span"); c.className="wordchip"; c.textContent=f.w;
+      c.onclick=()=>{
+        if(fin2 || c.classList.contains("used")) return;
+        const esperada=huecos[k];
+        if(f.real && palabraLimpia(f.w)===esperada.l){
+          c.classList.add("used");
+          const h=area.querySelector(`.hueco[data-h="${k}"]`);
+          h.textContent=f.w; h.classList.add("puesta");
+          speakFR(f.w,0.8);
+          k++;
+          if(k>=huecos.length){
+            fin2=true;
+            const ok=errs===0;
+            ding(ok);
+            if(S.session) S.session.tries++;
+            recordAnswer("lectura", ok); recordSkill("lectura", ok);
+            pts += ok ? addPts(25) : addPts(10);
+            if(!ok) markWeak({fr:p.fr, es:p.es});
+            const fb=$("lecFb");
+            fb.innerHTML=`${ok?"✅ ":""}<b>${esc(p.es)}</b>${errs?` · ${errs} fallo${errs===1?"":"s"}`:""}
+              <button class="linkish" id="lecStar2">⭐ guardar este trozo</button>`;
+            fb.style.color= ok? "var(--green)":"var(--ink)";
+            $("lecStar2").onclick=()=>{ markWeak({fr:p.fr, es:p.es}); store.save(); toast("⭐ Trozo guardado en tus repasos"); };
+            nextBtn(fb, ()=>{ ti++; paso(); });
+          }
+        } else {
+          errs++; ding(false);
+          c.style.animation="shake .3s"; setTimeout(()=>c.style.animation="",320);
+          if(errs===2){ const h=area.querySelector(`.hueco[data-h="${k}"]`);
+            h.title=LEX_LEC[huecos[k].l]||""; h.classList.add("pista"); }
+        }
+      };
+      zona.appendChild(c);
+    });
   }
 
   function paso(){
@@ -4257,8 +4337,7 @@ function gameRead(){
         <button class="btn small ghost" id="lecDecir">🎙️ Leerlo yo</button>
       </div>
       <div class="hint" id="lecSig"></div>
-      <p style="font-weight:800;text-align:center;margin:14px 0 6px;">¿Qué dice?</p>
-      <div class="options" id="lecOpts"></div>
+      <div id="lecReto"></div>
       <div class="speakresult" id="lecFb"></div>`;
 
     // tocar una palabra: significado + audio + ⭐ a repasos
@@ -4274,9 +4353,46 @@ function gameRead(){
       };
     });
     $("lecOir").onclick=()=>speakFR(p.fr, 0.8);
-    $("lecDecir").onclick=()=>{ speakFR(p.fr,0.75); toast("🎙️ Léelo en voz alta después de Coco — sin nota, es para tu boca"); };
+    /* 🎙️ v1.73: leerlo en voz alta AHORA SE CALIFICA. Antes solo sonaba el audio
+       y no medía nada — "hablar primero" era su prioridad y aquí no se cumplía.
+       El listón es generoso a propósito: el ejercicio es LEER de corrido, no
+       clavar la pronunciación palabra por palabra. */
+    $("lecDecir").onclick=()=>{
+      const fb=$("lecFb");
+      fb.innerHTML=`<button class="btn small red" id="lecMic">🎙️ Leer en voz alta</button>`;
+      fb.style.color="var(--ink)";
+      wireExamMic($("lecMic"), fb, {
+        maxMs:20000,
+        onTomas:(tomas)=>{
+          let mejor=0, oido="";
+          tomas.forEach(t=>{ const s=similarity(t,p.fr); if(s>mejor){ mejor=s; oido=t; } });
+          const pct=Math.round(mejor*100);
+          const bien = mejor>=.5;
+          if(bien){ S.prefs.srFails=0; recordSkill("hablar", true); pts+=addPts(10); }
+          else recordSkill("hablar", false);
+          fb.innerHTML=`${bien?"✅":"🔁"} Leíste <b>${pct}%</b> parecido a Coco.<br>
+            <span style="opacity:.6;font-size:.85rem;">te oí: "${esc(oido.trim())}"</span><br>
+            <button class="replaybtn" id="lecOir2">🔊 así suena</button>`;
+          fb.style.color = bien? "var(--green)":"var(--ink)";
+          $("lecOir2").onclick=()=>speakFR(p.fr,0.75);
+        },
+        onMudo:()=>{ fb.innerHTML="🎧 No te capté. Léelo igual en voz alta — eso cuenta aunque Coco no lo oiga 💪"; fb.style.color="var(--orange)"; },
+        onBloqueado:()=>{ fb.innerHTML="🎙️ Micrófono bloqueado. Léelo en voz alta de todos modos."; fb.style.color="var(--orange)"; }
+      });
+      speakFR(p.fr,0.75);
+    };
 
-    const box=$("lecOpts");
+    /* 🕳️ v1.73 — MODO HUECOS. Mateo: "está muy fácil... mi mente pide otros retos",
+       y la lectura es lo que más le sirve. Elegir entre 4 traducciones se resuelve
+       por el sentido general; rellenar los huecos obliga a mirar LA PALABRA. Se
+       activa del 🌶️3 en adelante para que no aparezca antes de tiempo. */
+    const tier=diffFor("lectura").tier;
+    const huecos = tier>=3 ? elegirHuecos(p.fr) : [];
+    if(huecos.length){ pasoHuecos(p, huecos, idx, total); return; }
+
+    const box=document.createElement("div"); box.className="options"; box.id="lecOpts";
+    $("lecReto").innerHTML=`<p style="font-weight:800;text-align:center;margin:14px 0 6px;">¿Qué dice?</p>`;
+    $("lecReto").appendChild(box);
     ops.forEach(o=>{
       const b=document.createElement("div"); b.className="opt"; b.textContent=o.es;
       b.onclick=()=>{
@@ -4345,22 +4461,25 @@ function markSpoken(t){
   S.spoken=S.spoken||[];
   if(!S.spoken.includes(t)){ S.spoken.push(t); if(S.spoken.length>60) S.spoken.shift(); store.save(); }
 }
+/* 🎙️ v1.73: el reconocedor vive en VOZ, no dentro de EXAM, para que lo usen
+   tanto el 📜 examen como la 📖 lectura. Misma receta probada, un solo sitio. */
+const VOZ={sr:undefined, srOn:false, onHeard:null};
 function examSR(){
-  if(EXAM && EXAM.sr!==undefined) return EXAM.sr;
+  if(VOZ.sr!==undefined) return VOZ.sr;
   let r=null;
   if(SR){
     try{
       r=new SR(); r.lang="fr-FR"; r.continuous=true; r.interimResults=false; r.maxAlternatives=3;
-      r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(EXAM&&EXAM.onHeard) EXAM.onHeard(rl); };
-      r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ if(EXAM) EXAM.sr=null; } };
-      r.onend=()=>{ if(EXAM) EXAM.srOn=false; };
+      r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(VOZ.onHeard) VOZ.onHeard(rl); };
+      r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ VOZ.sr=null; } };
+      r.onend=()=>{ VOZ.srOn=false; };
     }catch(e){ r=null; }
   }
-  if(EXAM) EXAM.sr=r;
+  VOZ.sr=r;
   return r;
 }
-function examSRStart(){ const r=examSR(); if(r&&EXAM&&!EXAM.srOn){ try{ r.start(); EXAM.srOn=true; }catch(e){} } }
-function examSRStop(){ const r=EXAM&&EXAM.sr; if(r){ try{ r.abort(); }catch(e){} } if(EXAM) EXAM.srOn=false; }
+function examSRStart(){ const r=examSR(); if(r&&!VOZ.srOn){ try{ r.start(); VOZ.srOn=true; }catch(e){} } }
+function examSRStop(){ const r=VOZ.sr; if(r){ try{ r.abort(); }catch(e){} } VOZ.srOn=false; }
 
 /* 🎙️ v1.63 — EL MICRÓFONO DEL EXAMEN, con la MISMA receta del juego 3 ¡SUÉLTALO!
    (12 arreglos acumulados ahí; en v1.62 reinventé el flujo y salió mudo).
@@ -4373,7 +4492,7 @@ function examSRStop(){ const r=EXAM&&EXAM.sr; if(r){ try{ r.abort(); }catch(e){}
    NO tocar esto sin leer el juego 3 primero.                                    */
 function wireExamMic(mic, fb, cfg){
   let grabando=false, pressAt=0, tope=null, tomas=[];
-  const empujar=()=>{ const r=examSR(); if(r&&EXAM&&!EXAM.srOn){ try{ r.start(); EXAM.srOn=true; }catch(e){} } };
+  const empujar=()=>{ const r=examSR(); if(r&&!VOZ.srOn){ try{ r.start(); VOZ.srOn=true; }catch(e){} } };
   async function start(){
     grabando=true; tomas=[]; pressAt=Date.now();
     mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
@@ -4394,11 +4513,11 @@ function wireExamMic(mic, fb, cfg){
     }
     if(!grabando) return;                               // paró mientras se pedía el permiso
     const r=examSR();
-    if(r){ try{ r.abort(); }catch(e){} if(EXAM) EXAM.srOn=false; setTimeout(empujar,150); }
+    if(r){ try{ r.abort(); }catch(e){} VOZ.srOn=false; setTimeout(empujar,150); }
     setTimeout(()=>{ if(grabando) empujar(); }, 700);   // segundo empujón
     clearTimeout(tope);
     tope=setTimeout(()=>{ if(grabando) stop(); }, cfg.maxMs||10000);
-    if(EXAM) EXAM.onHeard=(rl)=>{
+    VOZ.onHeard=(rl)=>{
       if(Date.now()-pressAt<400) return;                // eco o resto de una toma vieja
       if(speechSynthesis.speaking) return;              // no puntuar la voz de Coco
       for(let i=0;i<rl.length;i++) if(rl[i]&&rl[i].transcript) tomas.push(rl[i].transcript);
@@ -4411,7 +4530,7 @@ function wireExamMic(mic, fb, cfg){
     clearTimeout(tope);
     if(cfg.onParar) cfg.onParar();   // ya habló: el reloj no debe cortar la gracia
     setTimeout(()=>{                                    // gracia: deja llegar el resultado final
-      if(EXAM) EXAM.onHeard=null;
+      VOZ.onHeard=null;
       if(tomas.length) cfg.onTomas(tomas);
       else {
         S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
@@ -4435,7 +4554,6 @@ function startExam(){
     items:{ listen:pool.slice(0,EXAM_N), build:pool.slice(EXAM_N,EXAM_N*2),
             say:pool.slice(EXAM_N*2,EXAM_N*3), improv:shuffle(IMPROV).slice(0,EXAM_N) },
     pool, res:{listen:[],build:[],say:[],improv:[]}, si:0, qi:0, selfGraded:false,
-    sr:undefined, srOn:false, onHeard:null
   };
   show("scr-game");
   $("dots").innerHTML=""; $("tierChip").textContent="📜"; noTimer();
@@ -4548,7 +4666,7 @@ function examSay(area, cab){
   let cerrado=false;
   const cerrar=(ok, oido)=>{
     if(cerrado) return; cerrado=true;
-    EXAM.onHeard=null; examSRStop(); releaseMic();
+    VOZ.onHeard=null; examSRStop(); releaseMic();
     const ctl=$("exCtl"); if(ctl) ctl.remove();   // fuera los controles: solo queda «Seguir»
     ding(ok);
     fb.innerHTML=(ok?"✅ ":"")+`Coco lo dice así: <b>${esc(q.fr)}</b>`+(oido?`<br><span style="opacity:.6;font-size:.85rem;">te oí: "${esc(oido)}"</span>`:"");
@@ -4606,7 +4724,7 @@ function examImprov(area, cab){
   let cerrado=false, dicho="";
   const cerrar=()=>{
     if(cerrado) return; cerrado=true;
-    stopTimer(); EXAM.onHeard=null; examSRStop(); releaseMic();
+    stopTimer(); VOZ.onHeard=null; examSRStop(); releaseMic();
     const ctl=$("exCtl"); if(ctl) ctl.remove();
     const wz=$("exWzone"); if(wz) wz.innerHTML="";   // fuera el textarea y su botón
     const said=norm(dicho);
