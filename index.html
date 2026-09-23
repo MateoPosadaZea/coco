@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.74 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.75 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1794,7 +1794,7 @@ const S = {
   gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
   spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
   read: {},            // 📖 v1.71: por qué trozo va cada lectura {idTexto:indice}
-  readActual: null,    // 📚 v1.74: qué texto está leyendo ahora
+  readSeen: [],        // 🎲 v1.75: trozos ya leídos, para no repetir
   skills: {},          // 💪 v1.72: acierto por destreza {id:{n,ok,rec[]}}
   exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
@@ -1937,7 +1937,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}, ra:S.readActual||null};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}, rv:S.readSeen||[]};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1958,7 +1958,7 @@ function applyState(p){
   S.exam=(p.ex&&typeof p.ex==="object")?p.ex:null;
   S.read=(p.rd&&typeof p.rd==="object")?p.rd:{};   // 📖 v1.71
   S.skills=(p.sk&&typeof p.sk==="object")?p.sk:{};  // 💪 v1.72
-  S.readActual=typeof p.ra==="string"?p.ra:null;    // 📚 v1.74
+  S.readSeen=Array.isArray(p.rv)?p.rv:[];           // 🎲 v1.75
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -4187,7 +4187,32 @@ const LEX_LEC = {
  "mains":"manos", "haut":"arriba", "respire":"respira", "entre":"entre",
  "jambes":"piernas", "gagnent":"ganan", "bras":"brazos", "fatigué":"cansado",
  "vois":"veo", "ses":"sus", "round":"asalto", "dur":"duro",
- "entraîne":"entrena", "relever":"levantarse", "déjà":"ya", "gagner":"ganar"
+ "entraîne":"entrena", "relever":"levantarse", "déjà":"ya", "gagner":"ganar",
+ /* v1.75: vocabulario de los títulos nuevos */
+ "pouvoir":"poder", "esprit":"mente", "meilleure":"mejor", "vengeance":"venganza",
+ "ressembler":"parecerse", "matin":"mañana", "aujourd'hui":"hoy", "sera":"será",
+ "difficile":"difícil", "gêne":"estorba", "devient":"se vuelve", "agis":"actúa",
+ "comme":"como", "dernière":"última", "douleur":"dolor", "avis":"opinión",
+ "reviens":"vuelve", "reste":"quédate / queda", "tranquille":"tranquilo", "montes":"subes",
+ "niveau":"nivel", "buts":"metas", "tombes":"caes", "habitudes":"hábitos",
+ "habitude":"hábito", "cent":"cien", "change":"cambia", "rends":"haz / vuelve",
+ "visible":"visible", "mauvaise":"mala", "rate":"falles", "suite":"seguidas",
+ "système":"sistema", "compte":"cuenta / importa", "deviens":"conviértete", "tombé":"caído",
+ "vingt":"veinte", "ans":"años", "voyage":"viajamos", "sûr":"seguro",
+ "silence":"silencio", "entendent":"oyen", "munitions":"municiones", "sac":"mochila",
+ "vertes":"verdes", "maintenant":"ahora", "laisserai":"dejaré", "seule":"sola",
+ "endroit":"lugar", "terres":"tierras", "perdues":"perdidas", "lève-toi":"levántate",
+ "guerrier":"guerrero", "lumière":"luz", "feu":"fuego", "repos":"descanso",
+ "gardé":"guardado", "géant":"gigante", "mourras":"morirás", "souvent":"a menudo",
+ "grave":"grave", "mort":"muerte", "apprend":"enseña", "rythme":"ritmo",
+ "arbre":"árbol", "brille":"brilla", "loin":"lejos", "donné":"regalado / dado",
+ "mer":"mar", "attendent":"esperan", "larmes":"lágrimas", "expliquer":"explicar",
+ "chaleur":"calor", "épaules":"hombros", "dérange":"molesta", "soir":"tarde / noche",
+ "apporte":"trae", "sommes":"somos", "animaux":"animales", "racontent":"cuentan",
+ "histoires":"historias", "histoire":"historia", "commune":"común", "cerveau":"cerebro",
+ "existent":"existen", "agriculture":"agricultura", "blé":"trigo", "moins":"menos",
+ "million":"millón", "oblige":"obliga", "avenir":"futuro", "passé":"pasado",
+ "ensemble":"juntos", "forts":"fuertes", "lion":"león"
 };
 
 const LECTURAS = [{
@@ -4313,6 +4338,78 @@ const LECTURAS = [{
    {fr:"Le troisième round est le plus dur.", es:"El tercer asalto es el más duro."},
    {fr:"On s'entraîne quand personne ne regarde.", es:"Uno entrena cuando nadie mira."},
    {fr:"Se relever, c'est déjà gagner.", es:"Levantarse ya es ganar."}
+  ]},
+{ id:"marco", titulo:"Meditaciones · Marco Aurelio", fuente:"Sus ideas en francés sencillo · no es el texto literal",
+  aviso:"Estoicismo romano, hermano del texto de Spinoza. Nivel A2.",
+  pasajes:[
+   {fr:"Tu as du pouvoir sur ton esprit, pas sur le monde.", es:"Tienes poder sobre tu mente, no sobre el mundo."},
+   {fr:"La meilleure vengeance est de ne pas leur ressembler.", es:"La mejor venganza es no parecerse a ellos."},
+   {fr:"Chaque matin, dis-toi : aujourd'hui sera difficile.", es:"Cada mañana dite: hoy será difícil."},
+   {fr:"Ce qui gêne le chemin devient le chemin.", es:"Lo que estorba el camino se vuelve el camino."},
+   {fr:"Ne parle pas de l'homme bon, sois-en un.", es:"No hables del hombre bueno, sé uno."},
+   {fr:"Agis comme si c'était ta dernière heure.", es:"Actúa como si fuera tu última hora."},
+   {fr:"La douleur n'est pas plus forte que ton avis.", es:"El dolor no es más fuerte que tu opinión."},
+   {fr:"Reviens à toi-même et reste tranquille.", es:"Vuelve a ti mismo y quédate tranquilo."}
+  ]},
+{ id:"habitos", titulo:"Hábitos atómicos", fuente:"Las ideas del libro de Clear, escritas para ti · no es el texto literal",
+  aviso:"Libro con derechos de autor: aquí van sus ideas en francés sencillo.",
+  pasajes:[
+   {fr:"Tu ne montes pas au niveau de tes buts.", es:"No subes al nivel de tus metas."},
+   {fr:"Tu tombes au niveau de tes habitudes.", es:"Caes al nivel de tus hábitos."},
+   {fr:"Un pour cent chaque jour change tout.", es:"Un uno por ciento cada día lo cambia todo."},
+   {fr:"Rends la bonne habitude facile et visible.", es:"Haz el buen hábito fácil y visible."},
+   {fr:"Rends la mauvaise habitude difficile.", es:"Haz el mal hábito difícil."},
+   {fr:"Ne rate jamais deux fois de suite.", es:"Nunca falles dos veces seguidas."},
+   {fr:"Le système compte plus que le but.", es:"El sistema importa más que la meta."},
+   {fr:"Deviens la personne que tu veux être.", es:"Conviértete en la persona que quieres ser."}
+  ]},
+{ id:"tlou", titulo:"The Last of Us", fuente:"Escenas escritas en el mundo del juego",
+  aviso:"Vocabulario de supervivencia y viaje. Nivel A2.",
+  pasajes:[
+   {fr:"Le monde est tombé il y a vingt ans.", es:"El mundo cayó hace veinte años."},
+   {fr:"On voyage la nuit, c'est plus sûr.", es:"Viajamos de noche, es más seguro."},
+   {fr:"Garde le silence, ils entendent tout.", es:"Guarda silencio, lo oyen todo."},
+   {fr:"Il reste peu de munitions dans le sac.", es:"Quedan pocas municiones en la mochila."},
+   {fr:"Les villes sont vertes maintenant.", es:"Las ciudades ahora están verdes."},
+   {fr:"Je ne la laisserai pas seule.", es:"No la dejaré sola."},
+   {fr:"On cherche un endroit sûr pour dormir.", es:"Buscamos un lugar seguro para dormir."},
+   {fr:"Ce qui reste, c'est les gens.", es:"Lo que queda es la gente."}
+  ]},
+{ id:"elden", titulo:"Elden Ring", fuente:"Escenas escritas en el mundo del juego",
+  aviso:"Vocabulario de aventura y combate. Nivel A2.",
+  pasajes:[
+   {fr:"La nuit tombe sur les terres perdues.", es:"La noche cae sobre las tierras perdidas."},
+   {fr:"Lève-toi, guerrier sans lumière.", es:"Levántate, guerrero sin luz."},
+   {fr:"Le feu de camp est le seul repos.", es:"La hoguera es el único descanso."},
+   {fr:"Ce chemin est gardé par un géant.", es:"Ese camino lo guarda un gigante."},
+   {fr:"Tu mourras souvent, ce n'est pas grave.", es:"Morirás a menudo, no pasa nada."},
+   {fr:"Chaque mort t'apprend son rythme.", es:"Cada muerte te enseña su ritmo."},
+   {fr:"L'arbre brille au loin.", es:"El árbol brilla a lo lejos."},
+   {fr:"Rien n'est donné, tout se gagne.", es:"Nada se regala, todo se gana."}
+  ]},
+{ id:"camus", titulo:"El extranjero · Camus", fuente:"Inspirado en Camus · no es el texto literal",
+  aviso:"Frases cortas y secas, como el original. Nivel A2.",
+  pasajes:[
+   {fr:"Aujourd'hui, le soleil est trop fort.", es:"Hoy el sol está demasiado fuerte."},
+   {fr:"Je regarde la mer sans rien dire.", es:"Miro el mar sin decir nada."},
+   {fr:"Les gens attendent de moi des larmes.", es:"La gente espera de mí lágrimas."},
+   {fr:"Je n'ai rien à expliquer.", es:"No tengo nada que explicar."},
+   {fr:"La chaleur pèse sur mes épaules.", es:"El calor pesa sobre mis hombros."},
+   {fr:"Le temps passe et rien ne change.", es:"El tiempo pasa y nada cambia."},
+   {fr:"Je dis la vérité, même si elle dérange.", es:"Digo la verdad, aunque moleste."},
+   {fr:"Le soir apporte un peu de calme.", es:"La tarde trae un poco de calma."}
+  ]},
+{ id:"sapiens", titulo:"Sapiens", fuente:"Las ideas del libro de Harari, escritas para ti · no es el texto literal",
+  aviso:"Libro con derechos de autor: aquí van sus ideas en francés sencillo.",
+  pasajes:[
+   {fr:"Nous sommes des animaux qui racontent des histoires.", es:"Somos animales que cuentan historias."},
+   {fr:"L'argent est la plus grande histoire commune.", es:"El dinero es la mayor historia común."},
+   {fr:"Le feu a changé notre corps et notre cerveau.", es:"El fuego cambió nuestro cuerpo y nuestro cerebro."},
+   {fr:"Les villes existent parce qu'on y croit.", es:"Las ciudades existen porque creemos en ellas."},
+   {fr:"L'agriculture a donné plus de blé et moins de temps.", es:"La agricultura dio más trigo y menos tiempo."},
+   {fr:"Un million de gens a besoin d'une histoire commune.", es:"Un millón de personas necesita una historia común."},
+   {fr:"Rien n'oblige l'avenir à ressembler au passé.", es:"Nada obliga al futuro a parecerse al pasado."},
+   {fr:"Ensemble, nous sommes plus forts qu'un lion.", es:"Juntos somos más fuertes que un león."}
   ]}
 ];
 
@@ -4344,54 +4441,33 @@ function elegirHuecos(fr){
    C1 y lo ahogaría. Son escenas escritas en el mundo de cada uno, a su nivel,
    y cada ficha lo dice de frente en vez de disimularlo. */
 function gameRead(){
-  S.read = S.read || {};
-  const elegido = LECTURAS.find(x=>x.id===S.readActual) || LECTURAS[0];
-  if(!S.readActual){ elegirLectura(); return; }
-  leerTexto(elegido);
+  // 🎲 v1.75 — la biblioteca es una BASE DE DATOS que sirve sola. Mateo: "que
+  // salgan textos aleatorios, sin tener que escogerlos". Antes había que cruzar
+  // un menú; ahora abres y ya estás leyendo. Se sirven trozos que no has visto,
+  // mezclando títulos, y cuando se agotan la biblioteca vuelve a barajarse.
+  S.readSeen = S.readSeen || [];
+  const todos = LECTURAS.flatMap(L=>L.pasajes.map((x,i)=>Object.assign({}, x, {_L:L, _k:L.id+"#"+i})));
+  let pool = todos.filter(x=>!S.readSeen.includes(x._k));
+  let vuelta=false;
+  if(pool.length<5){ S.readSeen=[]; pool=todos; vuelta=true; }
+  leerTanda(shuffle(pool).slice(0,5), todos, vuelta);
 }
-function elegirLectura(){
-  $("gameTitle").textContent="📚 Tu biblioteca";
+function leerTanda(tanda, todos, vuelta){
+  $("gameTitle").textContent="📖 Lectura";
   noTimer();
   const area=$("gameArea");
-  area.innerHTML=`<div class="prompt" style="font-size:1.1rem;">📚 ¿Qué quieres leer hoy?
-      <span class="sub">Cada texto recuerda por dónde ibas</span></div>
-    <div id="biblio" style="margin-top:12px;"></div>`;
-  const box=$("biblio");
-  LECTURAS.forEach(L=>{
-    const van=S.read[L.id]||0, total=L.pasajes.length;
-    const pct=Math.round(van/total*100);
-    const d=document.createElement("div");
-    d.className="resultrow"; d.style.cursor="pointer"; d.style.textAlign="left";
-    d.innerHTML=`<span style="flex:1;">
-        <b>${esc(L.titulo)}</b>
-        <div class="tr" style="opacity:.55;font-size:.72rem;">${esc(L.fuente)}</div>
-        <div class="track" style="height:6px;margin-top:5px;background:var(--soft);border-radius:4px;overflow:hidden;">
-          <span class="fill" style="display:block;height:100%;width:${pct}%;background:var(--purple);"></span></div>
-      </span><span style="opacity:.6;font-size:.75rem;white-space:nowrap;">${van}/${total}</span>`;
-    d.onclick=()=>{ S.readActual=L.id; store.save(); leerTexto(L); };
-    box.appendChild(d);
-  });
-}
-function leerTexto(L){
-  $("gameTitle").textContent="📖 "+L.titulo;
-  noTimer();
-  const area=$("gameArea");
-  // se leen 5 pasajes por sesión, avanzando desde donde quedó
-  const total=L.pasajes.length;
-  let desde = Math.min(S.read[L.id]||0, total-1);
-  const tanda = [];
-  for(let i=0;i<5 && desde+i<total;i++) tanda.push(desde+i);
   let ti=0, pts=0;
+  const titulos=[...new Set(tanda.map(x=>x._L.titulo))];
 
   function fin(){
-    S.read[L.id] = (desde+tanda.length>=total) ? 0 : desde+tanda.length;   // al terminar, vuelve a empezar
     store.save();
     if(S.session) gameDone("📖 Lectura", pts);
-    else { show("scr-home"); refreshTop(); cocoSay(`📖 Leíste ${tanda.length} trozos de <b>${L.titulo}</b>. Lo que marcaste con ⭐ está en tus repasos.`); }
+    else { show("scr-home"); refreshTop();
+      cocoSay(`📖 Leíste ${tanda.length} trozos de ${titulos.length>1?"<b>"+titulos.length+"</b> textos":"<b>"+titulos[0]+"</b>"}. Lo que marcaste con ⭐ está en tus repasos.`); }
   }
 
   /* 🕳️ rellenar los huecos tocando fichas, en orden. Cero escritura. */
-  function pasoHuecos(p, huecos, idx, total){
+  function pasoHuecos(p, huecos){
     const area=$("gameArea");
     const toks=p.fr.split(/\s+/);
     const pos=huecos.map(h=>h.i);
@@ -4401,14 +4477,14 @@ function leerTexto(L){
       return `<span class="hueco" data-h="${k}">${"·".repeat(Math.max(3,palabraLimpia(t).length))}</span>`;
     }).join(" ");
     // fichas: las palabras tapadas + señuelos del mismo texto, para que no se adivine por forma
-    const otras=[...new Set(L.pasajes.flatMap(x=>x.fr.split(/\s+/))
+    const otras=[...new Set(p._L.pasajes.flatMap(x=>x.fr.split(/\s+/))
       .map(palabraLimpia).filter(w=>w.length>=4 && LEX_LEC[w] && !huecos.some(h=>h.l===w)))];
     const fichas=shuffle(huecos.map(h=>({w:h.t, real:true}))
       .concat(shuffle(otras).slice(0,3).map(w=>({w, real:false}))));
     area.innerHTML=`
       <div class="prompt" style="font-size:1.05rem;line-height:1.7;">
         <div class="lecturafr">${texto}</div>
-        <span class="sub">trozo ${idx+1} de ${total} · 🕳️ completa lo que falta</span>
+        <span class="sub">📚 ${esc(p._L.titulo)} · 🕳️ completa lo que falta</span>
       </div>
       <div class="btn-row" style="justify-content:center;margin:10px 0;">
         <button class="btn small purple" id="lecOir">🔊 Oírlo entero</button>
@@ -4457,7 +4533,8 @@ function leerTexto(L){
 
   function paso(){
     if(ti>=tanda.length){ fin(); return; }
-    const idx=tanda[ti], p=L.pasajes[idx];
+    const p=tanda[ti], L=p._L;
+    if(!S.readSeen.includes(p._k)){ S.readSeen.push(p._k); if(S.readSeen.length>400) S.readSeen.shift(); }
     // el francés, palabra por palabra y tocable
     const palabras=p.fr.split(/(\s+)/).map(tok=>{
       if(/^\s+$/.test(tok)) return tok;
@@ -4466,14 +4543,13 @@ function leerTexto(L){
                  : `<span>${esc(tok)}</span>`;
     }).join("");
     // opciones: la traducción buena + señuelos de OTROS pasajes, del mismo tamaño
-    const otros=L.pasajes.filter((x,i)=>i!==idx);
-    const malas=senuelosParecidos(otros, p, 3);
+    const malas=senuelosParecidos(todos.filter(x=>x._k!==p._k), p, 3);
     const ops=shuffle([p].concat(malas));
 
     area.innerHTML=`
       <div class="prompt" style="font-size:1.05rem;line-height:1.7;">
         <div class="lecturafr">${palabras}</div>
-        <span class="sub">trozo ${idx+1} de ${total} · toca cualquier palabra para ver qué significa</span>
+        <span class="sub">📚 ${esc(L.titulo)} · ${ti+1} de ${tanda.length} · toca cualquier palabra</span>
       </div>
       <div class="btn-row" style="justify-content:center;margin:10px 0;">
         <button class="btn small purple" id="lecOir">🔊 Oírlo</button>
@@ -4531,7 +4607,7 @@ function leerTexto(L){
        activa del 🌶️3 en adelante para que no aparezca antes de tiempo. */
     const tier=diffFor("lectura").tier;
     const huecos = tier>=3 ? elegirHuecos(p.fr) : [];
-    if(huecos.length){ pasoHuecos(p, huecos, idx, total); return; }
+    if(huecos.length){ pasoHuecos(p, huecos); return; }
 
     const box=document.createElement("div"); box.className="options"; box.id="lecOpts";
     $("lecReto").innerHTML=`<p style="font-weight:800;text-align:center;margin:14px 0 6px;">¿Qué dice?</p>`;
@@ -4558,18 +4634,17 @@ function leerTexto(L){
     });
   }
 
-  // portada del texto: qué es y el aviso de nivel, sin inflar
+  // portada: qué te va a salir hoy, sin menús que atravesar
+  const leidos=S.readSeen.length, hay=todos.length;
   area.innerHTML=`
-    <div class="prompt" style="font-size:1.2rem;">📖 ${esc(L.titulo)}
-      <span class="sub">${esc(L.fuente)}</span></div>
-    <div class="bubble" style="margin-top:14px;text-align:left;">${esc(L.aviso)}<br><br>
-      Vas por el trozo <b>${desde+1}</b> de ${total}. Cada palabra se toca para ver qué significa y oírla; con ⭐ se va a tus repasos.</div>`;
+    <div class="prompt" style="font-size:1.2rem;">📖 Lectura al azar
+      <span class="sub">${tanda.length} trozos de tu biblioteca · ${LECTURAS.length} textos</span></div>
+    <div class="bubble" style="margin-top:14px;text-align:left;">
+      Hoy te salen: ${titulos.map(t=>"<b>"+esc(t)+"</b>").join(" · ")}.<br><br>
+      Cada palabra se toca para ver qué significa y oírla; con ⭐ se va a tus repasos.
+      ${vuelta ? "<br><br>🔄 Ya diste la vuelta a la biblioteca: se baraja de nuevo."
+               : `<br><br><span style="opacity:.6;font-size:.85rem;">Llevas ${leidos} de ${hay} trozos leídos.</span>`}</div>`;
   nextBtn(area, paso, "Empezar a leer 📖");
-  const otro=document.createElement("button");
-  otro.className="linkish"; otro.textContent="📚 Elegir otro texto";
-  otro.style.marginTop="10px";
-  otro.onclick=()=>{ S.readActual=null; store.save(); elegirLectura(); };
-  area.appendChild(otro);
 }
 
 /* ================== 📜 EL EXAMEN DE SALIDA (v1.62) ==================
