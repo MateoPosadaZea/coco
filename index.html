@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.75 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.76 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1767,16 +1767,24 @@ const IMPROV=[
 ];
 
 /* Frases motivadoras de Coco */
-const COCO_GOOD = ["¡Magnifique! 🎉","¡Très bien! ✨","¡Eres una máquina! 🚀","¡Coco está orgulloso! 🦜","¡Formidable! 🌟","Oh là là, ¡qué nivel! 🔥"];
-const COCO_MEH  = ["¡Casi casi! Mañana será mejor 💪","No pasa nada, ¡así se aprende! 🌱","Coco cree en ti 🦜❤️","¡Los errores son parte del juego! 🎲"];
+/* 🍃 v1.76 — EL TONO, MÁS TRANQUILO. Mateo: "un tono un poco más relajado, más
+   natural... quiero aprender a hablar y estar más relajado, menos estresado".
+   Fuera los signos de admiración en cascada, el "¡eres una máquina!" y las
+   frases que empujan. Coco sigue celebrando, pero sin subirte la pulsación:
+   una app que grita no enseña a hablar tranquilo. */
+const COCO_GOOD = ["Magnifique 🎉","Très bien ✨","Eso sonó natural 🦜","Bien ahí, tranquilo y claro 🌿","Formidable 🌟","Oh là là, qué bien va eso"];
+const COCO_MEH  = ["Casi. Mañana sale 🌱","Tranquilo, así se aprende","Los errores son parte del camino","Nada grave — seguimos 🦜"];
 const COCO_HOME = [
- "¿Jugamos 5 minutitos? 🇫🇷",
+ "¿Cinco minutos y ya? 🇫🇷",
  "Dicen que un croissant sabe mejor si lo pides en francés 🥐",
  "Cada sesión es un ladrillo del viaje 🧳",
- "Petit à petit, l'oiseau fait son nid. ¡Poquito a poco! 🪺",
- "Hoy es un buen día para hablar francés 🗼",
+ "Petit à petit, l'oiseau fait son nid. Poquito a poco 🪺",
+ "Hoy es buen día para hablar francés, sin prisa 🗼",
  "Algún día, en un café de verdad, todo esto va a valer la pena ✨",
  "La misión no es la racha — es la escena real que un día vas a vivir 🎬",
+ "No hay examen de esto hoy. Léelo, dilo, y ya 🍃",
+ "Hablar tranquilo también se entrena 🌿",
+ "El italiano te espera. No se va a ir a ningún lado 🇮🇹",
 ];
 </script>
 <script>
@@ -1849,9 +1857,9 @@ function updateTierChip(tier){ const c=$("tierChip"); if(c) c.textContent="🌶�
 function announceTier(tier, up){
   updateTierChip(tier);
   toast(up ? (tier>=4
-              ? "🌶️".repeat(tier)+" ¡Reto "+tier+"! Frases más largas, más señuelos y audio a velocidad real"
-              : "🌶️ ¡Nivel de reto SUBIÓ a "+"🌶️".repeat(tier)+"! Coco ya no se anda con juegos")
-           : "🧯 Coco baja un poco el ritmo, ¡a afinar la base!");
+              ? "🌶️".repeat(tier)+" Reto "+tier+": frases más largas, más señuelos y audio a velocidad real"
+              : "🌶️ Subiste a "+"🌶️".repeat(tier)+" — vas sobrado, subo un poco")
+           : "🧯 Bajo el ritmo un rato. Afinamos la base y volvemos 🍃");
 }
 /* ---- repaso espaciado (cajas de Leitner): fallar → vuelve hoy; acertar → 1, 3, 7, 14, 30 días ---- */
 const SRS_DAYS=[1,3,7,14,30];
@@ -4018,12 +4026,31 @@ function renderProgress(){
 /* ================== EVENTOS ================== */
 $("btnProgress").onclick=()=>{ renderProgress(); show("scr-progress"); };
 $("btnProgBack").onclick=()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
-// v1.66 — ARREGLO DE DISEÑO: 🎭 Improvisa solo estaba en Modo Inmersión, así que
-// la 5ª parte de la puerta (🎙️ misiones clavadas) era IMPOSIBLE de llenar jugando
-// la sesión de todos los días. Le pedí a Mateo algo que la app no le ofrecía.
-// Ahora el último juego rota entre la escena y la improvisación, y la sesión
-// sigue siendo de 4 juegos (~5 min, la promesa no se toca).
-$("btnPlay").onclick =()=>startSession(["blitz", rnd(["listen","match","build"]), "speak", rnd(["scene","scene","improv"])]);
+/* 🎲 v1.76 — LA SESIÓN DEJA DE SER LA MISMA TODOS LOS DÍAS.
+   Mateo: "incluyamos más ejercicios de lectura en la sesión diaria, quitemos
+   ejercicios a lo mejor repetitivos". Tenía razón: ⚡ Rayo léxico y 🎤 ¡Suéltalo!
+   caían SIEMPRE en el mismo sitio, sesión tras sesión.
+   · ⚡ se queda de primero porque es donde entran los repasos vencidos: es el
+     motor de su 🎓 memoria. Quitarlo rompería el único medidor que sube con el
+     tiempo. Pero ahora es lo ÚNICO fijo.
+   · 📖 Lectura entra en la rotación de dos ranuras — es lo que más le sirve.
+   · 🎤 hablar sigue pesando, pero ya no es un mueble.
+   Siguen siendo 4 juegos: la promesa de ~5 min no se toca. */
+function sesionDeHoy(){
+  const juegos=["blitz",
+    rnd(["lectura","lectura","listen","match"]),
+    rnd(["speak","speak","lectura","build"]),
+    rnd(["scene","improv","lectura"])];
+  // que no salga la lectura tres veces seguidas: variedad antes que insistencia
+  const rep=["listen","build","scene"];
+  let vistas=0;
+  return juegos.map(g=>{
+    if(g!=="lectura") return g;
+    vistas++;
+    return vistas<=2 ? g : rnd(rep);
+  });
+}
+$("btnPlay").onclick =()=>startSession(sesionDeHoy());
 $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),"speak","scene","improv"],{immersion:true});
 $("btnScene").onclick=()=>startSession(["scene"]);
 $("btnRead").onclick =()=>startSession(["lectura"]);   // 📖 v1.71
