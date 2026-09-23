@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.73 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.74 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1794,6 +1794,7 @@ const S = {
   gradList: [],        // 🎓 frases graduadas (para el quiz sorpresa: se pueden RE-probar)
   spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
   read: {},            // 📖 v1.71: por qué trozo va cada lectura {idTexto:indice}
+  readActual: null,    // 📚 v1.74: qué texto está leyendo ahora
   skills: {},          // 💪 v1.72: acierto por destreza {id:{n,ok,rec[]}}
   exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
@@ -1936,7 +1937,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}, ra:S.readActual||null};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1957,6 +1958,7 @@ function applyState(p){
   S.exam=(p.ex&&typeof p.ex==="object")?p.ex:null;
   S.read=(p.rd&&typeof p.rd==="object")?p.rd:{};   // 📖 v1.71
   S.skills=(p.sk&&typeof p.sk==="object")?p.sk:{};  // 💪 v1.72
+  S.readActual=typeof p.ra==="string"?p.ra:null;    // 📚 v1.74
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -4150,7 +4152,42 @@ const LEX_LEC = {
  "prendre":"tomar","dont tu as besoin":"que necesitas","seule chose":"única cosa",
  "sûre":"segura","vivant":"vivo","plein":"lleno","merveilles":"maravillas","toutes":"todas",
  "capable":"capaz","savoir":"saber","exactement":"exactamente","vraiment":"de verdad",
- "besoin":"necesidad","cherche":"busques","dehors":"fuera","cosmos":"cosmos","extrait":"extracto"
+ "besoin":"necesidad","dehors":"fuera","cosmos":"cosmos","extrait":"extracto",
+ /* v1.74: vocabulario de los textos nuevos */
+ "chaud":"caluroso", "ville":"ciudad", "jeune":"joven", "homme":"hombre",
+ "descend":"baja", "escalier":"escalera", "lentement":"despacio", "peur":"miedo",
+ "rencontrer":"encontrarse con", "logeuse":"casera", "argent":"dinero", "doit":"debe",
+ "beaucoup":"mucho", "idée":"idea", "terrible":"terrible", "tête":"cabeza",
+ "marche":"camina", "rue":"calle", "sans":"sin", "regarder":"mirar",
+ "personne":"nadie", "après":"después", "dormir":"dormir", "vérité":"verdad",
+ "pèse":"pesa", "lourd":"pesado", "deux":"dos", "joueurs":"jugadores",
+ "premier":"primero", "parle":"habla", "temps":"tiempo", "deuxième":"segundo",
+ "jouer":"jugar", "penser":"pensar", "penses":"piensas", "trop":"demasiado",
+ "corps":"cuerpo", "oublie":"olvida", "regarde":"mira", "balle":"pelota",
+ "coup":"golpe", "coups":"golpes", "erreur":"error", "ennemie":"enemiga",
+ "concentration":"concentración", "calme":"tranquila", "tendue":"tensa", "confiance":"confianza",
+ "leur":"su / de ellos", "gens":"gente", "mentent":"mienten", "gentils":"amables",
+ "demande":"pregunta", "ont":"han", "feraient":"harían", "adore":"me encanta",
+ "vaut":"vale", "cherche":"busca", "faits":"hechos", "compliments":"cumplidos",
+ "dernière":"última", "fois":"vez", "arrivé":"pasado", "payé":"pagado",
+ "problème":"problema", "petit":"pequeño", "bonne":"buena", "question":"pregunta",
+ "camp":"campamento", "dort":"duerme", "encore":"todavía", "sous":"bajo",
+ "neige":"nieve", "cheval":"caballo", "connaît":"conoce", "chemin":"camino",
+ "mieux":"mejor", "loyauté":"lealtad", "train":"tren", "passe":"pasa",
+ "près":"cerca", "grandit":"crece", "notre":"nuestro", "disparaît":"desaparece",
+ "chasser":"cazar", "viande":"carne", "honte":"vergüenza", "partir":"marcharse",
+ "soleil":"sol", "couche":"se pone", "plaines":"llanuras", "château":"castillo",
+ "escaliers":"escaleras", "bougent":"se mueven", "baguette":"varita", "choisi":"elegido",
+ "main":"mano", "cours":"clase", "potions":"pociones", "commence":"empieza",
+ "heures":"horas", "couloir":"pasillo", "interdit":"prohibido", "troisième":"tercero",
+ "étage":"piso", "tableaux":"cuadros", "parlent":"hablan", "vole":"vuelo",
+ "première":"primera", "demain":"mañana", "forêt":"bosque", "dangereuse":"peligrosa",
+ "nuit":"noche", "courage":"valor", "montre":"muestra", "amis":"amigos",
+ "combat":"combate", "combats":"combates", "heure":"hora", "garde":"guarda / mantén",
+ "mains":"manos", "haut":"arriba", "respire":"respira", "entre":"entre",
+ "jambes":"piernas", "gagnent":"ganan", "bras":"brazos", "fatigué":"cansado",
+ "vois":"veo", "ses":"sus", "round":"asalto", "dur":"duro",
+ "entraîne":"entrena", "relever":"levantarse", "déjà":"ya", "gagner":"ganar"
 };
 
 const LECTURAS = [{
@@ -4204,7 +4241,80 @@ const LECTURAS = [{
    {fr:"Je suis là... La nature, le cosmos... C'est moi.",
     es:"Estoy aquí... La naturaleza, el cosmos... Soy yo."}
   ]
-}];
+},
+{ id:"crimen", titulo:"Crimen y castigo", fuente:"Inspirado en Dostoievski · no es el texto literal",
+  aviso:"La prosa real de Dostoievski en francés es de nivel C1 y te ahogaría. Estos pasajes están escritos en el mundo de la novela, a tu nivel.",
+  pasajes:[
+   {fr:"Il fait très chaud dans la ville.", es:"Hace mucho calor en la ciudad."},
+   {fr:"Le jeune homme descend l'escalier lentement.", es:"El joven baja la escalera despacio."},
+   {fr:"Il a peur de rencontrer sa logeuse.", es:"Tiene miedo de encontrarse con su casera."},
+   {fr:"Il n'a pas d'argent et il doit beaucoup.", es:"No tiene dinero y debe mucho."},
+   {fr:"Une idée terrible vit dans sa tête.", es:"Una idea terrible vive en su cabeza."},
+   {fr:"Il marche dans la rue sans regarder personne.", es:"Camina por la calle sin mirar a nadie."},
+   {fr:"Après, il ne peut plus dormir.", es:"Después, ya no puede dormir."},
+   {fr:"La vérité pèse plus lourd que la peur.", es:"La verdad pesa más que el miedo."}
+  ]},
+{ id:"tenis", titulo:"El juego interior del tenis", fuente:"Las ideas del libro de Gallwey, escritas para ti · no es el texto literal",
+  aviso:"El libro tiene derechos de autor, así que aquí están sus ideas contadas en francés sencillo, no sus frases.",
+  pasajes:[
+   {fr:"Il y a deux joueurs dans ta tête.", es:"Hay dos jugadores en tu cabeza."},
+   {fr:"Le premier parle tout le temps et juge.", es:"El primero habla todo el tiempo y juzga."},
+   {fr:"Le deuxième sait jouer sans penser.", es:"El segundo sabe jugar sin pensar."},
+   {fr:"Quand tu penses trop, ton corps oublie.", es:"Cuando piensas demasiado, tu cuerpo olvida."},
+   {fr:"Regarde la balle, ne juge pas le coup.", es:"Mira la pelota, no juzgues el golpe."},
+   {fr:"L'erreur n'est pas ton ennemie.", es:"El error no es tu enemigo."},
+   {fr:"La concentration est calme, pas tendue.", es:"La concentración es tranquila, no tensa."},
+   {fr:"Fais confiance à ton corps.", es:"Confía en tu cuerpo."}
+  ]},
+{ id:"momtest", titulo:"The Mom Test", fuente:"Las ideas del libro de Fitzpatrick, escritas para ti · no es el texto literal",
+  aviso:"Libro con derechos de autor: aquí van sus ideas en francés sencillo, no sus frases.",
+  pasajes:[
+   {fr:"Ne parle pas de ton idée, parle de leur vie.", es:"No hables de tu idea, habla de su vida."},
+   {fr:"Les gens mentent pour être gentils.", es:"La gente miente por ser amable."},
+   {fr:"Demande ce qu'ils ont fait, pas ce qu'ils feraient.", es:"Pregunta qué hicieron, no qué harían."},
+   {fr:"« J'adore ton idée » ne vaut rien.", es:"«Me encanta tu idea» no vale nada."},
+   {fr:"Cherche des faits, pas des compliments.", es:"Busca hechos, no cumplidos."},
+   {fr:"Demande la dernière fois que c'est arrivé.", es:"Pregunta la última vez que eso pasó."},
+   {fr:"S'ils n'ont jamais payé, le problème est petit.", es:"Si nunca pagaron, el problema es pequeño."},
+   {fr:"Une bonne question fait un peu peur.", es:"Una buena pregunta da un poco de miedo."}
+  ]},
+{ id:"rdr2", titulo:"Red Dead Redemption 2", fuente:"Escenas escritas en el mundo del juego",
+  aviso:"Vocabulario del oeste: caballos, trenes, campamento. Nivel A2.",
+  pasajes:[
+   {fr:"Le camp dort encore sous la neige.", es:"El campamento duerme aún bajo la nieve."},
+   {fr:"Mon cheval connaît le chemin mieux que moi.", es:"Mi caballo conoce el camino mejor que yo."},
+   {fr:"On a la loyauté, c'est tout ce qu'on a.", es:"Tenemos lealtad, es todo lo que tenemos."},
+   {fr:"Le train passe à l'aube près de la rivière.", es:"El tren pasa al amanecer cerca del río."},
+   {fr:"La ville grandit et notre monde disparaît.", es:"La ciudad crece y nuestro mundo desaparece."},
+   {fr:"Je vais chasser, on n'a plus de viande.", es:"Voy a cazar, ya no tenemos carne."},
+   {fr:"Il n'y a pas de honte à partir.", es:"No hay vergüenza en marcharse."},
+   {fr:"Le soleil se couche sur les plaines.", es:"El sol se pone sobre las llanuras."}
+  ]},
+{ id:"hogwarts", titulo:"Hogwarts", fuente:"Escenas escritas en el mundo del castillo",
+  aviso:"Vocabulario de magia y colegio. Nivel A2.",
+  pasajes:[
+   {fr:"Le château a des escaliers qui bougent.", es:"El castillo tiene escaleras que se mueven."},
+   {fr:"Ma baguette a choisi ma main.", es:"Mi varita eligió mi mano."},
+   {fr:"Le cours de potions commence à huit heures.", es:"La clase de pociones empieza a las ocho."},
+   {fr:"Un couloir est interdit au troisième étage.", es:"Un pasillo está prohibido en el tercer piso."},
+   {fr:"Les tableaux parlent quand on passe.", es:"Los cuadros hablan cuando uno pasa."},
+   {fr:"Je vole pour la première fois demain.", es:"Vuelo por primera vez mañana."},
+   {fr:"La forêt est dangereuse la nuit.", es:"El bosque es peligroso de noche."},
+   {fr:"Le courage se montre aussi entre amis.", es:"El valor también se muestra entre amigos."}
+  ]},
+{ id:"boxeo", titulo:"Undisputed · boxeo", fuente:"Escenas escritas en el mundo del ring",
+  aviso:"Vocabulario de entrenamiento y combate. Nivel A2.",
+  pasajes:[
+   {fr:"Le combat commence dans une heure.", es:"El combate empieza en una hora."},
+   {fr:"Garde tes mains en haut.", es:"Mantén las manos arriba."},
+   {fr:"Respire entre les coups.", es:"Respira entre los golpes."},
+   {fr:"Les jambes gagnent les combats, pas les bras.", es:"Las piernas ganan los combates, no los brazos."},
+   {fr:"Il est fatigué, je le vois dans ses yeux.", es:"Está cansado, lo veo en sus ojos."},
+   {fr:"Le troisième round est le plus dur.", es:"El tercer asalto es el más duro."},
+   {fr:"On s'entraîne quand personne ne regarde.", es:"Uno entrena cuando nadie mira."},
+   {fr:"Se relever, c'est déjà gagner.", es:"Levantarse ya es ganar."}
+  ]}
+];
 
 /* limpia una palabra para buscarla en el glosario (sin puntuación, sin mayúsculas) */
 function palabraLimpia(w){ return w.toLowerCase().replace(/[«»"'"'!?,.;:()…]/g,"").replace(/^[-–]|[-–]$/g,"").trim(); }
@@ -4227,13 +4337,46 @@ function elegirHuecos(fr){
   return shuffle(cand).slice(0, Math.min(3, cand.length)).sort((a,b)=>a.i-b.i);
 }
 /* ================== JUEGO: 📖 LECTURA ================== */
+/* 📚 v1.74 — la biblioteca. Mateo pidió textos de lo que YA está leyendo y
+   jugando, y eso cambia el ejercicio: se abre porque quiere, no por deber.
+   Ninguno es el texto literal — los de Gallwey y Fitzpatrick tienen derechos
+   vigentes y el repo es público, y la prosa real de Dostoievski en francés es
+   C1 y lo ahogaría. Son escenas escritas en el mundo de cada uno, a su nivel,
+   y cada ficha lo dice de frente en vez de disimularlo. */
 function gameRead(){
-  const L=LECTURAS[0];
+  S.read = S.read || {};
+  const elegido = LECTURAS.find(x=>x.id===S.readActual) || LECTURAS[0];
+  if(!S.readActual){ elegirLectura(); return; }
+  leerTexto(elegido);
+}
+function elegirLectura(){
+  $("gameTitle").textContent="📚 Tu biblioteca";
+  noTimer();
+  const area=$("gameArea");
+  area.innerHTML=`<div class="prompt" style="font-size:1.1rem;">📚 ¿Qué quieres leer hoy?
+      <span class="sub">Cada texto recuerda por dónde ibas</span></div>
+    <div id="biblio" style="margin-top:12px;"></div>`;
+  const box=$("biblio");
+  LECTURAS.forEach(L=>{
+    const van=S.read[L.id]||0, total=L.pasajes.length;
+    const pct=Math.round(van/total*100);
+    const d=document.createElement("div");
+    d.className="resultrow"; d.style.cursor="pointer"; d.style.textAlign="left";
+    d.innerHTML=`<span style="flex:1;">
+        <b>${esc(L.titulo)}</b>
+        <div class="tr" style="opacity:.55;font-size:.72rem;">${esc(L.fuente)}</div>
+        <div class="track" style="height:6px;margin-top:5px;background:var(--soft);border-radius:4px;overflow:hidden;">
+          <span class="fill" style="display:block;height:100%;width:${pct}%;background:var(--purple);"></span></div>
+      </span><span style="opacity:.6;font-size:.75rem;white-space:nowrap;">${van}/${total}</span>`;
+    d.onclick=()=>{ S.readActual=L.id; store.save(); leerTexto(L); };
+    box.appendChild(d);
+  });
+}
+function leerTexto(L){
   $("gameTitle").textContent="📖 "+L.titulo;
   noTimer();
   const area=$("gameArea");
   // se leen 5 pasajes por sesión, avanzando desde donde quedó
-  S.read = S.read || {};
   const total=L.pasajes.length;
   let desde = Math.min(S.read[L.id]||0, total-1);
   const tanda = [];
@@ -4258,7 +4401,7 @@ function gameRead(){
       return `<span class="hueco" data-h="${k}">${"·".repeat(Math.max(3,palabraLimpia(t).length))}</span>`;
     }).join(" ");
     // fichas: las palabras tapadas + señuelos del mismo texto, para que no se adivine por forma
-    const otras=[...new Set(LECTURAS[0].pasajes.flatMap(x=>x.fr.split(/\s+/))
+    const otras=[...new Set(L.pasajes.flatMap(x=>x.fr.split(/\s+/))
       .map(palabraLimpia).filter(w=>w.length>=4 && LEX_LEC[w] && !huecos.some(h=>h.l===w)))];
     const fichas=shuffle(huecos.map(h=>({w:h.t, real:true}))
       .concat(shuffle(otras).slice(0,3).map(w=>({w, real:false}))));
@@ -4422,6 +4565,11 @@ function gameRead(){
     <div class="bubble" style="margin-top:14px;text-align:left;">${esc(L.aviso)}<br><br>
       Vas por el trozo <b>${desde+1}</b> de ${total}. Cada palabra se toca para ver qué significa y oírla; con ⭐ se va a tus repasos.</div>`;
   nextBtn(area, paso, "Empezar a leer 📖");
+  const otro=document.createElement("button");
+  otro.className="linkish"; otro.textContent="📚 Elegir otro texto";
+  otro.style.marginTop="10px";
+  otro.onclick=()=>{ S.readActual=null; store.save(); elegirLectura(); };
+  area.appendChild(otro);
 }
 
 /* ================== 📜 EL EXAMEN DE SALIDA (v1.62) ==================
