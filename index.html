@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.77 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.78 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -488,6 +488,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
     <div class="card">
       <h2 style="text-align:center;">📈 Tu progreso</h2>
       <div class="pstats" id="pstats"></div>
+      <div id="pmov"></div>
     </div>
     <div class="card">
       <h3 style="margin-bottom:4px;">Puntos por día</h3>
@@ -1764,6 +1765,81 @@ const IMPROV=[
  {t:"Te quedaste en blanco a mitad de frase: compra tiempo y pide que hable más despacio — sin pena",
   keys:[["attends","un moment","laisse-moi"],["lentement","répète","comment on dit"]],
   model:"Attends, un moment... parle plus lentement, s'il te plaît !"},
+/* 📚 lo que lee */
+ {t:"Cuenta qué libro estás leyendo y por qué te engancha",
+  keys:[["je lis","j'ai lu","je suis en train de lire"],["livre","roman"],["parce que","car"]],
+  model:"Je lis un roman russe en ce moment, et j'aime beaucoup parce que les personnages sont très humains."},
+ {t:"Te preguntan si lees mucho: di que sí y qué tipo de libros prefieres",
+  keys:[["je lis","j'aime lire"],["beaucoup","souvent"],["je préfère","surtout"]],
+  model:"Oui, je lis beaucoup ! Je préfère les romans et les livres qui parlent de la vie."},
+ {t:"Habla de tu padre: te comparte textos en francés y los leen juntos",
+  keys:[["mon père"],["textes","livres","lire"],["ensemble","avec moi","me partage"]],
+  model:"Mon père me partage des textes en français, et on les lit ensemble."},
+ /* 🎮 lo que juega */
+ {t:"Recomienda un videojuego: cómo se llama y qué te gusta de él",
+  keys:[["jeu","je joue"],["j'aime","génial","super"],["histoire","paysages","monde"]],
+  model:"Je joue à Red Dead Redemption. J'aime beaucoup l'histoire et les paysages."},
+ {t:"Di cuánto tiempo juegas y que después te toca trabajar",
+  keys:[["je joue"],["une heure","le soir","un peu"],["après","ensuite","puis"]],
+  model:"Je joue une heure le soir, et après je dois travailler."},
+ /* 🎸 la guitarra */
+ {t:"Di que tocas guitarra desde hace años y qué música prefieres",
+  keys:[["guitare"],["depuis"],["je préfère","j'aime","musique"]],
+  model:"Je joue de la guitare depuis plusieurs années. Je préfère la musique acoustique."},
+ {t:"Invita a alguien a tocar música contigo este fin de semana",
+  keys:[["week-end","samedi","dimanche"],["jouer","guitare","musique"],["tu veux","ça te dit","on peut"]],
+  model:"Ça te dit de jouer de la musique avec moi ce week-end ?"},
+ /* 💼 su oficio */
+ {t:"Tu amigo quiere saber cómo es un día normal de tu trabajo — cuéntaselo",
+  keys:[["je travaille","mon travail"],["le matin","d'abord","souvent"],["ensuite","après","puis"]],
+  model:"Je travaille sur des produits. Le matin je dessine, et ensuite je parle avec l'équipe."},
+ /* 🧘 hablar relajado — lo que Mateo pidió: "aprender a hablar más relajado" */
+ {t:"No conoces la palabra en francés: dilo y pide ayuda para encontrarla",
+  keys:[["je ne sais pas","je sais pas","comment on dit"],["mot","en français"],["tu peux m'aider","vous pouvez m'aider","aide"]],
+  model:"Je ne sais pas comment on dit ce mot en français... tu peux m'aider ?"},
+ {t:"Alguien se disculpa por algo pequeño — quítale importancia",
+  keys:[["ce n'est pas grave","pas de problème","ce n'est rien"],["t'inquiète","ne t'inquiète pas","tranquille"]],
+  model:"Ce n'est pas grave, ne t'inquiète pas ! Tout va bien."},
+ {t:"Te preguntan si hablas bien francés: responde con calma, sin disculparte de más",
+  keys:[["je parle"],["un peu","doucement"],["j'apprends","je progresse","ça vient"]],
+  model:"Je parle un peu, doucement. J'apprends encore, et ça vient !"},
+ {t:"Cambia de tema con elegancia: no quieres hablar de eso",
+  keys:[["on parle","parlons","on change"],["autre chose","d'autre chose"],["si tu veux","plutôt","dis-moi"]],
+  model:"On parle d'autre chose, si tu veux ? Dis-moi plutôt comment va ta famille."},
+ {t:"Di que estás cansado PERO que quieres seguir un rato más",
+  keys:[["fatigué"],["mais"],["continuer","encore"]],
+  model:"Je suis un peu fatigué, mais je veux continuer encore un peu."},
+ {t:"Agradece de verdad: alguien te ayudó mucho hoy",
+  keys:[["merci"],["beaucoup","vraiment","mille fois"],["gentil","aidé","sympa"]],
+  model:"Merci beaucoup, vraiment ! C'est très gentil de m'avoir aidé."},
+ {t:"Pide perdón por llegar tarde y explica por qué, sin dramatizar",
+  keys:[["désolé","pardon"],["en retard"],["parce que","il y avait","le métro"]],
+  model:"Désolé, je suis en retard : il y avait beaucoup de monde dans le métro."},
+ /* 🗣️ opinar con matices — su punto flojo declarado */
+ {t:"Alguien dice que el francés es difícil — dale tu opinión, con matices",
+  keys:[["difficile"],["mais","pourtant"],["à mon avis","je trouve","je pense"]],
+  model:"C'est difficile au début, mais à mon avis c'est une belle langue. Je trouve que ça vient avec le temps."},
+ {t:"Comenta el partido de ayer: quién jugó bien y qué te pareció",
+  keys:[["match"],["bien","super","mal"],["joué","équipe","j'ai trouvé"]],
+  model:"Le match d'hier était super ! L'équipe a très bien joué."},
+ /* ⏳ ayer y mañana */
+ {t:"Cuenta qué hiciste ayer — algo simple, en pasado",
+  keys:[["hier"],["j'ai lu","j'ai joué","j'ai travaillé","j'ai mangé"],["c'était","bien","sympa","tranquille"]],
+  model:"Hier j'ai lu un peu et j'ai joué de la guitare. C'était tranquille."},
+ {t:"Di qué vas a hacer mañana — dos planes",
+  keys:[["demain"],["je vais"],["et","après","ensuite"]],
+  model:"Demain je vais travailler, et après je vais jouer de la guitare."},
+ /* 🍽️ pedir de verdad, con números */
+ {t:"Pide un plato recomendado y di que no comes mucha carne",
+  keys:[["vous conseillez","vous recommandez","qu'est-ce que"],["je ne mange pas","je mange pas"],["viande"]],
+  model:"Qu'est-ce que vous conseillez ? Je ne mange pas beaucoup de viande."},
+ {t:"Reserva una mesa por teléfono: para dos, esta noche, a las ocho",
+  keys:[["réserver","une table"],["ce soir"],["huit heures","vingt heures"]],
+  model:"Bonjour, je voudrais réserver une table pour deux, ce soir à huit heures."},
+ /* 🏔️ de dónde viene */
+ {t:"Cuenta de dónde eres y cómo es tu ciudad, en dos frases",
+  keys:[["je viens","je suis de","j'habite"],["colombie","bogota"],["ville","grande","froid","montagnes"]],
+  model:"Je viens de Colombie, j'habite à Bogota. C'est une grande ville dans les montagnes."},
 ];
 
 /* Frases motivadoras de Coco */
@@ -1803,6 +1879,7 @@ const S = {
   spoken: [],          // 🎙️ v1.62: misiones de Improvisa CLAVADAS — la 5ª parte de la puerta
   read: {},            // 📖 v1.71: por qué trozo va cada lectura {idTexto:indice}
   readSeen: [],        // 🎲 v1.75: trozos ya leídos, para no repetir
+  week: [],            // 📈 v1.78: una marca de las 5 partes por día (últimas 12), para ver el MOVIMIENTO
   skills: {},          // 💪 v1.72: acierto por destreza {id:{n,ok,rec[]}}
   exam: null,          // 📜 v1.62: {tries,passed,best,last,lastScores} — el examen de salida
   name: "",            // 🪪 v1.54: el nombre de quien juega — la app es de cada quien
@@ -1945,7 +2022,7 @@ function packState(){
   return {v:2, x:S.xp, s:S.streak, b:S.bestStreak, d:S.lastDay, h:S.hist, t:S.theme,
     f:S.diff, w:S.weak, ls:S.lastScenes||[], c:S.custom||[], p:S.pending||[], g:S.grad||0,
     pr:S.prefs||{}, ib:S.inbox||[], pc:S.ps||null, sg:S.songs||[], gl:S.gradList||[],
-    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}, rv:S.readSeen||[]};
+    nm:S.name||"", lt:S.lastTwists||[], sp:S.spoken||[], ex:S.exam||null, rd:S.read||{}, sk:S.skills||{}, rv:S.readSeen||[], wk:S.week||[]};
 }
 function applyState(p){
   if(!p || typeof p!=="object") return false;
@@ -1967,6 +2044,7 @@ function applyState(p){
   S.read=(p.rd&&typeof p.rd==="object")?p.rd:{};   // 📖 v1.71
   S.skills=(p.sk&&typeof p.sk==="object")?p.sk:{};  // 💪 v1.72
   S.readSeen=Array.isArray(p.rv)?p.rv:[];           // 🎲 v1.75
+  S.week=Array.isArray(p.wk)?p.wk:[];               // 📈 v1.78: marcas diarias
   return true;
 }
 /* ⚖️ cuánto progreso REAL representa una copia (para no restaurar la peor) */
@@ -2465,6 +2543,42 @@ function solidPct(){
   const s=solidStats();
   return Math.min(99, Math.round(100*(Math.min(s.days/21,1)+Math.min(s.xp/26000,1)+
     Math.min(s.tier/3,1)+Math.min(s.mem/30,1)+Math.min(s.voice/VOICE_GOAL,1))/5));
+}
+/* 📈 v1.78 — EL MEDIDOR SE QUEDA QUIETO AUNQUE HAYA AVANCE, y eso es real:
+   dos de las cinco partes (⭐ y 🌶️) ya están al tope de lo que mide la puerta,
+   y la 🎓 memoria depende del calendario (mínimo 11 días por frase). Así que
+   Mateo puede jugar una semana entera, mejorar, y ver el mismo %. No es un bug
+   del número: es que el número solo mide NIVEL y él quiere ver MOVIMIENTO.
+   Se guarda una foto de las 5 partes y se refresca cuando cumple 7 días.
+   CERO INFLAR: la foto no suma nada, solo recuerda de dónde venías.        */
+function diasDesde(iso){
+  if(!iso) return 999;
+  const a=new Date(iso+"T00:00:00"), b=new Date(todayStr()+"T00:00:00");
+  return Math.round((b-a)/86400000);
+}
+/* ⚠️ UNA SOLA FOTO NO SIRVE, y lo descubrió la prueba: si la foto se refresca
+   al cumplir 7 días, la comparación vale CERO justo el día en que empieza a
+   servir — Mateo habría visto "nada se movió" precisamente cuando sí se movió.
+   Así que se guardan MARCAS DIARIAS (una por día, las últimas 12) y se compara
+   contra la más reciente que ya tenga 7 días o más. No se tiran por viejas: si
+   vuelve después de tres semanas, la referencia es de hace tres semanas y el
+   texto lo dice — es más honesto que fingir que no hay con qué comparar.    */
+function semanaFoto(){
+  const s=solidStats(), hoy=todayStr();
+  if(!Array.isArray(S.week)) S.week=[];
+  const marca={d:hoy, dd:s.days, x:s.xp, t:s.tier, m:s.mem, v:s.voice};
+  const antes=JSON.stringify(S.week);
+  const i=S.week.findIndex(w=>w && w.d===hoy);
+  if(i>=0) S.week[i]=marca; else S.week.push(marca);
+  S.week=S.week.filter(w=>w&&w.d).sort((a,b)=>a.d<b.d?-1:1).slice(-12);
+  if(JSON.stringify(S.week)!==antes) store.save();
+}
+/* la referencia: la marca más nueva que ya cumplió una semana (o la más vieja
+   que haya, si todavía no hay ninguna con 7 días) */
+function refSemana(){
+  const ms=(S.week||[]).filter(w=>w&&w.d&&w.d!==todayStr());
+  const maduras=ms.filter(w=>diasDesde(w.d)>=7);
+  return maduras.length ? maduras[maduras.length-1] : (ms.length ? ms[0] : null);
 }
 function renderLangs(){
   const it=$("lang-it"), pt=$("lang-pt");
@@ -3520,11 +3634,25 @@ function gameScene(){
 }
 
 /* ================== JUEGO 5: IMPROVISA 🎭 ================== */
+/* 🎙️ v1.78 — PRIMERO LAS MISIONES QUE AÚN NO ESTÁN CLAVADAS.
+   Mateo: "No siento avance, veo el mismo 85% de hace rato". Parte de la razón
+   estaba aquí: el juego sorteaba entre TODAS las misiones, así que le repetía
+   las que ya tenía ganadas y la barra 🎙️ (la única de la puerta que le puede
+   seguir subiendo) se movía a la mitad de velocidad. El listón NO baja — hay
+   que tocar todas las claves igual; lo que cambia es que no se le gasta el
+   turno en algo que ya demostró. Misma filosofía que dropWeakest(): atender
+   lo que falta, no lo que sobra. Si ya están casi todas, vuelve a sortear
+   entre todas para que siga habiendo repaso.                               */
+function misionesDeHoy(n){
+  const hechas=new Set(S.spoken||[]);
+  const faltan=IMPROV.filter(m=>!hechas.has(m.t));
+  return shuffle(faltan.length>=n ? faltan : IMPROV).slice(0,n);
+}
 function gameImprov(){
   $("gameTitle").textContent="🎭 Improvisa";
   noTimer();
   updateTierChip(diffFor("improv").tier);
-  const ms=shuffle(IMPROV).slice(0,2);
+  const ms=misionesDeHoy(2);
   let mi=0, pts=0;
   const area=$("gameArea");
 
@@ -3999,7 +4127,7 @@ function renderDuras(){
 }
 
 function renderProgress(){
-  renderDestrezas(); renderTemas(); renderDuras();
+  renderDestrezas(); renderTemas(); renderDuras(); renderMovimiento();
   // tiles
   const days = S.hist.length;
   const avgAcc = days ? Math.round(S.hist.reduce((t,e)=>t+e.a,0)/days) : 0;
@@ -4039,6 +4167,53 @@ function renderProgress(){
     rows.innerHTML = S.hist.slice(-14).reverse().map(e=>
       `<div class="resultrow"><span>${fmtDay(e.d)}${e.d===today?" · hoy":""}</span><span>${e.p} pts · ${e.a}% 🎯</span></div>`).join("");
   }
+}
+
+/* 📈 v1.78 — LO QUE SE MOVIÓ, no solo dónde estás.
+   Mateo, sobre el % de la puerta: "No siento avance, veo el mismo 85% de hace
+   rato". Y mirando la fórmula tenía razón: con ⭐ y 🌶️ ya al tope, el % solo
+   lo mueven 🗓️ días, 🎓 memoria y 🎙️ misiones — y la 🎓 va a ritmo de
+   calendario. Esta tarjeta dice qué subió desde la foto de la semana pasada y,
+   sobre todo, CUÁL es la única parte que le queda. Sin culpa si no se movió. */
+function renderMovimiento(){
+  const box=$("pmov"); if(!box) return;
+  const s=solidStats();
+  const w=refSemana();
+  const num=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");
+  const PART=[
+    {e:"🗓️", n:"días",    v:s.days,  meta:21,         d:w?s.days-(w.dd||0):0},
+    {e:"⭐", n:"puntos",   v:s.xp,    meta:26000,      d:w?s.xp-(w.x||0):0},
+    {e:"🌶️", n:"reto",    v:s.tier,  meta:3,          d:w?s.tier-(w.t||0):0},
+    {e:"🎓", n:"memoria",  v:s.mem,   meta:30,         d:w?s.mem-(w.m||0):0},
+    {e:"🎙️", n:"misiones", v:s.voice, meta:VOICE_GOAL, d:w?s.voice-(w.v||0):0},
+  ];
+  const subieron=PART.filter(p=>p.d>0);
+  const faltan=PART.filter(p=>p.v<p.meta);
+  const dias=w?diasDesde(w.d):0;
+  const desde = !w||!dias ? "desde hoy"
+              : dias===1  ? "desde ayer" : "en los últimos "+dias+" días";
+  let mov = subieron.length
+    ? subieron.map(p=>`<b>${p.e} +${num(p.d)}</b>`).join(" · ")
+    : `<span class="hint">Nada de esto se movió ${desde} — y no pasa nada: el medidor es lento a propósito.</span>`;
+  // la parte que de verdad queda: si solo falta una, se dice con nombre y apellido
+  let queda;
+  if(!faltan.length){
+    queda=`Las 5 partes están llenas. Lo único que queda es el <b>📜 examen</b>.`;
+  } else if(faltan.length===1){
+    const f=faltan[0];
+    queda=`<b>Solo te falta una parte</b>: ${f.e} ${f.n} (${num(f.v)}/${num(f.meta)}). El resto ya está al tope — por eso el % no se mueve aunque juegues.`;
+  } else {
+    const topes=PART.filter(p=>p.v>=p.meta).map(p=>p.e).join(" ");
+    queda=`Te quedan ${faltan.length} partes: ${faltan.map(f=>f.e+" "+f.n+" "+num(f.v)+"/"+num(f.meta)).join(" · ")}.`
+      + (topes?` Las de ${topes} ya están al tope y no mueven el %.`:"");
+  }
+  box.innerHTML=`<div class="card" style="margin-top:12px;">
+    <h3 style="margin-bottom:4px;">🧗 Movimiento hacia la puerta</h3>
+    <p class="hint" style="text-align:left;margin:0 0 8px;">Comparado con ${desde}</p>
+    <p style="margin:0 0 10px;">${mov}</p>
+    <p style="margin:0;">${queda}</p>
+    <p class="hint" style="text-align:left;margin:10px 0 0;">El % es solo el medidor del día a día: el 🇮🇹 italiano lo abre el 📜 examen, y ese lo puedes presentar cuando quieras.</p>
+  </div>`;
 }
 
 /* ================== EVENTOS ================== */
@@ -5503,6 +5678,7 @@ document.addEventListener("keydown",e=>{
 
 /* ================== ARRANQUE ================== */
 const restored = store.load();
+semanaFoto();                       // 📈 v1.78: de dónde venías hace una semana
 /* 🛟 v1.55: si el guardado principal venía dañado, la caja fuerte ya tiró de copia.
    Se avisa sin drama y sin culpa: el progreso está, que es lo que importa. */
 if(store.rescued){

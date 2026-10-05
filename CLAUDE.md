@@ -46,7 +46,14 @@ Cuatro secciones de 4: 🎧 entender · 🧩 armar · 🎙️ decir · ⚡ impro
 - **No da ⭐** — un examen se aprueba, no se farmea. Y lo fallado entra solo a repasos (CERO CULPA: es un mapa, no un portazo).
 - Califica el habla por **familias de palabras clave** (`IMPROV[].keys`), no por frase exacta: es lo que aguanta que el reconocedor de voz falle. Si no hay micrófono se autocalifica y el informe lo dice.
 - 🎙️ Improvisa ya medía producción y la puerta lo ignoraba (bug de diseño hasta v1.61). `markSpoken()` alimenta `S.spoken`.
-- Lo que falta para llevar esto más lejos: **más misiones en `IMPROV`** (hoy 23) — es el cuello de botella del examen y del entrenamiento. Conversación libre de verdad exigiría devolver la API de Claude, que está PODADA: es decisión de Mateo, no se hace por iniciativa propia.
+- Lo que falta para llevar esto más lejos: **más misiones en `IMPROV`** (45 desde v1.78; eran 23) — es el cuello de botella del examen y del entrenamiento. Conversación libre de verdad exigiría devolver la API de Claude, que está PODADA: es decisión de Mateo, no se hace por iniciativa propia.
+
+## 📈 El medidor se queda quieto aunque haya avance (v1.78)
+Mateo: *"No siento avance, veo el mismo 85% de hace rato"*. **No era un bug del número, era un límite del número**: con ⭐ y 🌶️ al tope de lo que mide la puerta, el % solo lo mueven 🗓️ días, 🎓 memoria (ritmo de calendario, mín. 11 días por frase) y 🎙️ misiones. Puede jugar una semana entera, mejorar, y ver el mismo %.
+- `S.week` = **marcas diarias** de las 5 partes (una por día, últimas 12). `refSemana()` compara contra la más nueva que ya cumplió 7 días. ⚠️ Una sola foto NO sirve: si se refresca al cumplir los 7 días, la comparación vale cero justo el día en que empieza a servir (lo cazó la prueba, no el ojo).
+- `renderMovimiento()` en 📈 Mi progreso dice **qué subió** y, sobre todo, **cuál es la única parte que queda**. Sin culpa si no se movió.
+- `misionesDeHoy()`: 🎭 Improvisa sortea primero entre las misiones NO clavadas. El listón no baja (hay que tocar todas las claves); lo que cambia es que no le gasta el turno en algo ya ganado — al azar, la barra 🎙️ se movía a la mitad de velocidad.
+- Al añadir misiones a `IMPROV`: el modelo de Coco **debe** tocar todas sus propias claves, o la misión es imposible. Hay prueba para eso, y otra que verifica que una misión no se clave con la respuesta de otra (la #14 es laxa a propósito: es abierta).
 
 ## Estado (ago-2026)
 v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
