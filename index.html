@@ -408,7 +408,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.78 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.79 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -3735,18 +3735,35 @@ function gameImprov(){
             <div>📝 Tú: "${esc(inp.value.trim())}"</div>
             <div>Lograste <b>${hits.length} de ${m.keys.length}</b> · te faltó decir algo como: ${missing.map(x=>`<span class="dw-miss">${esc(x)}</span>`).join(" · ")}</div>
             <div>🦜 Coco lo diría así: <b>"${m.model}"</b> <button class="replaybtn">🔊</button></div>
-            <div style="opacity:.7;font-size:.8rem;margin-top:4px;">🔧 Escríbelo (o algo muy parecido) para cerrar la misión</div></div>`);
+            <div style="opacity:.7;font-size:.85rem;margin-top:6px;">🔁 <b>Inténtalo otra vez con TUS palabras</b>, ahora que sabes qué falta. Si prefieres, di la frase de Coco y también cierra.</div></div>`);
           fb.querySelector(".replaybtn").onclick=()=>speakFR(m.model,0.75);
           speakFR(m.model,0.8);
-          correcting=true; inp.value=""; inp.placeholder=m.model; inp.focus();
-          $("okBtn").textContent="Corregido ✔";
+          correcting=true; inp.value=""; inp.placeholder="Con tus palabras…"; inp.focus();
+          $("okBtn").textContent="Otra vez 🔁";
         }
       } else {
-        if(similarity(inp.value,m.model)>=.7){
+        /* 🔁 v1.79 — EL SEGUNDO INTENTO TAMBIÉN ES IMPROVISAR.
+           Antes el reintento se medía por PARECIDO A LA FRASE DE COCO: con un
+           25% de acierto en improvisar, a Mateo 3 de cada 4 misiones le
+           terminaban en transcribir el modelo, que es justo lo contrario del
+           ejercicio. Ahora se vuelve a medir por CLAVES: ya sabe qué le faltó,
+           que lo diga a su manera. Decir la frase de Coco sigue cerrando la
+           misión (nadie se queda atascado), pero deja de ser el único camino.
+           🔒 CERO INFLAR: el reintento da ⭐ y cierra, pero NO cuenta para la
+           barra 🎙️ de la puerta ni para la destreza — esas siguen midiendo
+           solo lo que le sale de primeras, sin ayuda. Se dice en pantalla. */
+        const said2=norm(inp.value);
+        const hits2=m.keys.filter(k=>k.some(v=>said2.includes(norm(v))));
+        const clavada=hits2.length===m.keys.length;
+        if(clavada || similarity(inp.value,m.model)>=.7){
           answered=true;
-          pts+=5; S.session.score+=5; floatPoints(5); ding(true); fixReview(m.model);
-          fb.innerHTML=`💪 ¡Guardada! +5`; fb.style.color="var(--green)";
-          setTimeout(()=>{mi++; ask();},1000);
+          const gana=clavada?12:5;
+          pts+=gana; S.session.score+=gana; floatPoints(gana); ding(true); fixReview(m.model);
+          fb.innerHTML = clavada
+            ? `🙌 ¡Eso es improvisar! +${gana}<br><span class="hint">Cuenta para tus ⭐. La barra 🎙️ de la puerta solo suma las que clavas al primer intento — esta te la llevas igual.</span>`
+            : `💪 ¡Guardada! +${gana}`;
+          fb.style.color="var(--green)";
+          setTimeout(()=>{mi++; ask();}, clavada?2200:1000);
         } else {
           ding(false); inp.style.animation="shake .35s"; setTimeout(()=>inp.style.animation="",380);
         }
@@ -4189,12 +4206,18 @@ function renderMovimiento(){
   ];
   const subieron=PART.filter(p=>p.d>0);
   const faltan=PART.filter(p=>p.v<p.meta);
+  // v1.79: el día que esto se estrena todavía no hay con qué comparar, y decir
+  // "nada se movió" ahí es falso y desanima. Si no hay referencia, se dice.
   const dias=w?diasDesde(w.d):0;
-  const desde = !w||!dias ? "desde hoy"
-              : dias===1  ? "desde ayer" : "en los últimos "+dias+" días";
-  let mov = subieron.length
-    ? subieron.map(p=>`<b>${p.e} +${num(p.d)}</b>`).join(" · ")
-    : `<span class="hint">Nada de esto se movió ${desde} — y no pasa nada: el medidor es lento a propósito.</span>`;
+  const desde = !w||!dias ? null
+              : dias===1  ? "ayer"
+              : dias<7    ? "hace "+dias+" días"
+              : dias===7  ? "hace una semana" : "hace "+dias+" días";
+  let mov = !desde
+    ? `<span class="hint">Las marcas empiezan hoy. En unos días aquí verás cuánto subió cada parte — aunque el % siga igual.</span>`
+    : subieron.length
+      ? subieron.map(p=>`<b>${p.e} +${num(p.d)}</b>`).join(" · ")
+      : `<span class="hint">Nada de esto se movió desde ${desde} — y no pasa nada: el medidor es lento a propósito.</span>`;
   // la parte que de verdad queda: si solo falta una, se dice con nombre y apellido
   let queda;
   if(!faltan.length){
@@ -4209,7 +4232,7 @@ function renderMovimiento(){
   }
   box.innerHTML=`<div class="card" style="margin-top:12px;">
     <h3 style="margin-bottom:4px;">🧗 Movimiento hacia la puerta</h3>
-    <p class="hint" style="text-align:left;margin:0 0 8px;">Comparado con ${desde}</p>
+    <p class="hint" style="text-align:left;margin:0 0 8px;">${desde?"Comparado con "+desde:"Primer día de marcas"}</p>
     <p style="margin:0 0 10px;">${mov}</p>
     <p style="margin:0;">${queda}</p>
     <p class="hint" style="text-align:left;margin:10px 0 0;">El % es solo el medidor del día a día: el 🇮🇹 italiano lo abre el 📜 examen, y ese lo puedes presentar cuando quieras.</p>

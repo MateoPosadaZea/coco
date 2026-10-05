@@ -55,6 +55,11 @@ Mateo: *"No siento avance, veo el mismo 85% de hace rato"*. **No era un bug del 
 - `misionesDeHoy()`: 🎭 Improvisa sortea primero entre las misiones NO clavadas. El listón no baja (hay que tocar todas las claves); lo que cambia es que no le gasta el turno en algo ya ganado — al azar, la barra 🎙️ se movía a la mitad de velocidad.
 - Al añadir misiones a `IMPROV`: el modelo de Coco **debe** tocar todas sus propias claves, o la misión es imposible. Hay prueba para eso, y otra que verifica que una misión no se clave con la respuesta de otra (la #14 es laxa a propósito: es abierta).
 
+## 🎭 Improvisar es el cuello de botella REAL (v1.79)
+Datos de Mateo (oct-2026, sus capturas): 💬 Conversación 100% · 🎤 Pronunciación 100% · 📖 Lectura 94% · 👂 Oído 93% · 🧩 Armar 83% · 📚 Vocabulario 75% · **🎭 Improvisar 25%**. Y sus 5 partes: 🗓️ 27/21 ✅ · ⭐ 87.692/26.000 ✅ · 🌶️ 5/3 ✅ · 🎓 27/30 · 🎙️ 5/15 → 84,67% = su 85%. **Lo único que lo separa del 100% es improvisar.**
+- El reintento tras fallar una misión **se medía por parecido a la frase de Coco**: con 25% de acierto, 3 de cada 4 misiones le terminaban en transcribir, que es lo contrario del ejercicio. Desde v1.79 el 2º intento se vuelve a medir **por claves**. Decir la frase de Coco sigue cerrando (nadie se atasca), pero deja de ser el único camino.
+- 🔒 CERO INFLAR: el reintento da ⭐ y cierra la misión, pero **NO** suma a `S.spoken` (barra 🎙️) ni a `recordSkill` — esas siguen midiendo solo el primer intento, sin ayuda. Se dice en pantalla, no se esconde.
+
 ## Estado (ago-2026)
 v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
 Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/passé composé, conversación libre.
