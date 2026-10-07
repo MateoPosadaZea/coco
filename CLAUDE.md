@@ -11,6 +11,7 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 - **TODO ES EJERCITABLE**: todo contenido visible lleva ⭐ → repasos; nada entra solo al SRS.
 - Onboarding = UNA pregunta (el nombre). Sin formularios.
 - Personalización = contenido jugable, nunca encuestas.
+- **EL NOMBRE ES COCO, y está decidido (oct-2026).** Mateo consideró «Amalia» por su abuela y lo resolvió él mismo: *«coco solo entonces mejor y ya… coco me recuerda a mi abuela también, la de la película»*. Coco ya lleva a la abuela dentro, así que no hay que elegir. **No reabrir el tema ni proponer renombres** (ni «Coco + una palabra»): se evaluó y se descartó. Amalia queda reservada para otro proyecto suyo.
 
 ## Reglas técnicas (NO regresionar)
 - 🔒 **LA CAJA FUERTE (v1.56-v1.59) — el progreso es intocable, esto es lo más delicado del archivo.**
