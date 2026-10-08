@@ -306,23 +306,26 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .cta .t{display:block; font-size:1.12rem; font-weight:700; letter-spacing:-.01em;}
 .cta .s{display:block; font-size:.85rem; opacity:.85; margin-top:2px;}
 .cta .fl{margin-left:auto; font-size:1.3rem; flex:none;}
-/* segundo nivel: tienen que SENTIRSE botones (superficie, borde, se hunden),
+/* ⚠️ .hopt y no .opt: .opt YA ERA la clase de las opciones de respuesta en
+   todos los juegos. La v1.81 la reusó sin mirar y pisó su estilo (francés y
+   español quedaron lado a lado, sin negrita). Lo cazó la prueba de la v1.82.
+   segundo nivel: tienen que SENTIRSE botones (superficie, borde, se hunden),
    pero sin competir con el verde. Antes eran losas rosas y moradas. */
-.opts{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
-.opt{
+.hopts{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+.hopt{
   display:flex; align-items:center; gap:12px; width:100%; text-align:left;
   font-family:inherit; font-size:1rem; cursor:pointer;
   background:var(--card); color:var(--ink); border:1px solid var(--soft2);
   border-radius:15px; padding:12px 14px; box-shadow:var(--shadow);
   font-weight:400; transition:transform .08s ease;
 }
-.opt:active{transform:translateY(1px);}
-.opt .ic{flex:none; width:36px; height:36px; border-radius:11px; background:var(--soft);
+.hopt:active{transform:translateY(1px);}
+.hopt .ic{flex:none; width:36px; height:36px; border-radius:11px; background:var(--soft);
   display:grid; place-items:center; font-size:1.15rem;}
-.opt .tx{min-width:0;}
-.opt .tt{display:block; font-size:.98rem; font-weight:600; line-height:1.3;}
-.opt .ss{display:block; font-size:.8rem; font-weight:400; opacity:.65; line-height:1.35;}
-.opt .ch{margin-left:auto; opacity:.4; flex:none; font-size:1.2rem;}
+.hopt .tx{min-width:0;}
+.hopt .tt{display:block; font-size:.98rem; font-weight:600; line-height:1.3;}
+.hopt .ss{display:block; font-size:.8rem; font-weight:400; opacity:.65; line-height:1.35;}
+.hopt .ch{margin-left:auto; opacity:.4; flex:none; font-size:1.2rem;}
 /* lo que no es de todos los días se pliega: sigue estando, deja de estorbar */
 details.plegable{padding:0; overflow:hidden;}
 details.plegable>summary{
@@ -435,17 +438,17 @@ details.plegable>.inner{padding:0 16px 16px;}
         <span class="fl">→</span>
       </button>
       <p class="hint" id="weakLine" style="margin:10px 0 0;"></p>
-      <div class="opts">
-        <button class="opt" id="btnLong"><span class="ic">🌊</span><span class="tx">
+      <div class="hopts">
+        <button class="hopt" id="btnLong"><span class="ic">🌊</span><span class="tx">
           <span class="tt">Inmersión</span>
           <span class="ss">Más preguntas, temas mezclados · 15 min</span></span><span class="ch">›</span></button>
-        <button class="opt" id="btnScene"><span class="ic">💬</span><span class="tx">
+        <button class="hopt" id="btnScene"><span class="ic">💬</span><span class="tx">
           <span class="tt">Solo conversación</span>
           <span class="ss">Escenas con giros, sin reloj</span></span><span class="ch">›</span></button>
-        <button class="opt" id="btnRead"><span class="ic">📖</span><span class="tx">
+        <button class="hopt" id="btnRead"><span class="ic">📖</span><span class="tx">
           <span class="tt">Leer un rato</span>
           <span class="ss">Textos de libros y juegos, por trozos</span></span><span class="ch">›</span></button>
-        <button class="opt" id="btnSongs" style="display:none;"><span class="ic">🎵</span><span class="tx">
+        <button class="hopt" id="btnSongs" style="display:none;"><span class="ic">🎵</span><span class="tx">
           <span class="tt">Cancionero</span>
           <span class="ss">Las canciones que has guardado</span></span><span class="ch">›</span></button>
       </div>
@@ -486,7 +489,7 @@ details.plegable>.inner{padding:0 16px 16px;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.81 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.82 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -675,7 +678,7 @@ const THEMES = [
   vocab:[
    {fr:"Je m'appelle...", es:"Me llamo..."},
    {fr:"Comment tu t'appelles ?", es:"¿Cómo te llamas?"},
-   {fr:"J'habite à Bogota", es:"Vivo en Bogotá"},
+   {fr:"J'habite à Barranquilla", es:"Vivo en Barranquilla"},
    {fr:"Je suis colombien", es:"Soy colombiano"},
    {fr:"Enchanté", es:"Encantado"},
    {fr:"Comment ça va ?", es:"¿Cómo estás?"},
@@ -690,7 +693,7 @@ const THEMES = [
    {fr:"Je m'appelle Mateo", es:"Me llamo Mateo"},
    {fr:"Enchanté !", es:"¡Encantado!"},
    {fr:"Je parle un peu français", es:"Hablo un poco de francés"},
-   {fr:"J'habite à Bogota", es:"Vivo en Bogotá"},
+   {fr:"J'habite à Barranquilla", es:"Vivo en Barranquilla"},
   ],
  },
  {
@@ -863,24 +866,28 @@ const THEMES = [
   /* 💛 construido con el material del cuaderno de Mateo — troceado y remezclado,
      nunca frases kilométricas literales (petición suya, 2026-07-17) */
   id:"perso", emoji:"💛", name:"Mi mundo", minLvl:1,
+  /* v1.82: lo que Mateo quiere ahora, en sus palabras — "aprender, conocerme,
+     disfrutar, relajarme cada vez más, sonreír y sentirme cada vez mejor;
+     sacar la empresa adelante, ayudar a mi familia, consentir a mis papás". */
   vocab:[
    {fr:"J'apprends", es:"Estoy aprendiendo"},
-   {fr:"J'écoute", es:"Estoy escuchando"},
-   {fr:"J'apprends vite", es:"Aprendo rápido"},
    {fr:"J'adore apprendre", es:"Me encanta aprender"},
-   {fr:"Comment vas-tu ?", es:"¿Cómo has estado?"},
-   {fr:"Quoi de neuf ?", es:"¿Qué hay de nuevo?"},
-   {fr:"Comment ça s'est passé ?", es:"¿Cómo les fue?"},
-   {fr:"Reconnaissant pour tout", es:"Agradecido por todo"},
+   {fr:"Je fais du sport", es:"Hago ejercicio"},
+   {fr:"Je veux profiter de la vie", es:"Quiero disfrutar la vida"},
+   {fr:"Je me détends de plus en plus", es:"Me relajo cada vez más"},
+   {fr:"Je veux mieux me connaître", es:"Quiero conocerme mejor"},
+   {fr:"Je souris plus souvent", es:"Sonrío más seguido"},
+   {fr:"Je me sens de mieux en mieux", es:"Me siento cada vez mejor"},
+   {fr:"J'aide ma famille", es:"Ayudo a mi familia"},
+   {fr:"Je gâte mes parents", es:"Consiento a mis papás"},
    {fr:"J'ai un objectif", es:"Tengo una meta"},
-   {fr:"Il est déjà fixé", es:"Ya está fija"},
-   {fr:"On joue de la musique ensemble", es:"Tocamos música juntos"},
-   {fr:"Je suis fier de toi", es:"Estoy orgulloso de ti"},
+   {fr:"Reconnaissant pour tout", es:"Agradecido por todo"},
+   {fr:"Quoi de neuf ?", es:"¿Qué hay de nuevo?"},
   ],
   speak:[
-   {fr:"J'apprends vite et j'adore apprendre", es:"Aprendo rápido y me encanta aprender"},
-   {fr:"Quoi de neuf ?", es:"¿Qué hay de nuevo?"},
-   {fr:"J'ai un objectif et il est déjà fixé", es:"Tengo una meta y ya está fija"},
+   {fr:"Je veux profiter de la vie et sourire", es:"Quiero disfrutar la vida y sonreír"},
+   {fr:"Je me détends et je me sens de mieux en mieux", es:"Me relajo y me siento cada vez mejor"},
+   {fr:"Je fais grandir mon entreprise pour aider ma famille", es:"Saco adelante mi empresa para ayudar a mi familia"},
    {fr:"Je suis reconnaissant pour tout", es:"Estoy agradecido por todo"},
   ],
  },
@@ -914,14 +921,14 @@ const THEMES = [
   id:"colombie", emoji:"🇨🇴", name:"Colombia en francés", minLvl:1,
   vocab:[
    {fr:"Je viens de Colombie", es:"Vengo de Colombia"},
-   {fr:"Bogota est ma ville", es:"Bogotá es mi ciudad"},
+   {fr:"Barranquilla est ma ville", es:"Barranquilla es mi ciudad"},
    {fr:"Le café colombien", es:"El café colombiano"},
    {fr:"Le meilleur du monde", es:"El mejor del mundo"},
-   {fr:"Il fait frais à Bogota", es:"Hace fresco en Bogotá"},
+   {fr:"Il fait chaud à Barranquilla", es:"Hace calor en Barranquilla"},
    {fr:"La côte caraïbe", es:"La costa caribe"},
    {fr:"J'adore la cumbia", es:"Me encanta la cumbia"},
    {fr:"On danse beaucoup", es:"Bailamos mucho"},
-   {fr:"Les montagnes sont belles", es:"Las montañas son hermosas"},
+   {fr:"La mer des Caraïbes", es:"El mar Caribe"},
    {fr:"Tu connais la Colombie ?", es:"¿Conoces Colombia?"},
    {fr:"Viens me rendre visite !", es:"¡Ven a visitarme!"},
    {fr:"Je suis fier de mon pays", es:"Estoy orgulloso de mi país"},
@@ -959,27 +966,29 @@ const THEMES = [
   ],
  },
  {
-  /* 🛠️ v1.32: el oficio de Mateo — crea productos del diseño a la producción, ama la tecnología */
-  id:"metier", emoji:"🛠️", name:"Mi oficio", minLvl:1,
+  /* 🛠️ v1.32 → 💼 v1.82: el oficio de Mateo, ahora con nombre propio. Tiene su
+     empresa, Matriz (diseño y desarrollo de software), y la está sacando adelante.
+     Su idea de fondo, dicha por él: "ayudar a la gente, ayudar y ayudar". */
+  id:"metier", emoji:"💼", name:"Mi empresa", minLvl:1,
   vocab:[
+   {fr:"J'ai ma propre entreprise", es:"Tengo mi propia empresa"},
+   {fr:"Elle s'appelle Matriz", es:"Se llama Matriz"},
+   {fr:"On fait du design et du logiciel", es:"Hacemos diseño y software"},
    {fr:"Je crée des produits", es:"Creo productos"},
-   {fr:"Du design à la production", es:"Del diseño a la producción"},
    {fr:"Les produits numériques", es:"Los productos digitales"},
-   {fr:"J'ai vingt-huit ans", es:"Tengo veintiocho años"},
-   {fr:"J'adore la technologie", es:"Me encanta la tecnología"},
-   {fr:"Je travaille sur un projet", es:"Estoy trabajando en un proyecto"},
-   {fr:"Une bonne idée", es:"Una buena idea"},
-   {fr:"C'est passionnant", es:"Es apasionante"},
+   {fr:"Je fais grandir mon entreprise", es:"Estoy sacando adelante mi empresa"},
+   {fr:"J'ai plein d'idées", es:"Tengo muchísimas ideas"},
+   {fr:"Je veux aider les gens", es:"Quiero ayudar a la gente"},
+   {fr:"C'est beaucoup de travail", es:"Es mucho trabajo"},
+   {fr:"Mon équipe", es:"Mi equipo"},
+   {fr:"Un nouveau client", es:"Un cliente nuevo"},
    {fr:"Qu'est-ce que tu fais dans la vie ?", es:"¿A qué te dedicas?"},
-   {fr:"On peut créer tellement de choses", es:"Se pueden crear tantas cosas"},
-   {fr:"Montre-moi ton travail", es:"Muéstrame tu trabajo"},
-   {fr:"Construire quelque chose", es:"Construir algo"},
   ],
   speak:[
-   {fr:"Je crée des produits, du design à la production", es:"Creo productos, del diseño a la producción"},
+   {fr:"J'ai ma propre entreprise, elle s'appelle Matriz", es:"Tengo mi propia empresa, se llama Matriz"},
+   {fr:"On fait du design et du développement de logiciels", es:"Hacemos diseño y desarrollo de software"},
+   {fr:"J'ai plein d'idées pour aider les gens", es:"Tengo muchas ideas para ayudar a la gente"},
    {fr:"Qu'est-ce que tu fais dans la vie ?", es:"¿A qué te dedicas?"},
-   {fr:"J'adore la technologie, c'est passionnant", es:"Me encanta la tecnología, es apasionante"},
-   {fr:"Je travaille sur un projet génial", es:"Estoy trabajando en un proyecto genial"},
   ],
  },
  {
@@ -1083,6 +1092,58 @@ const THEMES = [
    {fr:"C'était un plaisir de te rencontrer", es:"Fue un placer conocerte"},
   ],
  },
+ {
+  /* 🌴 v1.82: su vida ahora — vive en Barranquilla, en la costa caribe, con su
+     gata Cliff. Le encantan la playa y el calor, y sueña con Portugal.
+     «minette» y no «chatte»: las dos son gata, pero «chatte» tiene un doble
+     sentido vulgar que cualquier francés nota al instante. */
+  id:"chezmoi", emoji:"🌴", name:"Barranquilla y Cliff", minLvl:1,
+  vocab:[
+   {fr:"J'habite à Barranquilla", es:"Vivo en Barranquilla"},
+   {fr:"Sur la côte caraïbe", es:"En la costa caribe"},
+   {fr:"Il fait chaud toute l'année", es:"Hace calor todo el año"},
+   {fr:"J'adore la plage", es:"Me encanta la playa"},
+   {fr:"J'aime quand il fait chaud", es:"Me gusta cuando hace calor"},
+   {fr:"Près de la mer", es:"Cerca del mar"},
+   {fr:"J'ai une petite minette", es:"Tengo una gatica"},
+   {fr:"Elle s'appelle Cliff", es:"Se llama Cliff"},
+   {fr:"Elle dort toute la journée", es:"Duerme todo el día"},
+   {fr:"Un jour, je voudrais vivre au Portugal", es:"Algún día quisiera vivir en Portugal"},
+   {fr:"Il fait trop chaud aujourd'hui !", es:"¡Hoy hace demasiado calor!"},
+   {fr:"On va à la plage ?", es:"¿Vamos a la playa?"},
+  ],
+  speak:[
+   {fr:"J'habite à Barranquilla, sur la côte caraïbe", es:"Vivo en Barranquilla, en la costa caribe"},
+   {fr:"J'ai une petite minette, elle s'appelle Cliff", es:"Tengo una gatica, se llama Cliff"},
+   {fr:"J'adore la plage et j'aime quand il fait chaud", es:"Me encanta la playa y me gusta cuando hace calor"},
+   {fr:"Un jour, je voudrais vivre au Portugal", es:"Algún día quisiera vivir en Portugal"},
+  ],
+ },
+ {
+  /* 🎬 v1.82: lo que disfruta — fútbol, boxeo, buenas series (ahora Mad Men),
+     películas, libros y música. */
+  id:"loisirs", emoji:"🎬", name:"Lo que me gusta", minLvl:1,
+  vocab:[
+   {fr:"J'adore le football", es:"Me encanta el fútbol"},
+   {fr:"Je regarde la boxe", es:"Veo boxeo"},
+   {fr:"C'était un beau combat", es:"Fue una buena pelea"},
+   {fr:"Je regarde une série", es:"Estoy viendo una serie"},
+   {fr:"En ce moment, je regarde Mad Men", es:"En este momento estoy viendo Mad Men"},
+   {fr:"C'est une très bonne série", es:"Es una serie muy buena"},
+   {fr:"J'aime les bons films", es:"Me gustan las buenas películas"},
+   {fr:"Tu as vu ce film ?", es:"¿Viste esa película?"},
+   {fr:"Je lis un bon livre", es:"Estoy leyendo un buen libro"},
+   {fr:"J'écoute de la musique", es:"Escucho música"},
+   {fr:"Le week-end, je me repose", es:"El fin de semana descanso"},
+   {fr:"Qu'est-ce que tu regardes ?", es:"¿Qué estás viendo?"},
+  ],
+  speak:[
+   {fr:"En ce moment, je regarde Mad Men", es:"En este momento estoy viendo Mad Men"},
+   {fr:"J'adore le football et la boxe", es:"Me encantan el fútbol y el boxeo"},
+   {fr:"C'est une très bonne série, tu la connais ?", es:"Es una serie muy buena, ¿la conoces?"},
+   {fr:"Le week-end, je regarde un film et je me repose", es:"El fin de semana veo una película y descanso"},
+  ],
+ },
 ];
 
 /* ================== ESCENAS DE CONVERSACIÓN ================== */
@@ -1151,7 +1212,7 @@ const SCENES = [
     ]},
    {npc:"Tu habites où ?", npcEs:"¿Dónde vives?",
     options:[
-     {fr:"J'habite à Bogota, en Colombie", es:"Vivo en Bogotá, en Colombia", ok:true},
+     {fr:"J'habite à Barranquilla, en Colombie", es:"Vivo en Barranquilla, en Colombia", ok:true},
      {fr:"À gauche", es:"A la izquierda", ok:false, why:"Jaja, no es una dirección de calle 🗺️"},
      {fr:"J'ai faim", es:"Tengo hambre", ok:false, why:"Interesante, pero no respondiste 😅"},
     ]},
@@ -1383,7 +1444,7 @@ const SCENES = [
    {npc:"Cool ! Et tu viens d'où ? Ton accent est intéressant...", npcEs:"¡Genial! ¿Y de dónde vienes? Tu acento es interesante...",
     options:[
      {fr:"De Colombie ! Le pays de la cumbia", es:"¡De Colombia! El país de la cumbia", ok:true, alt:"«La Colombie ! Il faut m'apprendre ça !» 🥁"},
-     {fr:"Je viens de Bogota", es:"Vengo de Bogotá", ok:true},
+     {fr:"J'habite à Barranquilla", es:"Vivo en Barranquilla", ok:true},
      {fr:"Une baguette, s'il vous plaît", es:"Una baguette, por favor", ok:false, why:"El acento no se arregla con pan 😅"},
     ]},
    {npc:"On joue ensemble ? Toi, tu chantes !", npcEs:"¿Tocamos juntos? ¡Tú cantas!",
@@ -1603,6 +1664,80 @@ const SCENES = [
     ]},
   ],
  },
+ {
+  /* 🌴 v1.82: una amiga francesa de visita en Barranquilla */
+  id:"barranquilla-visita", themes:["chezmoi","colombie"], title:"🌴 Una amiga de visita en Barranquilla", npc:"🧳", npcName:"Léa",
+  vars:{
+   moment:[{fr:"ce week-end",es:"este fin de semana"},{fr:"samedi",es:"el sábado"},{fr:"demain",es:"mañana"}],
+   boisson:[{fr:"un jus de mangue",es:"un jugo de mango"},{fr:"une limonade de coco",es:"una limonada de coco"},{fr:"une eau bien fraîche",es:"un agua bien fría"}],
+  },
+  steps:[
+   {npc:"Salut ! Ça y est, je suis à Barranquilla ! Il fait chaud, non ?", npcEs:"¡Hola! ¡Por fin estoy en Barranquilla! Hace calor, ¿no?",
+    options:[
+     {fr:"Oui, il fait chaud toute l'année !", es:"¡Sí, hace calor todo el año!", ok:true, react:"Toute l'année ? C'est le rêve !", reactEs:"¿Todo el año? ¡Es el sueño!"},
+     {fr:"Bienvenue ! Ici, on aime la chaleur", es:"¡Bienvenida! Aquí nos gusta el calor", ok:true, react:"J'adore déjà cette ville !", reactEs:"¡Ya me encanta esta ciudad!"},
+     {fr:"Il fait froid, prends un manteau", es:"Hace frío, trae un abrigo", ok:false, why:"¿Abrigo en Barranquilla? 😂 Aquí hace calor siempre"},
+    ]},
+   {npc:"On fait quoi {moment} ?", npcEs:"¿Qué hacemos {moment}?",
+    options:[
+     {fr:"On va à la plage ?", es:"¿Vamos a la playa?", ok:true, react:"Oui ! J'ai apporté mon maillot", reactEs:"¡Sí! Traje mi vestido de baño"},
+     {fr:"On regarde le match ensemble", es:"Vemos el partido juntos", ok:true, react:"Avec plaisir, j'adore le football !", reactEs:"¡Con gusto, me encanta el fútbol!"},
+     {fr:"Je suis perdu", es:"Estoy perdido", ok:false, why:"¡Estás en tu propia ciudad! 😄"},
+    ]},
+   {npc:"J'ai trop soif ! Tu veux {boisson} ?", npcEs:"¡Tengo mucha sed! ¿Quieres {boisson}?",
+    options:[
+     {fr:"Oui, avec plaisir !", es:"¡Sí, con gusto!", ok:true, react:"Parfait, c'est moi qui invite", reactEs:"Perfecto, invito yo"},
+     {fr:"Bonne idée, il fait trop chaud aujourd'hui", es:"Buena idea, hoy hace demasiado calor", ok:true, react:"Exactement ! Allons-y", reactEs:"¡Exacto! Vamos"},
+     {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡Es mediodía y hace 34 grados! 🌞"},
+    ]},
+   {npc:"Oh ! C'est qui, ce petit chat ?", npcEs:"¡Oh! ¿Quién es este gatico?",
+    options:[
+     {fr:"C'est ma minette, elle s'appelle Cliff", es:"Es mi gatica, se llama Cliff", ok:true, react:"Cliff ! Elle est trop mignonne", reactEs:"¡Cliff! Es demasiado linda"},
+     {fr:"C'est Cliff, elle dort toute la journée", es:"Es Cliff, duerme todo el día", ok:true, react:"La belle vie !", reactEs:"¡Qué buena vida!"},
+     {fr:"C'est mon client", es:"Es mi cliente", ok:false, why:"Cliff no es cliente de Matriz 😹"},
+    ]},
+   {npc:"Je comprends pourquoi tu aimes vivre ici", npcEs:"Entiendo por qué te gusta vivir aquí",
+    options:[
+     {fr:"Oui ! Mais un jour, je voudrais vivre au Portugal", es:"¡Sí! Pero algún día quisiera vivir en Portugal", ok:true, react:"Le Portugal ? Il fait chaud aussi. Bonne idée !", reactEs:"¿Portugal? También hace calor. ¡Buena idea!"},
+     {fr:"Merci ! Reviens quand tu veux", es:"¡Gracias! Vuelve cuando quieras", ok:true, react:"Promis ! À bientôt", reactEs:"¡Prometido! Hasta pronto"},
+     {fr:"C'est trop cher", es:"Es muy caro", ok:false, why:"Nadie habló de plata 😅"},
+    ]},
+  ],
+ },
+ {
+  /* 🎬 v1.82: hablar de series, fútbol y boxeo con un amigo */
+  id:"series-amigo", themes:["loisirs","opinions"], title:"🎬 ¿Qué estás viendo?", npc:"🍿", npcName:"Hugo",
+  vars:{
+   serie:[{fr:"Breaking Bad",es:"Breaking Bad"},{fr:"Succession",es:"Succession"},{fr:"The Crown",es:"The Crown"}],
+   sport:[{fr:"le match d'hier",es:"el partido de ayer"},{fr:"le combat de samedi",es:"la pelea del sábado"}],
+  },
+  steps:[
+   {npc:"Salut ! Tu regardes quoi en ce moment ?", npcEs:"¡Hola! ¿Qué estás viendo en este momento?",
+    options:[
+     {fr:"En ce moment, je regarde Mad Men", es:"En este momento estoy viendo Mad Men", ok:true, react:"Mad Men ! Don Draper, quel personnage !", reactEs:"¡Mad Men! Don Draper, ¡qué personaje!"},
+     {fr:"Une très bonne série : Mad Men", es:"Una serie muy buena: Mad Men", ok:true, react:"Ah oui, c'est un classique", reactEs:"Ah sí, es un clásico"},
+     {fr:"Je regarde à gauche", es:"Miro a la izquierda", ok:false, why:"Jaja, te preguntó por series, no hacia dónde miras 👀"},
+    ]},
+   {npc:"Moi, je regarde {serie}. Tu connais ?", npcEs:"Yo estoy viendo {serie}. ¿La conoces?",
+    options:[
+     {fr:"Non, c'est bien ?", es:"No, ¿es buena?", ok:true, react:"C'est génial, tu vas adorer", reactEs:"Es genial, te va a encantar"},
+     {fr:"Oui ! C'est une très bonne série", es:"¡Sí! Es una serie muy buena", ok:true, react:"On a les mêmes goûts !", reactEs:"¡Tenemos los mismos gustos!"},
+     {fr:"Bonne nuit", es:"Buenas noches", ok:false, why:"¡No te despidas todavía! 😴"},
+    ]},
+   {npc:"Et tu as vu {sport} ?", npcEs:"¿Y viste {sport}?",
+    options:[
+     {fr:"Oui, quel spectacle !", es:"¡Sí, qué espectáculo!", ok:true, react:"Incroyable, hein ?", reactEs:"Increíble, ¿no?"},
+     {fr:"Non, mais j'adore le football et la boxe", es:"No, pero me encantan el fútbol y el boxeo", ok:true, react:"Alors la prochaine fois, on le regarde ensemble", reactEs:"Entonces la próxima lo vemos juntos"},
+     {fr:"L'addition, s'il vous plaît", es:"La cuenta, por favor", ok:false, why:"No están en un restaurante 😂"},
+    ]},
+   {npc:"Et ce week-end, tu fais quoi ?", npcEs:"¿Y este fin de semana qué haces?",
+    options:[
+     {fr:"Je me repose et je regarde un bon film", es:"Descanso y veo una buena película", ok:true, react:"Le plan parfait !", reactEs:"¡El plan perfecto!"},
+     {fr:"Je lis un bon livre à la plage", es:"Leo un buen libro en la playa", ok:true, react:"Quelle belle vie !", reactEs:"¡Qué buena vida!"},
+     {fr:"Je suis perdu", es:"Estoy perdido", ok:false, why:"No te preguntó por direcciones 🗺️"},
+    ]},
+  ],
+ },
 ];
 
 /* ================== FAMILIAS DE VERBOS 📖 (v1.43 — para la chuleta) ==================
@@ -1664,7 +1799,7 @@ const TWISTS=[
  {npc:"Vous n'êtes pas d'ici, non ? D'où venez-vous ?", themes:["presentation","colombie"], npcEs:"Usted no es de aquí, ¿no? ¿De dónde viene?",
   options:[
    {fr:"Je viens de Colombie !", es:"¡Vengo de Colombia!", ok:true, react:"La Colombie ! Magnifique !", reactEs:"¡Colombia! ¡Qué maravilla!"},
-   {fr:"J'habite à Bogota", es:"Vivo en Bogotá", ok:true, react:"Ah, Bogota ! J'aimerais visiter un jour", reactEs:"¡Ah, Bogotá! Me gustaría conocerla algún día"},
+   {fr:"J'habite à Barranquilla", es:"Vivo en Barranquilla", ok:true, react:"Barranquilla ! La mer, le soleil... quelle chance !", reactEs:"¡Barranquilla! El mar, el sol... ¡qué suerte!"},
    {fr:"C'est trop cher", es:"Es muy caro", ok:false, why:"¡Nadie te está cobrando! 😂"},
   ]},
  {npc:"Oh là là, vous parlez bien français !", themes:["perso"], npcEs:"¡Oh, habla usted bien francés!",
@@ -1778,8 +1913,8 @@ const IMPROV=[
   keys:[["café"],["croissant"],["s'il vous plaît","sil te plait","s'il te plaît"]],
   model:"Bonjour ! Un café et un croissant, s'il vous plaît."},
  {t:"Preséntate: tu nombre, dónde vives, y que hablas un poco de francés",
-  keys:[["je m'appelle"],["j'habite","bogota"],["un peu"]],
-  model:"Je m'appelle Mateo, j'habite à Bogota et je parle un peu français."},
+  keys:[["je m'appelle"],["j'habite","barranquilla","bogota"],["un peu"]],
+  model:"Je m'appelle Mateo, j'habite à Barranquilla et je parle un peu français."},
  {t:"Pregunta dónde está el metro y si está lejos",
   keys:[["où est"],["métro"],["loin"]],
   model:"Pardon, où est le métro ? C'est loin d'ici ?"},
@@ -1916,8 +2051,30 @@ const IMPROV=[
   model:"Bonjour, je voudrais réserver une table pour deux, ce soir à huit heures."},
  /* 🏔️ de dónde viene */
  {t:"Cuenta de dónde eres y cómo es tu ciudad, en dos frases",
-  keys:[["je viens","je suis de","j'habite"],["colombie","bogota"],["ville","grande","froid","montagnes"]],
-  model:"Je viens de Colombie, j'habite à Bogota. C'est une grande ville dans les montagnes."},
+  keys:[["je viens","je suis de","j'habite"],["colombie","barranquilla","bogota"],["ville","plage","chaud","mer","caraïbe"]],
+  model:"Je viens de Colombie, j'habite à Barranquilla. C'est une ville au bord de la mer, il fait chaud."},
+ /* 💼🌴🎬 v1.82: su vida ahora — Matriz, Cliff, Mad Men, el boxeo, el calor */
+ {t:"Presenta tu empresa: cómo se llama y qué hace",
+  keys:[["entreprise","ma boîte"],["matriz","elle s'appelle"],["design","logiciel","logiciels"]],
+  model:"J'ai ma propre entreprise, elle s'appelle Matriz. On fait du design et du logiciel."},
+ {t:"Presenta a tu gata: cómo se llama y qué hace todo el día",
+  keys:[["minette","chat","chatte"],["cliff"],["dort","dormir","joue"]],
+  model:"J'ai une petite minette, elle s'appelle Cliff. Elle dort toute la journée !"},
+ {t:"Recomienda la serie que estás viendo y di por qué te gusta",
+  keys:[["je regarde","série"],["mad men"],["parce que","j'adore","génial"]],
+  model:"En ce moment je regarde Mad Men. J'adore, parce que les personnages sont fascinants."},
+ {t:"Cuéntale a alguien que te gusta el boxeo y qué pelea viste",
+  keys:[["boxe"],["combat"],["j'ai vu","j'ai regardé","c'était"]],
+  model:"J'adore la boxe ! Hier, j'ai regardé un combat incroyable. C'était très intense."},
+ {t:"Di dónde te gustaría vivir algún día y por qué",
+  keys:[["je voudrais","j'aimerais"],["vivre","habiter"],["parce que","chaud","plage","mer"]],
+  model:"Un jour, je voudrais vivre au Portugal, parce que j'aime la mer et le climat chaud."},
+ {t:"Cuenta qué haces para sentirte cada vez mejor",
+  keys:[["sport","exercice"],["je me détends","je me repose","je lis"],["mieux"]],
+  model:"Je fais du sport, je me détends et je lis. Ça va de mieux en mieux."},
+ {t:"Di que quieres ayudar a tu familia y consentir a tus papás",
+  keys:[["ma famille"],["aider","j'aide"],["mes parents","gâter","je gâte"]],
+  model:"Je veux aider ma famille et gâter mes parents. C'est important pour moi."},
 ];
 
 /* Frases motivadoras de Coco */
@@ -2020,10 +2177,18 @@ function announceTier(tier, up){
 const SRS_DAYS=[1,3,7,14,30];
 function inDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return localISO(d); }
 const WEAK_MAX=40;
+/* 🔁 v1.82 — "ESTO SE REPITE DEMASIADO" (Mateo, con captura de una revancha).
+   Un solo tropiezo en «armar la frase» (tocar una ficha fuera de orden) mandaba
+   la frase a la caja 0 CON FECHA DE HOY: volvía en la siguiente sesión del mismo
+   día, y al otro, y al otro. Con nivel 5 y fichas señuelo, tropezar una vez es
+   facilísimo, así que algunas frases quedaban en bucle eterno.
+   Ahora vuelve MAÑANA. Lo demás no cambia: sigue cayendo a la caja 0, así que la
+   🎓 memoria sigue bajando al recaer (regla de la puerta, intacta) — solo deja de
+   perseguirlo el mismo día. Dentro de una sesión ya existe la "segunda oportunidad". */
 function markWeak(v){
   const w=S.weak.find(x=>x.fr===v.fr);
-  if(w){ w.box=0; w.due=todayStr(); return; }            // recae: vuelve a la caja 0, se repasa ya
-  S.weak.push({fr:v.fr, es:v.es, box:0, due:todayStr()});
+  if(w){ w.box=0; w.due=inDays(1); return; }             // recae: caja 0, vuelve mañana
+  S.weak.push({fr:v.fr, es:v.es, box:0, due:inDays(1)});
   if(S.weak.length>WEAK_MAX) dropWeakest();
 }
 /* v1.56 (decisión de Mateo): cuando los repasos se llenan sale la frase MÁS FLOJA,

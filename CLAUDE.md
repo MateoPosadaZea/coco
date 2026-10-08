@@ -83,6 +83,14 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - `cifra()` también en los números del nivel (`15.692 / 20.000`).
 - **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
 
+## 🌴 Quién es Mateo HOY (oct-2026 — contado por él, úsalo para el contenido)
+Vive en **Barranquilla** (costa caribe) — ya NO en Bogotá. Tiene su empresa, **Matriz** (diseño y desarrollo de software), y la está sacando adelante; su idea de fondo: *«ayudar a la gente, ayudar y ayudar»*. Tiene una gata, **Cliff**. Le gustan el **fútbol** y el **boxeo**, las buenas series (está viendo **Mad Men**), las películas, los libros y la música. Ama la playa y el calor; sueña con vivir en la costa o en **Portugal**. Hace ejercicio. Quiere aprender, conocerse, disfrutar, **relajarse cada vez más**, sonreír, ayudar a su familia y consentir a sus papás.
+
+## 🔁 «Esto se repite demasiado» (v1.82)
+- **El bucle**: en «armar la frase» UN tropiezo mandaba la frase a caja 0 **con fecha de hoy** → volvía en cada sesión. Ahora `markWeak()` la programa para **mañana** (`inDays(1)`). Sigue cayendo a caja 0, así que la 🎓 memoria sigue bajando al recaer (regla de la puerta intacta).
+- **Contenido**: «Mi oficio» → **«Mi empresa»** (Matriz); «Mi mundo» con lo que quiere ahora; temas nuevos **`chezmoi`** («Barranquilla y Cliff») y **`loisirs`** («Lo que me gusta»), cada uno con su escena (`barranquilla-visita`, `series-amigo`). Bogotá → Barranquilla en temas, escenas y misiones (en las claves de misión se dejó «bogota» como alternativa). 7 misiones nuevas → **52**. Ahora son **20 temas**.
+- «**minette**», no «chatte», para su gata: «chatte» tiene doble sentido vulgar.
+
 ## Estado (ago-2026)
 v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
 Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/passé composé, conversación libre.
@@ -91,3 +99,4 @@ Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/
 - Mateo **perdió su progreso** cuando el navegador borró los datos del sitio (posiblemente por una "recarga forzada" que en iPhone significa borrar datos del sitio — cuidado con sugerirle eso). La caja fuerte nació después y no pudo rescatarlo. Recordarle guardar el 📄 archivo de vez en cuando: es lo único que sobrevive a eso.
 - El entorno remoto de Claude Code **bloquea `github.io`** por política de red: no se puede verificar el footer en vivo desde la sesión. Se verifica el deploy por la API de GitHub (workflow "pages build and deployment" del commit) y se le pide a Mateo la confirmación visual.
 - No encadenar varias suites de Playwright en un solo comando: se queda sin memoria. Una por una.
+- **Antes de inventar un nombre de clase CSS, búscalo.** La v1.81 creó `.opt` para los botones del inicio sin ver que `.opt` YA ERA la clase de las opciones de respuesta de todos los juegos: la regla nueva, al venir después, les pisó el estilo (francés y español lado a lado, sin negrita) y salió publicado. Lo cazó la prueba de la v1.82. Los del inicio son ahora `.hopt`.
