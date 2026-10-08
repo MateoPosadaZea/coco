@@ -72,6 +72,17 @@ Mateo: *«está muy IA… debe verse prolijo, amigable, divertido y elegante… 
 - `cifra()` pone el separador de miles: `87692` → `87.692`.
 - **Falta la tanda 2** (el loro dibujado en vez del emoji 🦜, con estados) y la **tanda 3** (sacar los emoji de dentro de las frases: 912 en total, 182 distintos). El personaje elegido por Mateo: **cara frontal + cuerpo entero**, el mismo loro a dos distancias.
 
+## 🎯 Simplificar la experiencia (v1.81 — tanda 1b)
+Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual… podemos simplificar la experiencia, el texto, las opciones»*. Tenía razón: la v1.80 cambió la **pintura** y no el **reparto**, que era lo que la maqueta aprobada proponía.
+- **UNA acción principal.** `.cta` (verde, con subtítulo) para «Sesión de hoy». Antes había dos botones gordos de colores distintos (verde y rosa) compitiendo, más cinco pequeños en fila.
+- **Segundo nivel = `.opt`**: superficie, borde, icono en caja, subtítulo y chevron; se hunden al tocarlos. Tienen que SENTIRSE botones sin competir con el verde (Mateo pidió esto explícitamente al ver la maqueta).
+- **`<details class="card plegable">`** para «Temas y vocabulario» y «Pregúntale a Coco»: siguen enteros, dejan de estorbar. Mateo usa los temas como glosario, no para jugar.
+- Se quitaron el título «Tu misión de hoy 🎯» y su párrafo (ahora son el subtítulo del botón) y la pista de Inmersión (es el subtítulo de su opción).
+- El saludo era un marcador (*«Llevas 87.692 ⭐ y racha de 2 🔥»*). Ahora: *«Bonjour, Mateo. Qué bueno verte.»* Lo primero que dice una compañera no son tus cifras.
+- 🐛 Los textos del nivel seguían diciendo **🇵🇹 puerta**: la puerta apunta al 🇮🇹 italiano desde la v1.65.
+- `cifra()` también en los números del nivel (`15.692 / 20.000`).
+- **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
+
 ## Estado (ago-2026)
 v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
 Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/passé composé, conversación libre.

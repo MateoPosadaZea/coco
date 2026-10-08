@@ -290,6 +290,50 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .confetti{position:fixed; z-index:100; top:-20px; font-size:1.3rem; pointer-events:none; animation:confall linear forwards;}
 .dw-bad{background:var(--dwbad); color:#C62828; border-radius:6px; padding:0 4px; text-decoration:line-through;}
 .dw-miss{background:var(--goodbg); color:#1B5E20; border-radius:6px; padding:0 4px; font-weight:800;}
+/* 🎯 v1.81 — UNA SOLA ACCIÓN PRINCIPAL, el resto en una lista tranquila.
+   Mateo: "el diseño ui se ve igual, podemos simplificar la experiencia… el
+   texto, las opciones". Tenía razón: la v1.80 cambió la pintura pero no el
+   reparto. El inicio pedía seis decisiones antes de dejarlo jugar, con dos
+   botones gordos de colores distintos compitiendo entre sí. */
+.cta{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  font-family:'Figtree',-apple-system,system-ui,'Segoe UI',sans-serif;
+  border:none; cursor:pointer; background:var(--green); color:var(--onColor);
+  border-radius:18px; padding:16px 18px; box-shadow:var(--shadow);
+  transition:transform .08s ease, filter .15s;
+}
+.cta:active{transform:translateY(1px);}
+.cta .t{display:block; font-size:1.12rem; font-weight:700; letter-spacing:-.01em;}
+.cta .s{display:block; font-size:.85rem; opacity:.85; margin-top:2px;}
+.cta .fl{margin-left:auto; font-size:1.3rem; flex:none;}
+/* segundo nivel: tienen que SENTIRSE botones (superficie, borde, se hunden),
+   pero sin competir con el verde. Antes eran losas rosas y moradas. */
+.opts{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+.opt{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  font-family:inherit; font-size:1rem; cursor:pointer;
+  background:var(--card); color:var(--ink); border:1px solid var(--soft2);
+  border-radius:15px; padding:12px 14px; box-shadow:var(--shadow);
+  font-weight:400; transition:transform .08s ease;
+}
+.opt:active{transform:translateY(1px);}
+.opt .ic{flex:none; width:36px; height:36px; border-radius:11px; background:var(--soft);
+  display:grid; place-items:center; font-size:1.15rem;}
+.opt .tx{min-width:0;}
+.opt .tt{display:block; font-size:.98rem; font-weight:600; line-height:1.3;}
+.opt .ss{display:block; font-size:.8rem; font-weight:400; opacity:.65; line-height:1.35;}
+.opt .ch{margin-left:auto; opacity:.4; flex:none; font-size:1.2rem;}
+/* lo que no es de todos los días se pliega: sigue estando, deja de estorbar */
+details.plegable{padding:0; overflow:hidden;}
+details.plegable>summary{
+  list-style:none; cursor:pointer; padding:15px 16px; display:flex; align-items:center; gap:10px;
+  font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:600; font-size:1.05rem;
+}
+details.plegable>summary::-webkit-details-marker{display:none;}
+details.plegable>summary::after{content:"⌄"; margin-left:auto; opacity:.45; font-size:1.3rem;
+  line-height:1; transform:translateY(-4px); transition:transform .2s;}
+details.plegable[open]>summary::after{transform:translateY(2px) rotate(180deg);}
+details.plegable>.inner{padding:0 16px 16px;}
 .toast{
   position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(110px); z-index:80;
   background:var(--toastBg); color:var(--toastInk); border-radius:999px; padding:12px 20px;
@@ -386,31 +430,44 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
         <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
         <div class="hint" id="xpHint" style="margin-top:6px;"></div>
       </div>
-      <h3 style="text-align:center; margin-top:14px;">Tu misión de hoy 🎯</h3>
-      <p style="text-align:center; font-weight:700; opacity:.7; margin:4px 0 6px;">4 mini-juegos · ~5 minutos · un ladrillo más del viaje 🧳</p>
-      <p class="hint" id="weakLine" style="margin:0 0 12px;"></p>
-      <button class="btn big green" id="btnPlay">▶️ ¡Jugar la sesión de hoy!</button>
-      <button class="btn big" id="btnLong" style="background:var(--pink); margin-top:10px;">🌊 Modo Inmersión · ~15 min</button>
-      <p class="hint" style="margin:6px 0 0;">Más preguntas, temas mezclados y misiones de improvisación 🎭</p>
-      <div class="btn-row" style="margin-top:10px;">
-        <button class="btn small purple" id="btnScene">💬 Solo conversación</button>
-        <button class="btn small" id="btnSongs" style="display:none; background:var(--pink); color:#fff;">🎵 Cancionero</button>
-        <button class="btn small ghost" id="btnRead">📖 Leer</button>
+      <button class="cta" id="btnPlay" style="margin-top:16px;">
+        <span><span class="t">Sesión de hoy</span><span class="s">4 juegos · unos 5 minutos</span></span>
+        <span class="fl">→</span>
+      </button>
+      <p class="hint" id="weakLine" style="margin:10px 0 0;"></p>
+      <div class="opts">
+        <button class="opt" id="btnLong"><span class="ic">🌊</span><span class="tx">
+          <span class="tt">Inmersión</span>
+          <span class="ss">Más preguntas, temas mezclados · 15 min</span></span><span class="ch">›</span></button>
+        <button class="opt" id="btnScene"><span class="ic">💬</span><span class="tx">
+          <span class="tt">Solo conversación</span>
+          <span class="ss">Escenas con giros, sin reloj</span></span><span class="ch">›</span></button>
+        <button class="opt" id="btnRead"><span class="ic">📖</span><span class="tx">
+          <span class="tt">Leer un rato</span>
+          <span class="ss">Textos de libros y juegos, por trozos</span></span><span class="ch">›</span></button>
+        <button class="opt" id="btnSongs" style="display:none;"><span class="ic">🎵</span><span class="tx">
+          <span class="tt">Cancionero</span>
+          <span class="ss">Las canciones que has guardado</span></span><span class="ch">›</span></button>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
         <button class="btn small ghost" id="btnProgress">📈 Mi progreso</button>
         <button class="btn small ghost" id="btnSettings">⚙️ Ajustes</button>
       </div>
       <p class="hint" id="saveStatus" style="margin-top:10px;"></p>
     </div>
 
-    <div class="card">
-      <h3 style="margin-bottom:2px;">📚 Elige tu tema</h3>
-      <p class="hint" style="text-align:left; margin:0 0 10px;">🌀 Mezcla = variado (recomendado) · un tema específico = refuerzo. La Inmersión siempre mezcla.</p>
-      <div class="levels" id="levelGrid"></div>
-    </div>
+    <details class="card plegable">
+      <summary>📚 Temas y vocabulario</summary>
+      <div class="inner">
+        <p class="hint" style="text-align:left; margin:0 0 10px;">🌀 Mezcla = variado (recomendado). Un tema suelto = refuerzo. La Inmersión siempre mezcla.</p>
+        <div class="levels" id="levelGrid"></div>
+      </div>
+    </details>
 
-    <div class="card">
-      <h3 style="margin-bottom:2px;">🔎📓 Pregúntale a Coco</h3>
-      <p class="hint" style="text-align:left; margin:0 0 8px;">Busca "¿cómo se dice...?" en español o francés. ¿No está o quieres dominarla? Anótala — Claude la traduce en el chat y se vuelve parte de tus lecciones y repasos.</p>
+    <details class="card plegable">
+      <summary>🔎 Pregúntale a Coco</summary>
+      <div class="inner">
+      <p class="hint" style="text-align:left; margin:0 0 8px;">Busca «¿cómo se dice…?» en español o francés. Si no está, anótala: Claude la traduce y entra a tus repasos.</p>
       <input class="textinput" id="askInput" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="p. ej. izquierda · cuánto cuesta · estoy aprendiendo" style="font-size:1rem;" autocomplete="off">
       <div id="askResults" style="margin-top:8px;"></div>
       <div class="btn-row" id="noteRow" style="display:none; margin-top:8px;"><button class="btn small green" id="noteAdd">✏️ Anotarla para aprenderla</button></div>
@@ -422,13 +479,14 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <textarea class="textinput" id="pasteArea" spellcheck="false" autocorrect="off" autocapitalize="off" rows="3" style="display:none; margin-top:8px; font-size:.9rem; text-align:left;" placeholder="Pega aquí las líneas de Claude:&#10;estoy aprendiendo = j'apprends"></textarea>
       <div class="btn-row" id="importRow" style="display:none; margin-top:8px;"><button class="btn small green" id="importBtn">Importar ✔</button></div>
       <div id="customList"></div>
-    </div>
+      </div>
+    </details>
 
     <div style="text-align:center;">
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.80 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.81 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2198,19 +2256,19 @@ function refreshTop(){
   $("lvlLabel").textContent = `Nivel ${lv} · ${cur.name}`;
   if(next){
     const span=next.xp-cur.xp, gained=S.xp-cur.xp;
-    $("xpLabel").textContent = `${gained} / ${span} → ${next.name}`;
+    $("xpLabel").textContent = `${cifra(gained)} / ${cifra(span)} → ${next.name}`;
     $("xpFill").style.width = Math.min(100, Math.round(gained/span*100))+"%";
   } else {
     // v1.64 (CERO INFLAR, lo cazó Mateo): "¡MAX! 🏆" decía "ya terminaste", que es
     // falso — la escala ⭐ mide horas de laboratorio, no conversación. El tope de
     // la escala no es el tope del francés: eso lo mide la 🇵🇹 puerta y el 📜 examen.
-    $("xpLabel").textContent = `${S.xp} ⭐ · tope de la escala`;
+    $("xpLabel").textContent = `${cifra(S.xp)} ⭐ · tope de la escala`;
     $("xpFill").style.width = "100%";
   }
   const xh=$("xpHint");
   if(xh) xh.innerHTML = next
-    ? "⭐ mide constancia: cuánto has jugado. Lo que sabes hablar lo mide la 🇵🇹 puerta."
-    : "Llegaste al tope de esta escala — pero ⭐ mide <b>horas de laboratorio, no conversación</b>. Lo que sabes hablar lo mide la 🇵🇹 puerta y el 📜 examen.";
+    ? "⭐ mide constancia; la 🇮🇹 puerta mide lo que sabes hablar."
+    : "Tope de la escala. Pero ⭐ mide <b>constancia, no conversación</b>: eso lo miden la 🇮🇹 puerta y el 📜 examen.";
   const wl=$("weakLine");
   if(wl){
     const nd=dueWeak().length, later=S.weak.length-nd;
@@ -5823,7 +5881,7 @@ renderNotes();
 $("saveStatus").textContent = store.ok
   ? "💾 Guardado automático activo en este navegador"
   : "⚠️ Aquí no hay guardado automático (vista previa) · usa tu código COCO- al terminar";
-if(restored && S.xp>0) cocoSay(`¡Bienvenido de vuelta${S.name?", <b>"+esc(S.name)+"</b>":""}! 🦜 Llevas ${cifra(S.xp)} ⭐ y racha de ${S.streak} 🔥`);
+if(restored && S.xp>0) cocoSay(`Bonjour${S.name?", <b>"+esc(S.name)+"</b>":""}. Qué bueno verte.`);
 else cocoSay(rnd(COCO_HOME));
 </script>
 </body>
