@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Figtree:wght@400;500;600;700;800&display=swap">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coco</title>
 <meta name="theme-color" content="#FDF6EC">
@@ -14,22 +17,37 @@
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><ellipse cx="38" cy="14" rx="6" ry="12" fill="%23FF5252" transform="rotate(-18 38 14)"/><ellipse cx="50" cy="10" rx="6" ry="13" fill="%23FF9100"/><ellipse cx="62" cy="14" rx="6" ry="12" fill="%23FFD600" transform="rotate(18 62 14)"/><circle cx="50" cy="55" r="38" fill="%2343A047"/><circle cx="50" cy="63" r="29" fill="%2366BB6A"/><circle cx="35" cy="47" r="12" fill="white"/><circle cx="65" cy="47" r="12" fill="white"/><circle cx="36.5" cy="49" r="5" fill="%232B2B3F"/><circle cx="63.5" cy="49" r="5" fill="%232B2B3F"/><path d="M36 60 Q50 50 64 60 L50 74 Z" fill="%23FFB300"/><path d="M42 70 Q50 65 58 70 L50 81 Z" fill="%23F57C00"/></svg>'>
 <style>
 :root{
-  --bg:#FDF6EC; --ink:#2B2B3F; --card:#FFFFFF;
-  --blue:#3D5AFE; --red:#FF5252; --green:#00C853; --yellow:#FFD600;
-  --purple:#7C4DFF; --orange:#FF9100; --pink:#FF4081;
-  --shadow:0 6px 0 rgba(43,43,63,.12);
-  --radius:22px;
-  --soft:#EFE7DA; --soft2:#E8DFD0; --tint:#EEF1FF; --tintp:#F1EBFF;
-  --goodbg:#E3FBE9; --badbg:#FFE7E7; --dwbad:#FFE0E0;
-  --selbg:#FFF6E5; --tile:#FFF8EE;
+  --bg:#FBF8F3; --ink:#1E2126; --card:#FFFFFF;
+  /* el verde es la MARCA (es el loro) y además el "correcto"; el coral es
+     solo error y nunca es marca; el ámbar solo celebra. */
+  --blue:#2C5696; --red:#B8453C; --green:#16794E; --yellow:#E3B04A;
+  --purple:#67459B; --orange:#AD5F1E; --pink:#A94062;
+  /* tinta que va ENCIMA de un color: blanca casi siempre, oscura sobre el
+     ámbar. No puede ser --ink, que se invierte de noche. */
+  --onColor:#FFFFFF; --onYellow:#2B2B3F;
+  /* el aviso se pinta al revés que la página, así que necesita su propio par:
+     con --ink salía crema sobre crema en modo oscuro (invisible). */
+  --toastBg:#1E2126; --toastInk:#FBF8F3;
+  /* sombra suave en vez del bloque de 6px: el escalón duro era medio
+     "app de juguete" y competía con todo. */
+  --shadow:0 2px 6px rgba(30,33,38,.09), 0 1px 2px rgba(30,33,38,.06);
+  --radius:20px;
+  --soft:#F0EADF; --soft2:#E6DED0; --tint:#EAF2EC; --tintp:#F0EBE2;
+  --goodbg:#E6F2EA; --badbg:#F8E9E7; --dwbad:#F6E3E0;
+  --selbg:#FBF3E4; --tile:#FDFAF5;
 }
 /* 🌙 modo oscuro (v1.36 — buzón directo #2): jugar de noche sin quemarse los ojos */
 body.dark{
-  --bg:#15151F; --ink:#ECECF4; --card:#232332;
-  --soft:#2C2C3E; --soft2:#333349; --tint:#28304E; --tintp:#2F2946;
-  --goodbg:#1C3527; --badbg:#3E2230; --dwbad:#4A2430;
-  --selbg:#3B3322; --tile:#2C2C3E;
-  --shadow:0 6px 0 rgba(0,0,0,.35);
+  /* Solo cambian las SUPERFICIES. Los siete colores se quedan igual: están
+     elegidos para llevar texto blanco Y destacarse sobre los dos fondos
+     (el verde da 5,41 con el blanco, 5,11 sobre papel y 3,28 sobre noche),
+     así que no hace falta una segunda paleta que se pueda desincronizar. */
+  --bg:#17181C; --ink:#EFEAE1; --card:#1F2127;
+  --soft:#24262D; --soft2:#2C2F36; --tint:#1C2A23; --tintp:#262330;
+  --goodbg:#172E23; --badbg:#2E1E1D; --dwbad:#35211F;
+  --selbg:#2A2518; --tile:#1F2127;
+  --toastBg:#EFEAE1; --toastInk:#17181C;
+  --shadow:0 2px 8px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.3);
 }
 body.dark::before{opacity:.22;}
 body.dark .btn.yellow{color:#2B2B3F;}
@@ -56,19 +74,19 @@ body.dark .ptile{background:var(--tile);}
 html,body{margin:0;padding:0;}
 body{
   background:var(--bg); color:var(--ink);
-  font-family:'Nunito','Segoe UI',system-ui,-apple-system,sans-serif;
+  font-family:'Figtree',-apple-system,'SF Pro Text',system-ui,'Segoe UI',sans-serif;
   min-height:100vh; overflow-x:hidden;
 }
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; opacity:.5; z-index:0;
   background:
-   radial-gradient(circle at 12% 18%, rgba(124,77,255,.07) 0 140px, transparent 141px),
-   radial-gradient(circle at 88% 12%, rgba(255,82,82,.07) 0 120px, transparent 121px),
-   radial-gradient(circle at 85% 85%, rgba(61,90,254,.07) 0 160px, transparent 161px),
-   radial-gradient(circle at 10% 88%, rgba(255,214,0,.10) 0 130px, transparent 131px);
+   /* una sola luz cálida en vez de cuatro manchas de colores distintos:
+      eran moradas, rojas, azules y amarillas a la vez y ensuciaban el papel */
+   radial-gradient(ellipse 120% 60% at 50% 0%, rgba(22,121,78,.05), transparent 70%);
 }
 #app{position:relative; z-index:1; max-width:560px; margin:0 auto; padding:16px 16px 60px;}
-h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
+h1,h2,h3{font-family:'Fraunces',ui-serif,'New York',Georgia,serif; margin:.2em 0;
+  font-weight:600; letter-spacing:-.015em; line-height:1.18; text-wrap:balance;}
 .screen{display:none; animation:pop .35s ease;}
 .screen.active{display:block;}
 @keyframes pop{from{transform:scale(.96) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
@@ -80,7 +98,7 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 
 /* ---------- top bar ---------- */
 .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 4px 14px;}
-.brand{display:flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.25rem;}
+.brand{display:flex; align-items:center; gap:8px; font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; font-size:1.25rem;}
 .brand .flask{font-size:1.6rem; animation:floaty 3s ease-in-out infinite;}
 .stats{display:flex; gap:8px;}
 .chip{background:var(--card); border-radius:999px; padding:6px 12px; font-weight:800; font-size:.9rem;
@@ -91,7 +109,8 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .card{background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); margin-bottom:16px;}
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  font-family:'Baloo 2','Nunito',sans-serif; font-weight:800; font-size:1.05rem;
+  font-family:'Figtree',-apple-system,system-ui,'Segoe UI',sans-serif;
+  font-weight:700; font-size:1.05rem; letter-spacing:-.005em;
   border:none; border-radius:18px; padding:14px 22px; cursor:pointer;
   color:#fff; background:var(--blue); box-shadow:0 5px 0 rgba(0,0,0,.18);
   transition:transform .08s ease, filter .15s; user-select:none; text-align:center;
@@ -101,7 +120,7 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .btn.big{width:100%; font-size:1.3rem; padding:18px;}
 .btn.green{background:var(--green);} .btn.red{background:var(--red);}
 .btn.purple{background:var(--purple);} .btn.orange{background:var(--orange);}
-.btn.yellow{background:var(--yellow); color:var(--ink);}
+.btn.yellow{background:var(--yellow); color:var(--onYellow);}
 .btn.ghost{background:var(--card); color:var(--ink); box-shadow:0 4px 0 rgba(43,43,63,.12);}
 .btn.small{font-size:.9rem; padding:9px 14px; border-radius:14px;}
 .btn:disabled{opacity:.45; cursor:default; filter:none;}
@@ -119,7 +138,7 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 @keyframes beaktop{from{transform:translateY(0)}to{transform:translateY(-2.5px)}}
 .bubble{
   position:relative; background:var(--card); border-radius:18px; padding:12px 16px; margin:10px auto 4px;
-  max-width:420px; font-weight:700; box-shadow:0 4px 0 rgba(43,43,63,.10);
+  max-width:420px; font-weight:400; line-height:1.5; box-shadow:var(--shadow);
 }
 .bubble::after{content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
   border:10px solid transparent; border-bottom-color:#fff; border-top:none;}
@@ -136,7 +155,7 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .lang.locked{opacity:.55; cursor:default;}
 .lang .flag{font-size:1.8rem;}
 .lang .name{font-weight:800; font-size:.85rem;}
-.lang .soon{font-size:.65rem; font-weight:800; color:var(--purple); background:var(--tintp); border-radius:8px; padding:1px 6px; display:inline-block; margin-top:2px;}
+.lang .soon{font-size:.65rem; font-weight:700; letter-spacing:.03em; color:var(--ink); opacity:.65; background:var(--soft); border-radius:8px; padding:2px 7px; display:inline-block; margin-top:2px;}
 /* 🇵🇹 v1.64: las 5 partes de la puerta, a la vista. Un solo número no dice
    QUÉ se movió; cinco barritas sí. (Mateo: "no da confianza el porcentaje") */
 .ptbars{display:flex; gap:3px; justify-content:center; align-items:flex-end; height:20px; margin-top:3px;}
@@ -181,9 +200,9 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 
 /* ---------- game area ---------- */
 .gamehead{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
-.gametitle{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
+.gametitle{font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
 .timer{
-  font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.1rem; min-width:64px; text-align:center;
+  font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; font-size:1.1rem; min-width:64px; text-align:center;
   background:var(--card); border-radius:999px; padding:5px 12px; box-shadow:0 3px 0 rgba(43,43,63,.10);
 }
 .timer.hot{background:var(--red); color:#fff; animation:flamepulse .6s infinite;}
@@ -192,10 +211,10 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .timerfill.mid{background:var(--yellow);} .timerfill.low{background:var(--red);}
 
 .prompt{
-  text-align:center; font-size:1.7rem; font-weight:800; font-family:'Baloo 2',sans-serif;
+  text-align:center; font-size:1.7rem; font-weight:800; font-family:'Fraunces',ui-serif,'New York',Georgia,serif;
   background:var(--card); border-radius:var(--radius); padding:26px 18px; box-shadow:var(--shadow); margin-bottom:16px;
 }
-.prompt .sub{display:block; font-size:.85rem; font-family:'Nunito',sans-serif; font-weight:700; opacity:.6; margin-top:6px;}
+.prompt .sub{display:block; font-size:.85rem; font-family:'Figtree',-apple-system,system-ui,'Segoe UI',sans-serif; font-weight:700; opacity:.6; margin-top:6px;}
 .prompt.shake{animation:shake .35s;}
 .options{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
 .options.one-col{grid-template-columns:1fr;}
@@ -209,25 +228,25 @@ h1,h2,h3{font-family:'Baloo 2','Nunito','Segoe UI',sans-serif; margin:.2em 0;}
 .opt.dim{opacity:.45; pointer-events:none;}
 
 .combo{
-  position:fixed; top:70px; right:14px; z-index:50; font-family:'Baloo 2',sans-serif; font-weight:800;
+  position:fixed; top:70px; right:14px; z-index:50; font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800;
   background:var(--purple); color:#fff; border-radius:999px; padding:7px 14px; font-size:1rem;
   transform:scale(0); transition:transform .25s cubic-bezier(.2,1.6,.4,1); box-shadow:0 4px 0 rgba(0,0,0,.15);
 }
 .combo.show{transform:scale(1);}
 .floatpts{
-  position:fixed; z-index:60; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.4rem;
+  position:fixed; z-index:60; font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; font-size:1.4rem;
   color:var(--green); pointer-events:none; animation:ptsUp .9s ease-out forwards; text-shadow:0 2px 0 #fff;
 }
 @keyframes ptsUp{from{opacity:1; transform:translateY(0) scale(1)}to{opacity:0; transform:translateY(-70px) scale(1.4)}}
 
 /* ---------- inputs ---------- */
 .textinput{
-  width:100%; font-size:1.2rem; font-weight:700; font-family:'Nunito',sans-serif;
+  width:100%; font-size:1.2rem; font-weight:700; font-family:'Figtree',-apple-system,system-ui,'Segoe UI',sans-serif;
   border:3px solid var(--soft); border-radius:16px; padding:14px; outline:none; text-align:center;
   transition:border .2s; background:var(--card); color:var(--ink);
 }
 .textinput:focus{border-color:var(--blue);}
-.hint{text-align:center; font-size:.85rem; opacity:.65; font-weight:700; margin-top:8px;}
+.hint{text-align:center; font-size:.85rem; opacity:.7; font-weight:400; margin-top:8px; line-height:1.5;}
 
 /* ---------- speak game ---------- */
 .micbtn{
@@ -259,7 +278,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .replaybtn{border:none; background:var(--tint); border-radius:99px; padding:4px 10px; cursor:pointer; font-size:.95rem;}
 
 /* ---------- results ---------- */
-.bigscore{font-size:3.2rem; font-family:'Baloo 2',sans-serif; font-weight:800; text-align:center; color:var(--purple);}
+.bigscore{font-size:3.2rem; font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; text-align:center; color:var(--purple);}
 .medal{font-size:4rem; text-align:center; animation:popIn .5s cubic-bezier(.2,1.6,.4,1);}
 .resultrow{display:flex; justify-content:space-between; font-weight:800; padding:8px 4px; border-bottom:2px dashed var(--soft);}
 .saverow{display:flex; gap:8px; align-items:stretch; margin-top:8px;}
@@ -273,8 +292,9 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .dw-miss{background:var(--goodbg); color:#1B5E20; border-radius:6px; padding:0 4px; font-weight:800;}
 .toast{
   position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(110px); z-index:80;
-  background:var(--ink); color:#fff; border-radius:999px; padding:11px 20px; font-weight:800;
-  transition:transform .35s cubic-bezier(.2,1.4,.4,1); box-shadow:0 5px 0 rgba(0,0,0,.25);
+  background:var(--toastBg); color:var(--toastInk); border-radius:999px; padding:12px 20px;
+  font-weight:500; line-height:1.45;
+  transition:transform .35s cubic-bezier(.2,1.4,.4,1); box-shadow:0 6px 20px rgba(0,0,0,.28);
   max-width:90vw; text-align:center; font-size:.95rem;
 }
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -320,7 +340,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 /* ---------- progreso ---------- */
 .pstats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;}
 .ptile{background:var(--tile); border-radius:16px; padding:12px; text-align:center;}
-.ptile .pnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.6rem;}
+.ptile .pnum{font-family:'Fraunces',ui-serif,'New York',Georgia,serif; font-weight:800; font-size:1.6rem;}
 .ptile .plab{font-size:.72rem; font-weight:800; opacity:.6;}
 .chart{display:flex; align-items:flex-end; gap:2px; height:150px; padding:6px 2px 0;}
 .cbar{flex:1; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; min-width:0; cursor:default;}
@@ -408,7 +428,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.79 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.80 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -1990,6 +2010,8 @@ function clearWeak(v){
   w.due=inDays(SRS_DAYS[w.box-1]);                       // programada para dentro de 1/3/7/14/30 días
 }
 function dueWeak(){ const t=todayStr(); return S.weak.filter(w=>!w.due || w.due<=t); }
+/* 87692 se lee como salida de consola; 87.692 se lee como un logro. */
+function cifra(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,"."); }
 function toast(txt){
   let el=$("toastEl");
   if(!el){ el=document.createElement("div"); el.id="toastEl"; el.className="toast"; document.body.appendChild(el); }
@@ -2170,7 +2192,7 @@ const todayStr = () => localISO();
 function level(){ let l=1; for(let i=0;i<LVLS.length;i++) if(S.xp>=LVLS[i].xp) l=i+1; return l; }
 function refreshTop(){
   $("streakNum").textContent = S.streak;
-  $("xpNum").textContent = S.xp;
+  $("xpNum").textContent = cifra(S.xp);
   const lv = level();
   const cur=LVLS[lv-1], next=LVLS[lv];
   $("lvlLabel").textContent = `Nivel ${lv} · ${cur.name}`;
@@ -5801,7 +5823,7 @@ renderNotes();
 $("saveStatus").textContent = store.ok
   ? "💾 Guardado automático activo en este navegador"
   : "⚠️ Aquí no hay guardado automático (vista previa) · usa tu código COCO- al terminar";
-if(restored && S.xp>0) cocoSay(`¡Bienvenido de vuelta${S.name?", <b>"+esc(S.name)+"</b>":""}! 🦜 Llevas ${S.xp} ⭐ y racha de ${S.streak} 🔥`);
+if(restored && S.xp>0) cocoSay(`¡Bienvenido de vuelta${S.name?", <b>"+esc(S.name)+"</b>":""}! 🦜 Llevas ${cifra(S.xp)} ⭐ y racha de ${S.streak} 🔥`);
 else cocoSay(rnd(COCO_HOME));
 </script>
 </body>

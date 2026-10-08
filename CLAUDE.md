@@ -61,6 +61,17 @@ Datos de Mateo (oct-2026, sus capturas): 💬 Conversación 100% · 🎤 Pronunc
 - El reintento tras fallar una misión **se medía por parecido a la frase de Coco**: con 25% de acierto, 3 de cada 4 misiones le terminaban en transcribir, que es lo contrario del ejercicio. Desde v1.79 el 2º intento se vuelve a medir **por claves**. Decir la frase de Coco sigue cerrando (nadie se atasca), pero deja de ser el único camino.
 - 🔒 CERO INFLAR: el reintento da ⭐ y cierra la misión, pero **NO** suma a `S.spoken` (barra 🎙️) ni a `recordSkill` — esas siguen midiendo solo el primer intento, sin ayuda. Se dice en pantalla, no se esconde.
 
+## 🎨 La identidad (v1.80 — tanda 1 de 3)
+Mateo: *«está muy IA… debe verse prolijo, amigable, divertido y elegante… es tu compañera»*. Tenía razón y las causas eran medibles:
+- **La paleta eran los swatches A200/A400 de Material tal cual.** CUATRO no pasaban contraste con el texto blanco que llevan encima: verde `#00C853` **2,24:1** · amarillo **1,41** · naranja **2,26** · rosa **3,33** (mínimo 4,5). Los siete nuevos pasan. **Mismos NOMBRES de variable**, otros valores: nada estructural cambió.
+- El verde `#16794E` sirve para los DOS temas (5,41 con blanco · 5,11 sobre papel · 3,28 sobre noche), así que `body.dark` **solo redefine superficies**. Una paleta, no dos que se desincronicen.
+- Tokens nuevos: `--onColor`/`--onYellow` (tinta que va ENCIMA de un color; `--ink` no sirve porque se invierte) y `--toastBg`/`--toastInk`.
+- 🐛 **El aviso (toast) llevaba meses invisible en oscuro**: `background:var(--ink)` + `color:#fff` = crema sobre crema. Salía en las capturas de Mateo.
+- 🐛 **Las fuentes nunca se cargaron**: se pedían `Baloo 2`/`Nunito` sin enlace a Google Fonts. Ahora se enlazan Fraunces (display) + Figtree (interfaz) con respaldo `ui-serif`/`New York` y `-apple-system`, que en iPhone ya se ven bien **sin señal**. Si alguna vez estorba la dependencia, se quita la etiqueta `<link>` y queda el sistema.
+- El «todo en negrita» vivía en `.bubble` y `.hint` a 700. Los botones son Figtree (interfaz), no serif.
+- `cifra()` pone el separador de miles: `87692` → `87.692`.
+- **Falta la tanda 2** (el loro dibujado en vez del emoji 🦜, con estados) y la **tanda 3** (sacar los emoji de dentro de las frases: 912 en total, 182 distintos). El personaje elegido por Mateo: **cara frontal + cuerpo entero**, el mismo loro a dos distancias.
+
 ## Estado (ago-2026)
 v1.65: 18 temas · 24 misiones · 14 escenas · 18 giros · 8 juegos · bienvenida con nombre · modo libre · cancionero · quiz sorpresa · chuleta+verbos · paracaídas · modo oscuro · 🔒 caja fuerte · 🗄️ respaldo fuera del teléfono · 📴 funciona sin señal · 📜 examen de salida.
 Próximos: modo aventura, italiano (it-IT) al cruzar la puerta, números/comida/passé composé, conversación libre.
