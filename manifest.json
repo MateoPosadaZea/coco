@@ -3,8 +3,8 @@
  "short_name": "Coco",
  "start_url": ".",
  "display": "standalone",
- "background_color": "#FDF6EC",
- "theme_color": "#FDF6EC",
+ "background_color": "#FBF8F3",
+ "theme_color": "#FBF8F3",
  "icons": [
   {
    "src": "icon192.png",

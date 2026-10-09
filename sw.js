@@ -13,7 +13,7 @@
 
    NUNCA se cachea nada de otros dominios ni nada que no sea GET.
    El progreso NO vive aquí: vive en localStorage y en la 🔒 caja fuerte.        */
-const CACHE = "coco-v1";
+const CACHE = "coco-v2";   // v1.83: iconos nuevos — al cambiar el nombre, activate() borra los viejos
 const ESENCIALES = ["./", "./index.html", "./manifest.json", "./icon192.png", "./icon512.png"];
 
 self.addEventListener("install", e => {

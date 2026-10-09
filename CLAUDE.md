@@ -70,7 +70,7 @@ Mateo: *«está muy IA… debe verse prolijo, amigable, divertido y elegante… 
 - 🐛 **Las fuentes nunca se cargaron**: se pedían `Baloo 2`/`Nunito` sin enlace a Google Fonts. Ahora se enlazan Fraunces (display) + Figtree (interfaz) con respaldo `ui-serif`/`New York` y `-apple-system`, que en iPhone ya se ven bien **sin señal**. Si alguna vez estorba la dependencia, se quita la etiqueta `<link>` y queda el sistema.
 - El «todo en negrita» vivía en `.bubble` y `.hint` a 700. Los botones son Figtree (interfaz), no serif.
 - `cifra()` pone el separador de miles: `87692` → `87.692`.
-- **Falta la tanda 2** (el loro dibujado en vez del emoji 🦜, con estados) y la **tanda 3** (sacar los emoji de dentro de las frases: 912 en total, 182 distintos). El personaje elegido por Mateo: **cara frontal + cuerpo entero**, el mismo loro a dos distancias.
+- ~~Falta la tanda 2~~ (hecha en v1.83, ver abajo). Falta la **tanda 3** (sacar los emoji de dentro de las frases: 912 en total, 182 distintos). El personaje elegido por Mateo: **cara frontal + cuerpo entero**, el mismo loro a dos distancias.
 
 ## 🎯 Simplificar la experiencia (v1.81 — tanda 1b)
 Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual… podemos simplificar la experiencia, el texto, las opciones»*. Tenía razón: la v1.80 cambió la **pintura** y no el **reparto**, que era lo que la maqueta aprobada proponía.
@@ -82,6 +82,17 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - 🐛 Los textos del nivel seguían diciendo **🇵🇹 puerta**: la puerta apunta al 🇮🇹 italiano desde la v1.65.
 - `cifra()` también en los números del nivel (`15.692 / 20.000`).
 - **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
+
+## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad)
+Mateo eligió en una galería de 6 bocetos **la cara frontal (v1) + el cuerpo entero (v6)**: el mismo loro a dos distancias. Vive en `cocoCara(px, animo)` y `cocoCuerpo(px, pose)`; `cocoFace(px)` es la cara dentro del texto (cada 🦜 de `withCoco()`).
+- **Reglas del personaje — no regresionar:** DOS OJOS siempre (el primer boceto, un ojo enorme de perfil, «daba miedo, como un zombie»). Colores propios `--p1..--p5`, `--pPupila`, `--pBrillo`, `--pPico` — nunca los de la interfaz. Mejillas en **verde claro**, no coral (coral translúcido sobre verde = color barro). El pico va en `<g class="cpico">` para aletear al hablar.
+- **Estados**: caras `feliz · guino · uy · duerme · escucha`; poses `saluda · celebra · escucha · duerme`.
+- **Reacciona sin tocar la voz**: `ding()` (suena en cada respuesta de todos los juegos) → guiña al acertar, se sorprende al fallar (sin regañar: CERO CULPA) y vuelve sola. Un `MutationObserver` sobre `#gameArea` ve la clase `rec` (= micrófono grabando en TODOS los juegos de hablar) → ladea la cabeza para escuchar. **No se tocó speakFR/getMic/releaseMic.**
+- Inicio: saluda; si `diasDesde(S.lastDay)>=3`, **celebra** (se celebra volver). Tocarla: celebra 1,6 s. Resultados: celebra con acierto ≥60 %, si no saluda (antes: medallas 🏆🥈🥉🎖️).
+- **Iconos generados desde la misma función** (icon192/512.png, apple-touch-icon embebido, favicon SVG con colores literales porque en un data URI las variables no existen). `sw.js` → `CACHE="coco-v2"` para soltar los iconos viejos (caché-primero).
+- 🧹 Barrido: un **bloque entero de `body.dark` con la paleta VIEJA a mano** (lavanda `#7C93FF`, grises morados) sobrevivió a la v1.80 por no ser variable: bordes de las opciones de todos los juegos, «Mi progreso»/«Ajustes», enlaces, campos. Ahora todo sale de tokens (`--link`, `--badInk`, `--goodInk` nuevos). 🐛 La colita de la burbuja era **blanca en oscuro**. Las 9 sombras de bloque `0 Npx 0` → `var(--shadow)`.
+- Cabecera de juego: reto «🌶️ 5» en vez de cinco chiles; progreso en rayitas; barra de tiempo de 4px.
+- **Falta la tanda 3**: sacar los emoji de dentro de las frases (912, 182 distintos) y la pantalla de resultados/ajustes, que conserva textos en negrita del diseño viejo.
 
 ## 🌴 Quién es Mateo HOY (oct-2026 — contado por él, úsalo para el contenido)
 Vive en **Barranquilla** (costa caribe) — ya NO en Bogotá. Tiene su empresa, **Matriz** (diseño y desarrollo de software), y la está sacando adelante; su idea de fondo: *«ayudar a la gente, ayudar y ayudar»*. Tiene una gata, **Cliff**. Le gustan el **fútbol** y el **boxeo**, las buenas series (está viendo **Mad Men**), las películas, los libros y la música. Ama la playa y el calor; sueña con vivir en la costa o en **Portugal**. Hace ejercicio. Quiere aprender, conocerse, disfrutar, **relajarse cada vez más**, sonreír, ayudar a su familia y consentir a sus papás.
