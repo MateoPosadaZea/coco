@@ -527,7 +527,7 @@ details.plegable>.inner{padding:0 16px 16px;}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.84 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · hecho en tu Laboratorio 🧪 · v1.85 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -2659,6 +2659,19 @@ function speakFR(text, rate){
   });
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+/* 🎙️ v1.85 — LA TRAMPA DEL «YO ME CALIFICO». Mateo, con captura de ¡Suéltalo!:
+   "sigue sin funcionar el micrófono… lo suelto y paro pero no califica, debo
+   calificarlo yo mismo". El micrófono no tenía nada: tras DOS tomas mudas, la app
+   lo pasaba sola a «Yo me califico» y lo GUARDABA PARA SIEMPRE. Sus dos tomas mudas
+   fueron casi seguro antes de la v1.77 (el bug de speechSynthesis.speaking atascado
+   que tiraba su voz), así que el arreglo de la v1.77 nunca le llegó: ¡Suéltalo! y la
+   voz del 📜 examen dejaron de intentar reconocerlo. En Improvisa sí le funcionaba
+   porque ese juego no mira la preferencia — prueba de que el reconocedor de su
+   iPhone sí sirve.
+   Ahora el respaldo es SOLO POR ESTA SESIÓN (vozSoloHoy): si hoy no oye, te calificas
+   tú hoy; la próxima vez que abras la app, Coco vuelve a intentarlo. «Yo me califico»
+   solo queda fijo si lo escoges tú en Ajustes. */
+let vozSoloHoy=false;
 
 /* micrófono compartido: se pide UNA vez y se reutiliza (evita el permiso repetido) */
 let micStream=null;
@@ -3521,7 +3534,7 @@ function gameSpeak(){
     recog.onend=()=>{ srOn=false; if(recActive) setTimeout(ensureSR,120); };
   }
   // ⚙️ modo "yo me califico": sin reconocedor — grabas, te escuchas y te calificas tú
-  if(S.prefs && S.prefs.vg==="self") recog=null;
+  if((S.prefs && S.prefs.vg==="self") || vozSoloHoy) recog=null;
   function ensureSR(){
     if(!recog || srOn) return;
     try{ recog.start(); srOn=true; }
@@ -3680,11 +3693,11 @@ function gameSpeak(){
             // el "oído" existe pero no oye (típico de iPhone): tras 2 tomas mudas,
             // Coco se pasa solo a «Yo me califico» en este equipo — cero frustración
             S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
-            if(S.prefs.srFails>=2 && S.prefs.vg!=="self"){
-              S.prefs.vg="self"; store.save();
+            if(S.prefs.srFails>=2 && !vozSoloHoy){
+              vozSoloHoy=true;                            // v1.85: solo por hoy, NO se guarda
               try{ recog.abort(); }catch(_){}
               recog=null;
-              toast("🎧 El oído de este equipo no funciona bien — Coco pasó a «Yo me califico» (cámbialo en ⚙️ si quieres)");
+              toast("🎧 Hoy el oído no te está captando — por esta sesión te calificas tú. La próxima vez Coco vuelve a intentarlo.");
               selfRate("Escúchate con «👂 Escucharme», compárate con Coco y califícate:");
             }else{
               selfRate(`El reconocedor no captó tu voz 🎧 Toca el mic e intenta otra vez, o escúchate con "👂 Escucharme" y califícate tú:`);
@@ -6070,6 +6083,17 @@ document.addEventListener("keydown",e=>{
 
 /* ================== ARRANQUE ================== */
 const restored = store.load();
+/* 🎙️ v1.85: los fallos del oído se cuentan por SESIÓN (antes se arrastraban de un día
+   a otro), y UNA vez se rescata a quien quedó atrapado en «Yo me califico» sin
+   haberlo escogido — ver vozSoloHoy. */
+if(S.prefs){
+  S.prefs.srFails=0;
+  if(!S.prefs.voz185){
+    const atrapado = S.prefs.vg==="self";
+    S.prefs.voz185=1; S.prefs.vg="auto"; store.save();
+    if(atrapado) setTimeout(()=>toast("🎙️ Volví a encender el oído de Coco: en ¡Suéltalo! y en el examen ya no tienes que calificarte tú."), 4800);
+  }
+}
 /* ☀️ v1.84 — el diseño nuevo es de DÍA. Mateo pidió "no tan oscuro" y tenía el modo
    oscuro activado desde antes: se apaga UNA vez, con aviso. El interruptor sigue en
    Ajustes y la decisión se respeta de ahí en adelante (S.prefs.dia184). */
