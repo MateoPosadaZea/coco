@@ -83,7 +83,20 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - `cifra()` también en los números del nivel (`15.692 / 20.000`).
 - **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
 
-## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad)
+## ☀️ Coco al sol (v1.84) — MANDA SOBRE LAS SECCIONES DE IDENTIDAD ANTERIORES
+Mateo: *«algo más alegre, más fresco, no tan oscuro… fondo piel, no blanco, y azul cielo… aprender idiomas tirado en un pasto viendo el cielo azul, un día soleado… entrar al app, nubes moviéndose»*. Y sobre el personaje: *«por alguna razón me la imagino a ella [su abuela] sonriendo… el ave sirve pero la ilustración aún no»*. Eligió de una galería de 4: **la nube y el coco**.
+- **Paleta** (mismos nombres de variable): `--bg` piel `#FBE6D4` · `--card` crema `#FFF8F0` · `--ink` azul noche `#1D2F45` · **acción = `--blue` `#1871BA`** (azul cielo hondo: blanco encima 5,1:1, se recorta sobre la piel 4,2:1) · `--green` `#2F7D3B` = **acierto**, ya no es la marca · `--yellow` sol `#FFC94A` · `--celebra` `#8A5A12` (texto de puntos, 4,9:1 sobre piel). ⚠️ El **azul cielo claro solo va en el cielo**: sobre la piel un botón azul claro mide 1,48:1 y no se ve dónde empieza.
+- **Noche** = cielo azul marino con luna (`--bg #14223A`), no casi-negro.
+- **Letra: Nunito** en todo (400–900), con respaldo `ui-rounded`/SF Pro Rounded, que en iPhone se ve bien sin señal. Fuera Fraunces y Figtree.
+- **El cielo del inicio** (`.escena`): degradado, sol que respira, 4 nubes con `deriva`, lomas de pasto, Coco dentro. ⚠️ Coco se centra con `left:0;right:0;margin-inline:auto` y **no** con `transform`: la animación de flotar usa `transform` y lo pisaría.
+- **Personaje**: `cocoChar(px, animo)`; `cocoPj()` lee `S.prefs.pj` (`"nube"` por defecto, o `"coco"`), que se escoge en **Ajustes → Tu Coco** y viaja en la caja fuerte dentro de `pr`. La nube **flota**; el coco **se sienta en el pasto**. Animos: `feliz · guino · uy · duerme · escucha · celebra`. La boca va en `<g class="cboca">` (se mueve al hablar).
+- **REGLA DEL PERSONAJE — no regresionar: LA SONRISA.** Ojos cerrados en arco, mejillas, boca pequeña: la cara de alguien que te mira con cariño. Solo `uy` abre los ojitos (sorpresa, nunca regaño). El loro tenía ojos abiertos y fijos, y eso era lo que no convencía.
+- Reacciones sin tocar la voz: igual que v1.83 (`ding()` + `MutationObserver` de la clase `rec`).
+- ☀️ **Migración única** (`S.prefs.dia184`): Mateo tenía el modo oscuro activado; al primer arranque de la v1.84 se apaga UNA vez con aviso. Si luego vuelve a escoger noche, se respeta.
+- Iconos = la nube sobre cielo, generados desde `cocoChar`; `sw.js` → `CACHE="coco-v3"`.
+- El chiste del tío (*«¿y quién te enseña?»*) pasó de «un loro» a **«Un nuage qui s'appelle Coco»**.
+
+## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad) · REEMPLAZADO en v1.84 (queda como historia)
 Mateo eligió en una galería de 6 bocetos **la cara frontal (v1) + el cuerpo entero (v6)**: el mismo loro a dos distancias. Vive en `cocoCara(px, animo)` y `cocoCuerpo(px, pose)`; `cocoFace(px)` es la cara dentro del texto (cada 🦜 de `withCoco()`).
 - **Reglas del personaje — no regresionar:** DOS OJOS siempre (el primer boceto, un ojo enorme de perfil, «daba miedo, como un zombie»). Colores propios `--p1..--p5`, `--pPupila`, `--pBrillo`, `--pPico` — nunca los de la interfaz. Mejillas en **verde claro**, no coral (coral translúcido sobre verde = color barro). El pico va en `<g class="cpico">` para aletear al hablar.
 - **Estados**: caras `feliz · guino · uy · duerme · escucha`; poses `saluda · celebra · escucha · duerme`.
