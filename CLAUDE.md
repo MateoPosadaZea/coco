@@ -97,6 +97,15 @@ Mateo: *«algo más alegre, más fresco, no tan oscuro… fondo piel, no blanco,
 - Iconos = la nube sobre cielo, generados desde `cocoChar`; `sw.js` → `CACHE="coco-v3"`.
 - El chiste del tío (*«¿y quién te enseña?»*) pasó de «un loro» a **«Un nuage qui s'appelle Coco»**.
 
+## 🌙 De noche, todo es noche (v1.86)
+Mateo: *«que el modo noche, que se convierta en noche todo»*. Hasta la v1.85 la noche era el día con las luces bajas: el sol pálido hacía de luna, ni una estrella, y los juegos solo tenían fondo azul.
+- En la escena: **luna creciente** (el mismo `.sol` con `box-shadow:inset` y fondo transparente, sin animación de halo), **14 estrellas** fijas que titilan (`.estrellas`, posiciones fijas: el mismo cielo cada noche), **luciérnagas** sobre el pasto (`.luciernagas`, noche de Barranquilla), una **estrella fugaz** cada ~13 s (`.fugaz`) y Coco con un halo de luna. Todo eso es `display:none` de día.
+- **Cielo estrellado detrás de TODAS las pantallas**: `body.dark::before` (mosaico de puntitos) + `body.dark::after` (otra capa que titila). Van con `z-index:0` y `pointer-events:none`: hay prueba de que no tapan botones.
+- `applyTheme()` también pone `<meta name="theme-color">` (piel `#FBE6D4` / noche `#14223A`). El valor inicial `#FDF6EC` era de la paleta vieja.
+- Saludo **«Bonsoir»** de 18:00 a 5:00 **según el reloj, no según el tema** (Coco no enseña francés equivocado: tema noche a las 3 p. m. sigue siendo «Bonjour»).
+- `prefers-reduced-motion`: estrellas quietas, sin fugaz ni capa que titila.
+- No se hizo (LA PODA, no lo pidió): noche **automática** por hora. Si la pide, sería una 3ª opción en Ajustes → Tema, sin cambiar la que ya tiene escogida.
+
 ## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad) · REEMPLAZADO en v1.84 (queda como historia)
 Mateo eligió en una galería de 6 bocetos **la cara frontal (v1) + el cuerpo entero (v6)**: el mismo loro a dos distancias. Vive en `cocoCara(px, animo)` y `cocoCuerpo(px, pose)`; `cocoFace(px)` es la cara dentro del texto (cada 🦜 de `withCoco()`).
 - **Reglas del personaje — no regresionar:** DOS OJOS siempre (el primer boceto, un ojo enorme de perfil, «daba miedo, como un zombie»). Colores propios `--p1..--p5`, `--pPupila`, `--pBrillo`, `--pPico` — nunca los de la interfaz. Mejillas en **verde claro**, no coral (coral translúcido sobre verde = color barro). El pico va en `<g class="cpico">` para aletear al hablar.
