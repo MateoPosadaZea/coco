@@ -92,6 +92,9 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## 🌬️ v1.93 — Aire arriba
+Mateo: *«el bloque donde está la barra de progreso, que no se vea tan pegado arriba»*. Fuera del inicio, `#app` arranca con `28px + safe-area` arriba; en juego, la fila «JUEGO n DE m» se separa 22px de la píldora y la cabecera respira. Prueba: píldora ≥30px del borde, barra ≥18px de la píldora.
+
 ## ⚖️ v1.92 — El juego, centrado
 Mateo: *«que se vea un poco más centrado, se ve muy pegado arriba… el contenido»*. En juego, `#app` y `#scr-game` son columna flex: la cabecera arriba, «Salir» abajo, y `#gameArea` con `margin-block:auto` (centrado en el espacio libre, con 5vh extra abajo = centro óptico). Hay prueba que mide los dos huecos.
 

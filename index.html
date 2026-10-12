@@ -548,6 +548,12 @@ body[data-scr="scr-game"] #app{min-height:100vh; min-height:100dvh; display:flex
 #scr-game.active{display:flex; flex-direction:column; flex:1;}
 #scr-game #gameArea{margin-block:auto; padding:12px 0 calc(8px + 5vh);}   /* un poco arriba del centro: el centro óptico */
 #scr-game>div:last-child{margin-top:12px;}
+/* ===== v1.93 — aire arriba (Mateo: «el bloque donde está la barra de progreso, que no se vea tan pegado arriba») =====
+   Fuera del inicio (que ya abre con la cinta) la píldora baja un poco, y la barra
+   de juegos y el título se separan de ella. */
+body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset-top,0px));}
+#scr-game .sesprog{margin:22px 0 16px;}
+#scr-game .gamehead{margin:6px 0 10px;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -627,7 +633,7 @@ body[data-scr="scr-game"] #app{min-height:100vh; min-height:100dvh; display:flex
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.92</div>
+    <div class="footer-note">Coco · v1.93</div>
   </div>
 
   <!-- ============ GAME ============ -->
