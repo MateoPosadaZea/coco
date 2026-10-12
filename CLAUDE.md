@@ -84,6 +84,13 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - `cifra()` también en los números del nivel (`15.692 / 20.000`).
 - **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
 
+## 🎯 PARA QUIÉN ES (oct-2026, decisión de Mateo)
+*«No es solo para niños, inicialmente es para adultos… debe ser serio, moderno, cool, no tan infantil. Luego puede haber una versión para kids.»*
+- Toda decisión de diseño se mide contra **adulto, serio, moderno, cool**. Nada de confeti, figuritas por todos lados ni tono de app infantil en la versión principal.
+- Una versión **kids** es un proyecto posterior y aparte; no mezclarla en esta.
+- Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
+- El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
+
 ## 🦜 VUELVE EL LORO (v1.87) — ESTA ES LA IDENTIDAD VIGENTE
 Mateo, tras probar la v1.84 «al sol» y ver tres caminos nuevos (cielo entero, dibujado con grano, revista deportiva): *«me gustaba más la identidad anterior… la del pájaro Coco, con el verde, el fondo oscuro… por ahora es la más sólida de todas… tiene algo que ver con idiomas, así que volvamos a esa»*. Un loro aprende a hablar repitiendo: es el personaje de una app de idiomas.
 - `index.html` se reconstruyó **desde la v1.83** (commit 80f36e8) + lo que no era visual: el arreglo del micrófono de la v1.85 (`vozSoloHoy`, `voz185`), el saludo **«Bonsoir»** por reloj y `theme-color` que sigue al tema (`#17181C` / `#FBF8F3`). Iconos y manifest de la v1.83; `sw.js` → `CACHE="coco-v4"`.
