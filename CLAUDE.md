@@ -92,6 +92,14 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## ✂️ v1.94 — Mi progreso, Ajustes y resultados: menos texto
+Siguiendo MENOS ES MÁS. Palabras: Mi progreso 370→~140 · Ajustes 260→~100 · resultados 208→~30.
+- **Resultados**: solo Coco, «¡Bravo!», «5 de 6 bien», «+N PUNTOS», la frase de Coco y «Para repasar» (solo si hubo tropiezos). Fuera las filas por juego/racha/combo y las 3 tarjetas de guardado. Botón «Seguir».
+- **Ajustes → «Tu guardado»** reúne ahora: estado, caja fuerte (`#safeInfo`, `#btnSafeRestore`), «Guardar archivo» / «Guardar en GitHub» (sigue el `confirm` que avisa que el repo es PÚBLICO), «Ver mi código» / «Tengo un código». `#saveCode/#saveCopy/#copyHint` siguen en el DOM, escondidos (los usa `endSession`).
+- Títulos sin emoji y cortos («Pronunciación», «Escenas», «Tema»: Día/Noche); fuera los párrafos de Escenas, Cancionero y Buzón.
+- **Mi progreso**: tiles sin emoji; «Camino al italiano» en dos líneas (qué subió desde la marca · qué falta); destrezas/temas/difíciles sin subtítulos ni notas. La frase «el italiano lo abre el examen, no el %» vive ahora en la **hoja de la puerta** (al tocar la barra), siempre visible; la prueba de la v1.78 la busca allí.
+- `#btnSetBack`/`#btnProgBack` escondidos: lo hacen las pestañas.
+
 ## 🌬️ v1.93 — Aire arriba
 Mateo: *«el bloque donde está la barra de progreso, que no se vea tan pegado arriba»*. Fuera del inicio, `#app` arranca con `28px + safe-area` arriba; en juego, la fila «JUEGO n DE m» se separa 22px de la píldora y la cabecera respira. Prueba: píldora ≥30px del borde, barra ≥18px de la píldora.
 
