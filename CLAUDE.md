@@ -84,7 +84,14 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - `cifra()` también en los números del nivel (`15.692 / 20.000`).
 - **Medido**: el botón de jugar queda a 518px del tope (entra sin scroll en un iPhone). Hay prueba que verifica que los 33 ids del inicio sobreviven y que los cuatro botones siguen abriendo su juego.
 
-## ☀️ Coco al sol (v1.84) — MANDA SOBRE LAS SECCIONES DE IDENTIDAD ANTERIORES
+## 🦜 VUELVE EL LORO (v1.87) — ESTA ES LA IDENTIDAD VIGENTE
+Mateo, tras probar la v1.84 «al sol» y ver tres caminos nuevos (cielo entero, dibujado con grano, revista deportiva): *«me gustaba más la identidad anterior… la del pájaro Coco, con el verde, el fondo oscuro… por ahora es la más sólida de todas… tiene algo que ver con idiomas, así que volvamos a esa»*. Un loro aprende a hablar repitiendo: es el personaje de una app de idiomas.
+- `index.html` se reconstruyó **desde la v1.83** (commit 80f36e8) + lo que no era visual: el arreglo del micrófono de la v1.85 (`vozSoloHoy`, `voz185`), el saludo **«Bonsoir»** por reloj y `theme-color` que sigue al tema (`#17181C` / `#FBF8F3`). Iconos y manifest de la v1.83; `sw.js` → `CACHE="coco-v4"`.
+- ☑️ Migración única `S.prefs.loro187`: le devuelve el **modo oscuro** UNA vez (la v1.84 se lo había apagado). Si luego escoge claro, se respeta.
+- Lo de la v1.84 y la v1.86 (cielo, nube/coco, Nunito, estrellas y luciérnagas) **quedó fuera**; las secciones de abajo son historia. `S.prefs.pj` y `dia184` siguen en la caja fuerte sin uso: inofensivos.
+- Mateo dice «por ahora»: la identidad puede volver a moverse, pero **parte del loro**. Lo que se concluyó al compararlas (para la próxima vuelta): lo que fecha la app no es el loro ni el verde sino la ESTRUCTURA — ~15 emoji haciendo de iconos, todo en tarjetas, mucho texto explicando, «Mi progreso/Ajustes» como botones en vez de pestañas, restos de «Laboratorio». Tablero: https://claude.ai/artifact/3JGe67tAGjk19SDLHjVG4T
+
+## ☀️ Coco al sol (v1.84) · REVERTIDO en v1.87 (queda como historia)
 Mateo: *«algo más alegre, más fresco, no tan oscuro… fondo piel, no blanco, y azul cielo… aprender idiomas tirado en un pasto viendo el cielo azul, un día soleado… entrar al app, nubes moviéndose»*. Y sobre el personaje: *«por alguna razón me la imagino a ella [su abuela] sonriendo… el ave sirve pero la ilustración aún no»*. Eligió de una galería de 4: **la nube y el coco**.
 - **Paleta** (mismos nombres de variable): `--bg` piel `#FBE6D4` · `--card` crema `#FFF8F0` · `--ink` azul noche `#1D2F45` · **acción = `--blue` `#1871BA`** (azul cielo hondo: blanco encima 5,1:1, se recorta sobre la piel 4,2:1) · `--green` `#2F7D3B` = **acierto**, ya no es la marca · `--yellow` sol `#FFC94A` · `--celebra` `#8A5A12` (texto de puntos, 4,9:1 sobre piel). ⚠️ El **azul cielo claro solo va en el cielo**: sobre la piel un botón azul claro mide 1,48:1 y no se ve dónde empieza.
 - **Noche** = cielo azul marino con luna (`--bg #14223A`), no casi-negro.
@@ -97,7 +104,7 @@ Mateo: *«algo más alegre, más fresco, no tan oscuro… fondo piel, no blanco,
 - Iconos = la nube sobre cielo, generados desde `cocoChar`; `sw.js` → `CACHE="coco-v3"`.
 - El chiste del tío (*«¿y quién te enseña?»*) pasó de «un loro» a **«Un nuage qui s'appelle Coco»**.
 
-## 🌙 De noche, todo es noche (v1.86)
+## 🌙 De noche, todo es noche (v1.86) · REVERTIDO en v1.87 con la v1.84 (iba sobre el cielo)
 Mateo: *«que el modo noche, que se convierta en noche todo»*. Hasta la v1.85 la noche era el día con las luces bajas: el sol pálido hacía de luna, ni una estrella, y los juegos solo tenían fondo azul.
 - En la escena: **luna creciente** (el mismo `.sol` con `box-shadow:inset` y fondo transparente, sin animación de halo), **14 estrellas** fijas que titilan (`.estrellas`, posiciones fijas: el mismo cielo cada noche), **luciérnagas** sobre el pasto (`.luciernagas`, noche de Barranquilla), una **estrella fugaz** cada ~13 s (`.fugaz`) y Coco con un halo de luna. Todo eso es `display:none` de día.
 - **Cielo estrellado detrás de TODAS las pantallas**: `body.dark::before` (mosaico de puntitos) + `body.dark::after` (otra capa que titila). Van con `z-index:0` y `pointer-events:none`: hay prueba de que no tapan botones.
@@ -106,7 +113,7 @@ Mateo: *«que el modo noche, que se convierta en noche todo»*. Hasta la v1.85 l
 - `prefers-reduced-motion`: estrellas quietas, sin fugaz ni capa que titila.
 - No se hizo (LA PODA, no lo pidió): noche **automática** por hora. Si la pide, sería una 3ª opción en Ajustes → Tema, sin cambiar la que ya tiene escogida.
 
-## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad) · REEMPLAZADO en v1.84 (queda como historia)
+## 🦜 Coco dibujada (v1.83 — tanda 2 de la identidad) · VIGENTE OTRA VEZ desde la v1.87
 Mateo eligió en una galería de 6 bocetos **la cara frontal (v1) + el cuerpo entero (v6)**: el mismo loro a dos distancias. Vive en `cocoCara(px, animo)` y `cocoCuerpo(px, pose)`; `cocoFace(px)` es la cara dentro del texto (cada 🦜 de `withCoco()`).
 - **Reglas del personaje — no regresionar:** DOS OJOS siempre (el primer boceto, un ojo enorme de perfil, «daba miedo, como un zombie»). Colores propios `--p1..--p5`, `--pPupila`, `--pBrillo`, `--pPico` — nunca los de la interfaz. Mejillas en **verde claro**, no coral (coral translúcido sobre verde = color barro). El pico va en `<g class="cpico">` para aletear al hablar.
 - **Estados**: caras `feliz · guino · uy · duerme · escucha`; poses `saluda · celebra · escucha · duerme`.
