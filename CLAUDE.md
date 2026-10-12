@@ -92,6 +92,9 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## ⚖️ v1.92 — El juego, centrado
+Mateo: *«que se vea un poco más centrado, se ve muy pegado arriba… el contenido»*. En juego, `#app` y `#scr-game` son columna flex: la cabecera arriba, «Salir» abajo, y `#gameArea` con `margin-block:auto` (centrado en el espacio libre, con 5vh extra abajo = centro óptico). Hay prueba que mide los dos huecos.
+
 ## 🧭 v1.91 — El progreso del juego se entiende
 Mateo (captura de una escena): *«no se entienden mucho las líneas de arriba… que se entienda y se vea el progreso»*. Eran dos rayas sin etiqueta: la azul = juegos de la sesión, la verde = reloj (¡llena aunque no hubiera reloj!).
 - La fila de juegos dice **«JUEGO 2 DE 4»** (`#sesProg`, `#spLabel`, en `paintDots()`), con rayas más gruesas; si la sesión es de **un solo juego**, la fila no aparece.

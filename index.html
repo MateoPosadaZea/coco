@@ -542,6 +542,12 @@ details.plegable>.inner{padding:0 2px 16px;}
 .timerbar.sinreloj,.timer.sinreloj{display:none;}
 .timer{white-space:nowrap;}
 .timerbar{height:6px; margin:4px 0 14px;}
+/* ===== v1.92 — el juego, centrado (Mateo: «que se vea más centrado, se ve muy pegado arriba») =====
+   La cabecera se queda arriba, «Salir» abajo, y el juego en el medio del espacio que sobra. */
+body[data-scr="scr-game"] #app{min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;}
+#scr-game.active{display:flex; flex-direction:column; flex:1;}
+#scr-game #gameArea{margin-block:auto; padding:12px 0 calc(8px + 5vh);}   /* un poco arriba del centro: el centro óptico */
+#scr-game>div:last-child{margin-top:12px;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -621,7 +627,7 @@ details.plegable>.inner{padding:0 2px 16px;}
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.91</div>
+    <div class="footer-note">Coco · v1.92</div>
   </div>
 
   <!-- ============ GAME ============ -->
