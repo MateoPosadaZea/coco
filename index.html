@@ -534,6 +534,14 @@ details.plegable:first-of-type{margin-top:22px;}
 details.plegable>summary{font-weight:500; font-size:1rem; padding:16px 2px;}
 details.plegable>.inner{padding:0 2px 16px;}
 .footer-note{margin-top:28px; opacity:.4;}
+/* ===== v1.91 — progreso del juego que se entiende ===== */
+.sesprog{display:flex; align-items:center; gap:10px; margin:8px 0 12px;}
+.sp-l{flex:none; font:600 10.5px/1 var(--fm); letter-spacing:.1em; text-transform:uppercase; opacity:.7;}
+.sesprog .progress-dots{flex:1; margin:0;}
+.sesprog .pdot{height:6px; border-radius:3px;}
+.timerbar.sinreloj,.timer.sinreloj{display:none;}
+.timer{white-space:nowrap;}
+.timerbar{height:6px; margin:4px 0 14px;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -613,12 +621,12 @@ details.plegable>.inner{padding:0 2px 16px;}
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.90</div>
+    <div class="footer-note">Coco · v1.91</div>
   </div>
 
   <!-- ============ GAME ============ -->
   <div id="scr-game" class="screen">
-    <div class="progress-dots" id="dots"></div>
+    <div class="sesprog" id="sesProg"><span class="sp-l" id="spLabel"></span><div class="progress-dots" id="dots"></div></div>
     <div class="gamehead">
       <div class="gametitle"><span class="cocojuego" id="cocoJuego"></span><span id="gameTitle">⚡ Rayo léxico</span></div>
       <div style="display:flex; gap:8px; align-items:center;">
@@ -629,7 +637,7 @@ details.plegable>.inner{padding:0 2px 16px;}
     <div class="timerbar"><div class="timerfill" id="timerFill"></div></div>
     <div id="gameArea"></div>
     <div style="text-align:center; margin-top:16px;">
-      <button class="linkish" id="btnQuit">✖ Salir de la sesión</button>
+      <button class="linkish" id="btnQuit">Salir</button>
     </div>
   </div>
 
@@ -3202,7 +3210,8 @@ function runTimer(secs, onEnd, onTick){
   stopTimer();
   let left=secs;
   const paint=()=>{
-    $("timer").textContent="⏱ "+left+"s";
+    $("timer").textContent=left+" s";
+    $("timerFill").parentNode.classList.remove("sinreloj"); $("timer").classList.remove("sinreloj");   // v1.91: barra y píldora solo existen cuando hay reloj
     const f=$("timerFill"); const pct=left/secs*100;
     f.style.width=pct+"%";
     f.className="timerfill"+(pct<30?" low":pct<60?" mid":"");
@@ -3214,7 +3223,8 @@ function runTimer(secs, onEnd, onTick){
     if(left<=0){ stopTimer(); onEnd(); }
   },1000);
 }
-function noTimer(){ stopTimer(); $("timer").textContent="🧘"; $("timerFill").style.width="100%"; $("timerFill").className="timerfill"; }
+function noTimer(){ stopTimer(); $("timer").textContent=""; $("timer").classList.add("sinreloj"); $("timerFill").style.width="100%"; $("timerFill").className="timerfill";
+  $("timerFill").parentNode.classList.add("sinreloj"); }   // v1.91: antes 🧘 + una barra verde llena que no decía nada
 
 function startSession(games, opts){
   cocoJuego("feliz");                                  // 🦜 cada sesión empieza contenta
@@ -3223,7 +3233,13 @@ function startSession(games, opts){
   show("scr-game");
   nextGame();
 }
+/* 🧭 v1.91 — Mateo: «no se entienden mucho las líneas de arriba… que se entienda y se vea el
+   progreso». La barra azul eran los juegos de la sesión, sin decirlo. Ahora lo dice
+   («JUEGO 2 DE 4») y, si la sesión es de un solo juego, no aparece. */
 function paintDots(){
+  const n=S.session.games.length, i=Math.min(S.session.idx, n-1);
+  $("sesProg").style.display = n>1 ? "" : "none";
+  $("spLabel").textContent = `Juego ${i+1} de ${n}`;
   const dots=[...$("dots").children];
   dots.forEach((d,i)=>{
     d.className="pdot"+(i<S.session.idx?" done":i===S.session.idx?" now":"");
@@ -3935,7 +3951,7 @@ function pickScene(){
 
 function gameScene(){
   const sc = pickScene();
-  $("gameTitle").textContent="💬 "+sc.title;
+  $("gameTitle").textContent=sc.title;   // v1.91: sin el 💬 delante (salían dos emoji seguidos)
   noTimer();
   const tier=()=>diffFor("scene").tier;
   updateTierChip(tier());
@@ -3949,7 +3965,7 @@ function gameScene(){
     div.className="npcline";
     // 🌶️🌶️🌶️: sin traducción del personaje (toca para revelar, como pedir "pardon ?")
     const trHtml = tier()>=3
-      ? `<span class="tr hiddenTr">👁 toca para traducir</span>`
+      ? `<span class="tr hiddenTr">traducir</span>`
       : `<span class="tr">${step.npcEs}</span>`;
     div.innerHTML=`<div class="npcface">${step.twist?"✨":sc.npc}</div>
       <div class="msg npc">${step.twist?'<div class="twisttag">✨ ¡Imprevisto!</div>':""}${step.npc}${trHtml}
@@ -4066,13 +4082,13 @@ function gameScene(){
     // 🙉 "¿Pardon?": que lo repita despacio — gratis, como en la vida real
     const pb=document.createElement("button");
     pb.className="linkish"; pb.style.margin="4px auto"; pb.style.display="block";
-    pb.textContent="🙉 ¿Pardon? — repítemelo lentico";
+    pb.textContent="Repetir lento";
     pb.onclick=()=>speakFR(st.npc, 0.6);
     box.appendChild(pb);
     if(noTr){
       const hb=document.createElement("button");
       hb.className="linkish"; hb.style.margin="4px auto"; hb.style.display="block";
-      hb.textContent="💡 ver traducciones (vale menos puntos)";
+      hb.textContent="Ver traducción";
       hb.onclick=()=>{ hinted=true; box.querySelectorAll(".optTr").forEach(e=>e.style.display="block"); hb.remove(); };
       box.appendChild(hb);
     }

@@ -9,6 +9,7 @@ App de una sola página (`index.html`) para que Mateo aprenda idiomas (ahora: fr
 - **CERO INFLAR**: nada de títulos ni métricas que prometan de más; la "puerta" al siguiente idioma puede BAJAR si baja la solidez (es diseño, no bug).
 - **LA PODA**: solo se agrega lo que él pide; lo podado no vuelve (podados: botón reto rápido, API de Claude en la app, tarjeta "frases de la sesión", ejercicios de teclear en blitz/listen).
 - **TODO ES EJERCITABLE**: todo contenido visible lleva ⭐ → repasos; nada entra solo al SRS.
+- **MENOS ES MÁS (oct-2026)**: *«entre menos opciones y menos texto, mejor… que no enrede a la gente»*. Antes de añadir un botón, una línea o una explicación, preguntar si se puede quitar algo. Etiquetas de 1-3 palabras; nada de párrafos que expliquen en pantallas de uso diario.
 - Onboarding = UNA pregunta (el nombre). Sin formularios.
 - Personalización = contenido jugable, nunca encuestas.
 - **EL NOMBRE ES COCO, y está decidido (oct-2026).** Mateo consideró «Amalia» por su abuela y lo resolvió él mismo: *«coco solo entonces mejor y ya… coco me recuerda a mi abuela también, la de la película»*. Coco ya lleva a la abuela dentro, así que no hay que elegir. **No reabrir el tema ni proponer renombres** (ni «Coco + una palabra»): se evaluó y se descartó. Amalia queda reservada para otro proyecto suyo.
@@ -90,6 +91,12 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Una versión **kids** es un proyecto posterior y aparte; no mezclarla en esta.
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
+
+## 🧭 v1.91 — El progreso del juego se entiende
+Mateo (captura de una escena): *«no se entienden mucho las líneas de arriba… que se entienda y se vea el progreso»*. Eran dos rayas sin etiqueta: la azul = juegos de la sesión, la verde = reloj (¡llena aunque no hubiera reloj!).
+- La fila de juegos dice **«JUEGO 2 DE 4»** (`#sesProg`, `#spLabel`, en `paintDots()`), con rayas más gruesas; si la sesión es de **un solo juego**, la fila no aparece.
+- **Sin reloj** (`noTimer()`): ni barra ni píldora (`.sinreloj`); antes salían una barra verde llena y un 🧘. Con reloj: la barra y «8 s».
+- Textos del juego recortados: «Salir», «Repetir lento», «Ver traducción», «traducir»; el título de escena ya no lleva 💬 delante (salían dos emoji).
 
 ## 🧹 v1.90 — Inicio limpio
 Mateo: *«quitemos la mayor cantidad posible… texto que no sume o aporte valor, quitémoslo, limpiemos esa pantalla inicial… una experiencia fácil y útil»*. El inicio pasó de ~110 palabras a ~25 (hay prueba: <60).
