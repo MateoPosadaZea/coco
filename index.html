@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coco</title>
 <meta name="theme-color" content="#F3F5FA">
@@ -38,7 +38,7 @@
   --soft:#E8EBF2; --soft2:#D9DCE6; --tint:#E9E9FD; --tintp:#EEF0F6;
   --goodbg:#E3F5EA; --badbg:#FCE8E7; --dwbad:#FBE0DE;
   --selbg:#FFF6CC; --tile:#FFFFFF;
-  --f:'Inter Tight',-apple-system,'SF Pro Display',system-ui,'Segoe UI',sans-serif;
+  --f:'Inter',-apple-system,'SF Pro Display',system-ui,'Segoe UI',sans-serif;
   --fm:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
 }
 /* 🌙 modo oscuro (v1.36 — buzón directo #2): jugar de noche sin quemarse los ojos */
@@ -99,10 +99,10 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 
 /* ---------- top bar ---------- */
 .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 4px 14px;}
-.brand{display:flex; align-items:center; gap:8px; font-family:var(--f); font-weight:800; font-size:1.25rem;}
+.brand{display:flex; align-items:center; gap:8px; font-family:var(--f); font-weight:600; font-size:1.25rem;}
 .brand .flask{font-size:1.6rem; animation:floaty 3s ease-in-out infinite;}
 .stats{display:flex; gap:8px;}
-.chip{background:var(--card); border-radius:999px; padding:6px 12px; font-weight:800; font-size:.9rem;
+.chip{background:var(--card); border-radius:999px; padding:6px 12px; font-weight:600; font-size:.9rem;
   box-shadow:var(--shadow); display:flex; align-items:center; gap:5px;}
 .chip .flame{animation:flamepulse 1.6s ease-in-out infinite; display:inline-block;}
 
@@ -111,7 +111,7 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
   font-family:var(--f);
-  font-weight:700; font-size:1.05rem; letter-spacing:-.005em;
+  font-weight:500; font-size:1.05rem; letter-spacing:-.005em;
   border:none; border-radius:18px; padding:14px 22px; cursor:pointer;
   color:var(--onColor); background:var(--blue); box-shadow:var(--shadow);
   transition:transform .08s ease, filter .15s; user-select:none; text-align:center;
@@ -160,17 +160,17 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .lang.selected{border-color:var(--green); background:var(--tint);}
 .lang.locked{opacity:.55; cursor:default;}
 .lang .flag{font-size:1.8rem;}
-.lang .name{font-weight:800; font-size:.85rem;}
-.lang .soon{font-size:.65rem; font-weight:700; letter-spacing:.03em; color:var(--ink); opacity:.65; background:var(--soft); border-radius:8px; padding:2px 7px; display:inline-block; margin-top:2px;}
+.lang .name{font-weight:600; font-size:.85rem;}
+.lang .soon{font-size:.65rem; font-weight:500; letter-spacing:.03em; color:var(--ink); opacity:.65; background:var(--soft); border-radius:8px; padding:2px 7px; display:inline-block; margin-top:2px;}
 /* 🇵🇹 v1.64: las 5 partes de la puerta, a la vista. Un solo número no dice
    QUÉ se movió; cinco barritas sí. (Mateo: "no da confianza el porcentaje") */
 .ptbars{display:flex; gap:3px; justify-content:center; align-items:flex-end; height:20px; margin-top:3px;}
 .ptbar{width:6px; height:100%; background:var(--soft); border-radius:3px; display:flex; align-items:flex-end; overflow:hidden;}
 .ptbar i{display:block; width:100%; background:var(--purple); border-radius:3px; transition:height .5s cubic-bezier(.2,1.2,.4,1);}
 .ptbar.full i{background:var(--green);}
-.ptnum{font-size:.6rem; font-weight:800; opacity:.6; margin-top:1px;}
+.ptnum{font-size:.6rem; font-weight:600; opacity:.6; margin-top:1px;}
 /* barras con etiqueta, para la hoja de detalle */
-.ptrow{display:flex; align-items:center; gap:8px; margin:6px 0; font-weight:800; font-size:.8rem;}
+.ptrow{display:flex; align-items:center; gap:8px; margin:6px 0; font-weight:600; font-size:.8rem;}
 .ptrow .lab{flex:0 0 auto; width:1.2rem; text-align:center;}
 .ptrow .track{flex:1; height:9px; background:var(--soft); border-radius:5px; overflow:hidden;}
 .ptrow .fill{display:block; height:100%; background:var(--purple); border-radius:5px;}
@@ -184,17 +184,17 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .lecturafr .palabra:hover{background:var(--tint);}
 .lecturafr .palabra.vista{background:var(--tintp); color:var(--purple); border-bottom-color:var(--purple);}
 .lecturafr .hueco{display:inline-block; min-width:3rem; text-align:center; background:var(--soft);
-  border-radius:6px; padding:0 6px; letter-spacing:2px; color:var(--purple); font-weight:800;}
+  border-radius:6px; padding:0 6px; letter-spacing:2px; color:var(--purple); font-weight:600;}
 .lecturafr .hueco.puesta{background:var(--goodbg); color:var(--green); letter-spacing:0;}
 .lecturafr .hueco.pista{outline:2px dashed var(--orange);}
-.ptmini{font-size:.72rem; font-weight:700; opacity:.6; margin:-3px 0 8px 1.9rem;}
+.ptmini{font-size:.72rem; font-weight:500; opacity:.6; margin:-3px 0 8px 1.9rem;}
 .ptmini .mas{opacity:.8; text-decoration:underline;}
 .ptcomo{font-size:.75rem; font-weight:600; opacity:.85; line-height:1.5; margin:-4px 0 10px 1.9rem;
         border-left:3px solid var(--soft); padding-left:8px;}
 
 /* ---------- XP / progress ---------- */
 .xpwrap{margin:8px 0 4px;}
-.xplabel{display:flex; justify-content:space-between; font-size:.8rem; font-weight:800; opacity:.75; margin-bottom:4px;}
+.xplabel{display:flex; justify-content:space-between; font-size:.8rem; font-weight:600; opacity:.75; margin-bottom:4px;}
 .xpbar{height:16px; background:var(--soft); border-radius:999px; overflow:hidden;}
 .xpfill{height:100%; width:0%; border-radius:999px; transition:width .6s cubic-bezier(.2,1.4,.4,1);
   background:linear-gradient(90deg,var(--yellow),var(--orange));}
@@ -206,9 +206,9 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 
 /* ---------- game area ---------- */
 .gamehead{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
-.gametitle{font-family:var(--f); font-weight:800; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
+.gametitle{font-family:var(--f); font-weight:600; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
 .timer{
-  font-family:var(--f); font-weight:800; font-size:1.1rem; min-width:64px; text-align:center;
+  font-family:var(--f); font-weight:600; font-size:1.1rem; min-width:64px; text-align:center;
   background:var(--card); border-radius:999px; padding:5px 12px; box-shadow:var(--shadow);
 }
 .timer.hot{background:var(--red); color:#fff; animation:flamepulse .6s infinite;}
@@ -217,15 +217,15 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .timerfill.mid{background:var(--yellow);} .timerfill.low{background:var(--red);}
 
 .prompt{
-  text-align:center; font-size:1.7rem; font-weight:800; font-family:var(--f);
+  text-align:center; font-size:1.7rem; font-weight:600; font-family:var(--f);
   background:var(--card); border-radius:var(--radius); padding:26px 18px; box-shadow:var(--shadow); margin-bottom:16px;
 }
-.prompt .sub{display:block; font-size:.85rem; font-family:var(--f); font-weight:700; opacity:.6; margin-top:6px;}
+.prompt .sub{display:block; font-size:.85rem; font-family:var(--f); font-weight:500; opacity:.6; margin-top:6px;}
 .prompt.shake{animation:shake .35s;}
 .options{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
 .options.one-col{grid-template-columns:1fr;}
 .opt{
-  background:var(--card); border-radius:16px; padding:16px 12px; font-weight:800; font-size:1.05rem;
+  background:var(--card); border-radius:16px; padding:16px 12px; font-weight:600; font-size:1.05rem;
   border:3px solid var(--soft); cursor:pointer; text-align:center; transition:transform .1s;
 }
 .opt:hover{transform:translateY(-2px); border-color:var(--blue);}
@@ -234,20 +234,20 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .opt.dim{opacity:.45; pointer-events:none;}
 
 .combo{
-  position:fixed; top:70px; right:14px; z-index:50; font-family:var(--f); font-weight:800;
+  position:fixed; top:70px; right:14px; z-index:50; font-family:var(--f); font-weight:600;
   background:var(--purple); color:#fff; border-radius:999px; padding:7px 14px; font-size:1rem;
   transform:scale(0); transition:transform .25s cubic-bezier(.2,1.6,.4,1); box-shadow:var(--shadow);
 }
 .combo.show{transform:scale(1);}
 .floatpts{
-  position:fixed; z-index:60; font-family:var(--f); font-weight:800; font-size:1.4rem;
+  position:fixed; z-index:60; font-family:var(--f); font-weight:600; font-size:1.4rem;
   color:var(--green); pointer-events:none; animation:ptsUp .9s ease-out forwards; text-shadow:0 1px 0 var(--bg);
 }
 @keyframes ptsUp{from{opacity:1; transform:translateY(0) scale(1)}to{opacity:0; transform:translateY(-70px) scale(1.4)}}
 
 /* ---------- inputs ---------- */
 .textinput{
-  width:100%; font-size:1.2rem; font-weight:700; font-family:var(--f);
+  width:100%; font-size:1.2rem; font-weight:500; font-family:var(--f);
   border:3px solid var(--soft); border-radius:16px; padding:14px; outline:none; text-align:center;
   transition:border .2s; background:var(--card); color:var(--ink);
 }
@@ -266,16 +266,16 @@ h1,h2,h3{font-family:var(--f); margin:.2em 0;
 .micbtn.rec{animation:flamepulse .8s infinite; background:var(--red);}
 .btn.rec{animation:flamepulse .8s infinite; filter:brightness(1.15);}
 textarea.textinput{resize:none; text-align:left; line-height:1.4;}
-.speakresult{text-align:center; font-weight:800; margin-top:10px; min-height:28px; font-size:1.05rem;}
+.speakresult{text-align:center; font-weight:600; margin-top:10px; min-height:28px; font-size:1.05rem;}
 .twisttag{display:inline-block; background:var(--yellow); color:var(--onYellow);
-  font-size:.7rem; font-weight:800; border-radius:20px; padding:2px 10px; margin-bottom:4px;
+  font-size:.7rem; font-weight:600; border-radius:20px; padding:2px 10px; margin-bottom:4px;
   animation:popIn .4s cubic-bezier(.2,1.6,.4,1);}
 .stars{font-size:1.8rem; letter-spacing:4px; text-align:center; min-height:36px;}
 
 /* ---------- conversation ---------- */
 .chatwrap{display:flex; flex-direction:column; gap:10px; margin-bottom:14px; min-height:120px;}
-.msg{max-width:82%; padding:11px 15px; border-radius:18px; font-weight:700; animation:pop .3s ease; line-height:1.35;}
-.msg .tr{display:block; font-size:.78rem; opacity:.6; font-weight:700; margin-top:3px;}
+.msg{max-width:82%; padding:11px 15px; border-radius:18px; font-weight:500; animation:pop .3s ease; line-height:1.35;}
+.msg .tr{display:block; font-size:.78rem; opacity:.6; font-weight:500; margin-top:3px;}
 .msg.npc{background:var(--card); box-shadow:var(--shadow); align-self:flex-start; border-bottom-left-radius:6px;}
 .msg.me{background:var(--blue); color:#fff; align-self:flex-end; border-bottom-right-radius:6px;}
 .msg.me .tr{opacity:.75;}
@@ -284,9 +284,9 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 .replaybtn{border:none; background:var(--tint); border-radius:99px; padding:4px 10px; cursor:pointer; font-size:.95rem;}
 
 /* ---------- results ---------- */
-.bigscore{font-size:3.2rem; font-family:var(--f); font-weight:800; text-align:center; color:var(--celebra);}
+.bigscore{font-size:3.2rem; font-family:var(--f); font-weight:600; text-align:center; color:var(--celebra);}
 .medal{font-size:4rem; text-align:center; display:flex; justify-content:center; animation:popIn .5s cubic-bezier(.2,1.6,.4,1);}
-.resultrow{display:flex; justify-content:space-between; font-weight:800; padding:8px 4px; border-bottom:2px dashed var(--soft);}
+.resultrow{display:flex; justify-content:space-between; font-weight:600; padding:8px 4px; border-bottom:2px dashed var(--soft);}
 .saverow{display:flex; gap:8px; align-items:stretch; margin-top:8px;}
 .savecode{
   font-family:monospace; font-size:.9rem; background:#2B2B3F; color:#9EFFB0; border-radius:12px;
@@ -295,7 +295,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
 }
 .confetti{position:fixed; z-index:100; top:-20px; font-size:1.3rem; pointer-events:none; animation:confall linear forwards;}
 .dw-bad{background:var(--dwbad); color:var(--badInk); border-radius:6px; padding:0 4px; text-decoration:line-through;}
-.dw-miss{background:var(--goodbg); color:var(--goodInk); border-radius:6px; padding:0 4px; font-weight:800;}
+.dw-miss{background:var(--goodbg); color:var(--goodInk); border-radius:6px; padding:0 4px; font-weight:600;}
 /* 🎯 v1.81 — UNA SOLA ACCIÓN PRINCIPAL, el resto en una lista tranquila.
    Mateo: "el diseño ui se ve igual, podemos simplificar la experiencia… el
    texto, las opciones". Tenía razón: la v1.80 cambió la pintura pero no el
@@ -309,7 +309,7 @@ textarea.textinput{resize:none; text-align:left; line-height:1.4;}
   transition:transform .08s ease, filter .15s;
 }
 .cta:active{transform:translateY(1px);}
-.cta .t{display:block; font-size:1.12rem; font-weight:700; letter-spacing:-.01em;}
+.cta .t{display:block; font-size:1.12rem; font-weight:500; letter-spacing:-.01em;}
 .cta .s{display:block; font-size:.85rem; opacity:.85; margin-top:2px;}
 .cta .fl{margin-left:auto; font-size:1.3rem; flex:none;}
 /* ⚠️ .hopt y no .opt: .opt YA ERA la clase de las opciones de respuesta en
@@ -364,7 +364,7 @@ details.plegable>.inner{padding:0 16px 16px;}
 .levelcard.selected{border-color:var(--orange); background:var(--selbg);}
 .levelcard.locked{opacity:.5; cursor:default;}
 .levelcard .lemoji{font-size:1.7rem;}
-.levelcard .lname{font-weight:800; font-size:.78rem; margin-top:3px;}
+.levelcard .lname{font-weight:600; font-size:.78rem; margin-top:3px;}
 
 .lang .soon.won{background:var(--goodbg); color:var(--green);}
 
@@ -373,38 +373,38 @@ details.plegable>.inner{padding:0 16px 16px;}
 .peek{position:absolute; top:5px; right:5px; font-size:.78rem; background:var(--tint); border-radius:8px; padding:1px 5px; cursor:pointer; z-index:2;}
 .cheatov{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:60; display:flex; align-items:flex-end; justify-content:center;}
 .cheat{background:var(--bg); border-radius:22px 22px 0 0; max-height:82vh; overflow:auto; width:100%; max-width:560px; padding:18px 16px 30px; animation:pop .25s ease;}
-.cheatrow{display:flex; align-items:center; gap:8px; padding:9px 2px; border-bottom:2px dashed var(--soft); font-weight:800;}
+.cheatrow{display:flex; align-items:center; gap:8px; padding:9px 2px; border-bottom:2px dashed var(--soft); font-weight:600;}
 .cheatrow .cfr{flex:1;}
-.cheatrow .ces{opacity:.65; font-weight:700; font-size:.85rem; text-align:right;}
-.cheatfam{margin:16px 0 2px; font-weight:800; color:var(--purple); font-size:.95rem;}
-.cheatforms{font-size:.78rem; opacity:.7; font-weight:700;}
-.wordchip{display:inline-block; background:var(--card); border:2px solid var(--soft2); border-radius:12px; padding:8px 12px; margin:4px; font-weight:800; cursor:pointer;}
+.cheatrow .ces{opacity:.65; font-weight:500; font-size:.85rem; text-align:right;}
+.cheatfam{margin:16px 0 2px; font-weight:600; color:var(--purple); font-size:.95rem;}
+.cheatforms{font-size:.78rem; opacity:.7; font-weight:500;}
+.wordchip{display:inline-block; background:var(--card); border:2px solid var(--soft2); border-radius:12px; padding:8px 12px; margin:4px; font-weight:600; cursor:pointer;}
 .wordchip.used{opacity:.22; pointer-events:none;}
-.builtline{min-height:46px; background:var(--card); border-radius:12px; border:2px dashed var(--soft2); padding:8px 10px; font-weight:800; margin:8px 0; text-align:left; font-size:1.05rem;}
+.builtline{min-height:46px; background:var(--card); border-radius:12px; border:2px dashed var(--soft2); padding:8px 10px; font-weight:600; margin:8px 0; text-align:left; font-size:1.05rem;}
 
 /* 🔗 parejas de verbos (v1.51) */
 .matchcols{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
 .mcell{background:var(--card); border:3px solid var(--soft); border-radius:14px; padding:12px 8px;
-  font-weight:800; text-align:center; cursor:pointer; font-size:.95rem; margin-bottom:8px; transition:transform .1s;}
+  font-weight:600; text-align:center; cursor:pointer; font-size:.95rem; margin-bottom:8px; transition:transform .1s;}
 .mcell.sel{border-color:var(--blue); transform:scale(1.03);}
 .mcell.done{opacity:.35; pointer-events:none; border-color:var(--green);}
-.footer-note{text-align:center; font-size:.75rem; opacity:.55; font-weight:700; margin-top:20px;}
+.footer-note{text-align:center; font-size:.75rem; opacity:.55; font-weight:500; margin-top:20px;}
 
 /* ---------- progreso ---------- */
 .pstats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;}
 .ptile{background:var(--tile); border-radius:16px; padding:12px; text-align:center;}
-.ptile .pnum{font-family:var(--f); font-weight:800; font-size:1.6rem;}
-.ptile .plab{font-size:.72rem; font-weight:800; opacity:.6;}
+.ptile .pnum{font-family:var(--f); font-weight:600; font-size:1.6rem;}
+.ptile .plab{font-size:.72rem; font-weight:600; opacity:.6;}
 .chart{display:flex; align-items:flex-end; gap:2px; height:150px; padding:6px 2px 0;}
 .cbar{flex:1; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; min-width:0; cursor:default;}
-.cbar .vlab{font-size:.62rem; font-weight:800; color:var(--ink); opacity:0; transition:opacity .15s; line-height:1;}
+.cbar .vlab{font-size:.62rem; font-weight:600; color:var(--ink); opacity:0; transition:opacity .15s; line-height:1;}
 .cbar.today .vlab, .cbar:hover .vlab{opacity:.85;}
 .cbar .fill{width:100%; max-width:24px; background:var(--orange); border-radius:4px 4px 0 0; transition:height .5s cubic-bezier(.2,1.2,.4,1); min-height:2px;}
 .cbar.today .fill{background:var(--celebra);}
 .cbar.empty .fill{background:var(--soft);}
-.cbar .dlab{font-size:.58rem; font-weight:800; opacity:.5; line-height:1;}
+.cbar .dlab{font-size:.58rem; font-weight:600; opacity:.5; line-height:1;}
 .cbar.today .dlab{opacity:.9; color:var(--celebra);}
-.linkish{background:none; border:none; color:var(--link); font-weight:800; cursor:pointer; font-size:.85rem; text-decoration:underline; font-family:inherit;}
+.linkish{background:none; border:none; color:var(--link); font-weight:600; cursor:pointer; font-size:.85rem; text-decoration:underline; font-family:inherit;}
 @media (max-width:420px){ .prompt{font-size:1.4rem;} .options{grid-template-columns:1fr;} }
 /* ================================================================
    🎨 v1.88 — COCO CON VIDA (dirección SuperHi, logotipo A)
@@ -415,7 +415,7 @@ details.plegable>.inner{padding:0 16px 16px;}
    viejas sin tener que reescribir cada componente.
    ================================================================ */
 body{font-family:var(--f);}
-h1,h2,h3{font-family:var(--f); font-weight:700; letter-spacing:-.035em; line-height:1.08;}
+h1,h2,h3{font-family:var(--f); font-weight:500; letter-spacing:-.03em; line-height:1.1;}
 #app{padding:10px 16px 118px;}
 .card{border-radius:var(--radius);}
 .btn{font-family:var(--f); font-weight:600; border-radius:999px; letter-spacing:-.01em;}
@@ -443,7 +443,7 @@ body:not([data-scr="scr-home"]) .cinta{display:none;}
 .figs>*{position:absolute; display:block;}
 .figs .circ{border-radius:50%;}
 .hero .mascot{margin-top:4px;}
-.saludo{font:700 clamp(2.5rem,11.5vw,3.5rem)/.92 var(--f); letter-spacing:-.06em; margin:12px 0 8px; text-wrap:balance;}
+.saludo{font:300 clamp(2.6rem,12vw,3.7rem)/.95 var(--f); letter-spacing:-.05em; margin:12px 0 8px; text-wrap:balance;}
 .hero .bubble{background:none; box-shadow:none; padding:0 10px; margin:0 auto; font-size:1.02rem; opacity:.72;}
 .hero .bubble::after{display:none;}
 .acciones{position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:18px;}
@@ -484,7 +484,7 @@ body[data-scr="scr-game"] #app{padding-bottom:40px;}
 .timer{font:600 .78rem/1 var(--fm); letter-spacing:.08em; box-shadow:none; background:var(--soft); padding:8px 11px; min-width:0;}
 #tierChip{background:var(--yellow); color:var(--onYellow);}
 .timer.hot{background:var(--red); color:#fff;}
-.prompt{background:none; box-shadow:none; padding:10px 2px 12px; text-align:left; font:700 2.15rem/1 var(--f); letter-spacing:-.05em;}
+.prompt{background:none; box-shadow:none; padding:10px 2px 12px; text-align:left; font:400 2.1rem/1.05 var(--f); letter-spacing:-.04em;}
 .prompt .sub{font:500 .72rem/1.45 var(--fm); letter-spacing:.06em; text-transform:uppercase; opacity:.6; margin-top:12px;}
 .opt{border:1.5px solid var(--soft2); border-radius:20px; letter-spacing:-.01em;}   /* su negrita (800) no se toca: la protege la prueba de la v1.82 */
 .opt:hover{border-color:var(--ink);}
@@ -499,7 +499,7 @@ body.dark .opt:hover{border-color:var(--ink);}
 /* resultados */
 #scr-results .reshero{position:relative; text-align:center; padding:36px 0 8px;}
 #scr-results .reshero>*{position:relative; z-index:1;}
-#resTitle{font:700 clamp(3.2rem,15vw,4.2rem)/.88 var(--f); letter-spacing:-.065em; margin:14px 0 8px;}
+#resTitle{font:300 clamp(3.4rem,16vw,4.4rem)/.9 var(--f); letter-spacing:-.055em; margin:14px 0 8px;}
 .resnum{font-weight:600; font-size:1.05rem;}
 .respts{display:inline-block; margin-top:14px; font:600 .8rem/1 var(--fm); letter-spacing:.1em; background:var(--yellow); color:var(--onYellow);
   padding:9px 14px; border-radius:999px;}
@@ -514,6 +514,18 @@ body.dark .opt:hover{border-color:var(--ink);}
 .footer-note{font-weight:500; font-family:var(--fm); letter-spacing:.04em;}
 @media (max-width:420px){ .prompt{font-size:1.8rem;} }
 @media (prefers-reduced-motion:reduce){ .cinta>div{animation:none;} }
+/* ===== v1.89 — Inter ligera, formas propias, día/noche a un toque ===== */
+b,strong{font-weight:600;}
+[style*="font-weight:800"]{font-weight:500 !important;}
+[style*="font-weight:700"]{font-weight:500 !important;}
+.btn,.cta .t,.pill,.hopt .tt,.tabs button{font-weight:500;}
+.chip{font-weight:500;}
+.chip.tema{border:none; cursor:pointer; color:var(--ink); padding:6px 9px; font-family:var(--f);}
+.chip.tema svg{width:16px; height:16px;}
+.chip.tema:active{transform:scale(.94);}
+.figs svg{overflow:visible;}
+.gametitle{font-weight:500;}
+.xplabel,.resultrow,.ptrow,.speakresult,.lang .name{font-weight:500;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -525,6 +537,7 @@ body.dark .opt:hover{border-color:var(--ink);}
     <div class="brand"><svg class="logo" viewBox="0 0 352 110" role="img" aria-label="coco"><g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round"><path d="M78.4 31.8 A34 34 0 1 0 78.4 78.2"/><circle cx="136" cy="55" r="34"/><path d="M230.4 31.8 A34 34 0 1 0 230.4 78.2"/><circle cx="288" cy="55" r="34"/></g><circle cx="144" cy="47" r="11" fill="currentColor"/><circle cx="296" cy="47" r="11" fill="currentColor"/></svg></div>
     <div class="stats">
       <div class="chip" title="Racha de días"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5.5 1 1.5 1.5 2 2.5 2C12 7 11.5 5 12 3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><span id="streakNum">0</span></div>
+      <button class="chip tema" id="thToggle" aria-label="Cambiar a modo noche"></button>
       <div class="chip" title="Puntos totales"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><span id="xpNum">0</span></div>
     </div>
   </div>
@@ -532,7 +545,7 @@ body.dark .opt:hover{border-color:var(--ink);}
   <!-- ============ HOME ============ -->
   <div id="scr-home" class="screen active">
     <div class="hero">
-      <div class="figs" aria-hidden="true"><svg style="left:-6%;top:40px;width:150px;height:150px;fill:var(--figAm);transform:rotate(-16deg)" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 98 37 80 95H20L2 37z"/></svg><span class="circ" style="right:-8%;top:10px;width:150px;height:150px;background:var(--figCielo)"></span><svg style="left:-2%;top:330px;width:60px;height:60px;fill:var(--figVe)" viewBox="0 0 100 100" aria-hidden="true"><path d="M0 0 100 50 0 100z"/></svg><svg style="right:-1%;top:360px;width:70px;height:70px;fill:var(--figRosa);transform:rotate(12deg)" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0 64 34 100 36 72 60 82 98 50 76 18 98 28 60 0 36 36 34z"/></svg></div>
+      <div class="figs" aria-hidden="true"><svg style="left:-7%;top:44px;width:150px;height:135px;fill:var(--figAm);transform:rotate(-8deg)" viewBox="0 0 100 90" aria-hidden="true"><path d="M16 4h68a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H42L22 88l4-20H16A14 14 0 0 1 2 54V18A14 14 0 0 1 16 4z"/></svg><svg style="right:-5%;top:22px;width:150px;height:105px;stroke:var(--figCielo)" viewBox="0 0 100 70" aria-hidden="true"><path d="M13 57 50 15 87 57" fill="none" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="left:-3%;top:296px;width:46px;height:78px;stroke:var(--figVe)" viewBox="0 0 60 100" aria-hidden="true"><path d="M19 84 41 16" fill="none" stroke-width="24" stroke-linecap="round"/></svg><svg style="right:-5%;top:446px;width:86px;height:62px;stroke:var(--figRosa)" viewBox="0 0 110 80" aria-hidden="true"><path d="M48 13 17 40l31 27M93 13 62 40l31 27" fill="none" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="mascot" id="mascot" title="¡Soy Coco! Tócame"></div>
       <h1 class="saludo" id="saludo">Bonjour.</h1>
       <div class="bubble" id="cocoBubble">¿Cinco minutitos de francés?</div>
@@ -612,7 +625,7 @@ body.dark .opt:hover{border-color:var(--ink);}
       <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
       · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
     </div>
-    <div class="footer-note">Coco · v1.88 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · v1.89 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -725,7 +738,7 @@ body.dark .opt:hover{border-color:var(--ink);}
   <!-- ============ RESULTS ============ -->
   <div id="scr-results" class="screen">
     <div class="reshero">
-      <div class="figs" aria-hidden="true" style="top:-40px;bottom:-20px"><svg style="left:8%;top:40px;width:38px;height:38px;fill:var(--figAm);transform:rotate(18deg)" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0 64 34 100 36 72 60 82 98 50 76 18 98 28 60 0 36 36 34z"/></svg><span class="circ" style="right:12%;top:52px;width:24px;height:24px;background:var(--figRo)"></span><svg style="right:6%;top:170px;width:34px;height:34px;fill:var(--figVe);transform:rotate(-30deg)" viewBox="0 0 100 100" aria-hidden="true"><path d="M0 0 100 50 0 100z"/></svg><svg style="left:4%;top:220px;width:40px;height:40px;fill:var(--figRosa);transform:rotate(-12deg)" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 98 37 80 95H20L2 37z"/></svg><span class="circ" style="left:24%;top:140px;width:14px;height:14px;background:var(--figCielo)"></span></div>
+      <div class="figs" aria-hidden="true" style="top:-40px;bottom:-20px"><svg style="left:9%;top:52px;width:44px;height:20px;fill:var(--figRo)" viewBox="0 0 100 44" aria-hidden="true"><circle cx="22" cy="22" r="20"/><circle cx="78" cy="22" r="20"/></svg><svg style="right:10%;top:44px;width:46px;height:32px;stroke:var(--figAm)" viewBox="0 0 100 70" aria-hidden="true"><path d="M13 57 50 15 87 57" fill="none" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="right:6%;top:170px;width:20px;height:34px;stroke:var(--figVe)" viewBox="0 0 60 100" aria-hidden="true"><path d="M19 84 41 16" fill="none" stroke-width="24" stroke-linecap="round"/></svg><svg style="left:4%;top:214px;width:44px;height:32px;stroke:var(--figRosa)" viewBox="0 0 110 80" aria-hidden="true"><path d="M48 13 17 40l31 27M93 13 62 40l31 27" fill="none" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="left:22%;top:132px;width:22px;height:20px;fill:var(--figCielo)" viewBox="0 0 100 90" aria-hidden="true"><path d="M16 4h68a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H42L22 88l4-20H16A14 14 0 0 1 2 54V18A14 14 0 0 1 16 4z"/></svg></div>
       <div class="medal" id="medal"></div>
       <h2 id="resTitle">¡Bravo!</h2>
       <div class="resnum" id="resNum"></div>
@@ -6067,12 +6080,18 @@ $("vgSelf").onclick =()=>{ S.prefs.vg="self"; store.save(); paintSettings(); };
 $("spNormal").onclick=()=>{ S.prefs.slow=false; store.save(); paintSettings(); speakFR("Bonjour !"); };
 $("spSlow").onclick =()=>{ S.prefs.slow=true;  store.save(); paintSettings(); speakFR("Bonjour !"); };
 /* 🌙 modo oscuro (📬 buzón directo #2) */
+const ICON_LUNA='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>', ICON_SOL='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 function applyTheme(){
   const noche=!!(S.prefs && S.prefs.dark);
   document.body.classList.toggle("dark", noche);
+  // 🌗 v1.89: el botón de arriba muestra a dónde te lleva (luna de día, sol de noche)
+  const tt=document.getElementById("thToggle");
+  if(tt){ tt.innerHTML=noche?ICON_SOL:ICON_LUNA; tt.setAttribute("aria-label", noche?"Cambiar a modo día":"Cambiar a modo noche"); }
   // la barra del sistema sigue al tema (antes quedaba clara encima del fondo oscuro)
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=noche?"#0F1015":"#F3F5FA";
 }
+/* 🌗 v1.89 — Mateo: «que el dark mode se pueda cambiar desde el home, que sea más fácil» */
+$("thToggle").onclick=()=>{ S.prefs.dark=!S.prefs.dark; store.save(); applyTheme(); paintSettings(); };
 $("thLight").onclick=()=>{ S.prefs.dark=false; store.save(); applyTheme(); paintSettings(); };
 $("thDark").onclick =()=>{ S.prefs.dark=true;  store.save(); applyTheme(); paintSettings(); };
 $("nameEdit").onclick=()=>{
