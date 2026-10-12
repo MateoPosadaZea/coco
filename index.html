@@ -526,6 +526,14 @@ b,strong{font-weight:600;}
 .figs svg{overflow:visible;}
 .gametitle{font-weight:500;}
 .xplabel,.resultrow,.ptrow,.speakresult,.lang .name{font-weight:500;}
+/* ===== v1.90 — inicio limpio (Mateo: «quitemos texto que no sume… experiencia fácil y útil») ===== */
+#weakLine{display:none;}        /* lo dice la cinta: «3 PARA REPASAR HOY» */
+#xpHint{display:none;}          /* explicaba la diferencia ⭐/puerta: sobraba */
+details.plegable{box-shadow:none; background:transparent; border-top:1px solid var(--soft2); border-radius:0; margin:0;}
+details.plegable:first-of-type{margin-top:22px;}
+details.plegable>summary{font-weight:500; font-size:1rem; padding:16px 2px;}
+details.plegable>.inner{padding:0 2px 16px;}
+.footer-note{margin-top:28px; opacity:.4;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -545,7 +553,7 @@ b,strong{font-weight:600;}
   <!-- ============ HOME ============ -->
   <div id="scr-home" class="screen active">
     <div class="hero">
-      <div class="figs" aria-hidden="true"><svg style="left:-7%;top:44px;width:150px;height:135px;fill:var(--figAm);transform:rotate(-8deg)" viewBox="0 0 100 90" aria-hidden="true"><path d="M16 4h68a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H42L22 88l4-20H16A14 14 0 0 1 2 54V18A14 14 0 0 1 16 4z"/></svg><svg style="right:-5%;top:22px;width:150px;height:105px;stroke:var(--figCielo)" viewBox="0 0 100 70" aria-hidden="true"><path d="M13 57 50 15 87 57" fill="none" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="left:-3%;top:296px;width:46px;height:78px;stroke:var(--figVe)" viewBox="0 0 60 100" aria-hidden="true"><path d="M19 84 41 16" fill="none" stroke-width="24" stroke-linecap="round"/></svg><svg style="right:-5%;top:446px;width:86px;height:62px;stroke:var(--figRosa)" viewBox="0 0 110 80" aria-hidden="true"><path d="M48 13 17 40l31 27M93 13 62 40l31 27" fill="none" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="figs" aria-hidden="true"><svg style="left:-7%;top:44px;width:150px;height:135px;fill:var(--figAm);transform:rotate(-8deg)" viewBox="0 0 100 90" aria-hidden="true"><path d="M16 4h68a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H42L22 88l4-20H16A14 14 0 0 1 2 54V18A14 14 0 0 1 16 4z"/></svg><svg style="right:-5%;top:22px;width:150px;height:105px;stroke:var(--figCielo)" viewBox="0 0 100 70" aria-hidden="true"><path d="M13 57 50 15 87 57" fill="none" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="left:-3%;top:296px;width:46px;height:78px;stroke:var(--figVe)" viewBox="0 0 60 100" aria-hidden="true"><path d="M19 84 41 16" fill="none" stroke-width="24" stroke-linecap="round"/></svg></div>
       <div class="mascot" id="mascot" title="¡Soy Coco! Tócame"></div>
       <h1 class="saludo" id="saludo">Bonjour.</h1>
       <div class="bubble" id="cocoBubble">¿Cinco minutitos de francés?</div>
@@ -580,33 +588,17 @@ b,strong{font-weight:600;}
       <div class="lang locked" id="lang-pt"><div class="flag">🇵🇹</div><div class="name">Portugués</div><div class="soon">PRONTO</div></div>
     </div>
 
-    <div class="card nivel">
-      <h3>Tu nivel</h3>
-      <div class="xpwrap">
-        <div class="xplabel"><span id="lvlLabel">Nivel 1 · Aprendiz</span><span id="xpLabel">0 / 100</span></div>
-        <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
-        <div class="hint" id="xpHint" style="margin-top:6px;"></div>
-      </div>
-      <!-- las pestañas de abajo hacen de estos dos botones; se quedan escondidos para no romper nada -->
-      <div class="btn-row" style="display:none;">
-        <button class="btn small ghost" id="btnProgress">Mi progreso</button>
-        <button class="btn small ghost" id="btnSettings">Ajustes</button>
-      </div>
-      <p class="hint" id="saveStatus" style="margin-top:10px;"></p>
-    </div>
 
     <details class="card plegable">
-      <summary>📚 Temas y vocabulario</summary>
+      <summary>Temas</summary>
       <div class="inner">
-        <p class="hint" style="text-align:left; margin:0 0 10px;">🌀 Mezcla = variado (recomendado). Un tema suelto = refuerzo. La Inmersión siempre mezcla.</p>
         <div class="levels" id="levelGrid"></div>
       </div>
     </details>
 
     <details class="card plegable">
-      <summary>🔎 Pregúntale a Coco</summary>
+      <summary>¿Cómo se dice…?</summary>
       <div class="inner">
-      <p class="hint" style="text-align:left; margin:0 0 8px;">Busca «¿cómo se dice…?» en español o francés. Si no está, anótala: Claude la traduce y entra a tus repasos.</p>
       <input class="textinput" id="askInput" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="p. ej. izquierda · cuánto cuesta · estoy aprendiendo" style="font-size:1rem;" autocomplete="off">
       <div id="askResults" style="margin-top:8px;"></div>
       <div class="btn-row" id="noteRow" style="display:none; margin-top:8px;"><button class="btn small green" id="noteAdd">✏️ Anotarla para aprenderla</button></div>
@@ -621,11 +613,7 @@ b,strong{font-weight:600;}
       </div>
     </details>
 
-    <div style="text-align:center;">
-      <button class="linkish" id="btnLoadCode">🔑 Tengo un código de guardado</button>
-      · <button class="linkish" id="btnShowCode">💾 Ver mi código (para llevar mi progreso)</button>
-    </div>
-    <div class="footer-note">Coco · v1.89 · El audio funciona mejor en Chrome/Edge · Al pedir micrófono elige "Permitir mientras visito el sitio"</div>
+    <div class="footer-note">Coco · v1.90</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -697,6 +685,14 @@ b,strong{font-weight:600;}
       </div>
       <p class="hint" style="text-align:left;">📬 Enviar directo abre GitHub con tu buzón ya escrito — solo tocas «Submit new issue» y Claude lo lee en la próxima sesión, sin copiar nada.</p>
     </div>
+    <div class="card">
+      <h3>Tu guardado</h3>
+      <p class="hint" id="saveStatus" style="text-align:left; margin:4px 0 8px;"></p>
+      <div style="text-align:left;">
+        <button class="linkish" id="btnShowCode">Ver mi código</button> ·
+        <button class="linkish" id="btnLoadCode">Tengo un código</button>
+      </div>
+    </div>
     <button class="btn big" id="btnSetBack">Volver al inicio</button>
   </div>
 
@@ -706,6 +702,19 @@ b,strong{font-weight:600;}
       <h2 style="text-align:center;">📈 Tu progreso</h2>
       <div class="pstats" id="pstats"></div>
       <div id="pmov"></div>
+    </div>
+    <div class="card nivel">
+      <h3>Tu nivel</h3>
+      <div class="xpwrap">
+        <div class="xplabel"><span id="lvlLabel">Nivel 1 · Aprendiz</span><span id="xpLabel">0 / 100</span></div>
+        <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+        <div class="hint" id="xpHint" style="margin-top:6px;"></div>
+      </div>
+      <!-- las pestañas de abajo hacen de estos dos botones; se quedan escondidos para no romper nada -->
+      <div class="btn-row" style="display:none;">
+        <button class="btn small ghost" id="btnProgress">Mi progreso</button>
+        <button class="btn small ghost" id="btnSettings">Ajustes</button>
+      </div>
     </div>
     <div class="card">
       <h3 style="margin-bottom:4px;">Puntos por día</h3>
@@ -6337,10 +6346,10 @@ if(S.name) applyName(); else setTimeout(askName, 600);   // 🪪 una sola pregun
 refreshTop();
 renderNotes();
 $("saveStatus").textContent = store.ok
-  ? "💾 Guardado automático activo en este navegador"
-  : "⚠️ Aquí no hay guardado automático (vista previa) · usa tu código COCO- al terminar";
+  ? "Tu progreso se guarda solo en este teléfono."
+  : "Aquí no se guarda solo: usa tu código al terminar.";
 // 🎨 v1.88: «Bonjour, Mateo.» va en grande (pintaSaludo, por reloj); la burbuja acompaña
-if(restored && S.xp>0) cocoSay("Qué bueno verte. ¿Cinco minutitos de francés?");
+if(restored && S.xp>0) cocoSay("¿Cinco minutitos de francés?");
 else cocoSay(rnd(COCO_HOME));
 </script>
 </body>

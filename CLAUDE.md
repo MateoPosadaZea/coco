@@ -91,6 +91,13 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## 🧹 v1.90 — Inicio limpio
+Mateo: *«quitemos la mayor cantidad posible… texto que no sume o aporte valor, quitémoslo, limpiemos esa pantalla inicial… una experiencia fácil y útil»*. El inicio pasó de ~110 palabras a ~25 (hay prueba: <60).
+- En el inicio queda SOLO: cinta · saludo · Coco · «Sesión de hoy» + «Improvisar» · Inmersión/Conversación/Leer · «Camino al italiano» · dos filas plegadas («Temas», «¿Cómo se dice…?») · pie «Coco · v1.XX».
+- **«Tu nivel» → Mi progreso** (sin la explicación `#xpHint`, escondida). **Guardado + código → Ajustes** (tarjeta «Tu guardado»; `#saveStatus`, `#btnShowCode`, `#btnLoadCode`). `#weakLine` escondida: lo dice la cinta. Todos los ids siguen en el DOM.
+- Los plegables perdieron sus párrafos explicativos y los emoji del título; ahora son filas con una línea arriba, sin tarjeta.
+- Regla para lo que venga: **en el inicio no entra texto que explique**. Si algo necesita explicación, va en su pantalla (Progreso/Ajustes) o en la hoja que se abre al tocar.
+
 ## 🌗 v1.89 — Inter ligera, formas propias, día/noche a un toque (MANDA sobre lo de abajo donde choque)
 Mateo, al ver la v1.88: *«que el dark mode se pueda cambiar desde el home, que sea más fácil… la tipografía, vámonos con Inter light o algo así… que las formas no sean tan iguales a las del referente, experimentar un poco»*.
 - **Letra: Inter** (300–600) en vez de Inter Tight. Todo el CSS bajó un escalón (800→600, 700→500); el saludo y «¡Bravo!» van en **300** (ligera). Los `style="font-weight:800/700"` del HTML se aplanan con un selector de atributo. La prueba de la v1.82 ahora pide ≥600 en las opciones (antes exactamente 800).
