@@ -602,6 +602,8 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
   #scr-progress .card,#scr-settings .card{margin:0;}
   #scr-progress>.card:first-child,#scr-settings>.card:first-child{grid-row:span 2;}
 }
+/* v1.97: el chip del idioma (FR / EN) en la píldora de arriba */
+.chip.curso{font:600 .72rem/1 var(--fm); letter-spacing:.08em; min-width:34px; justify-content:center;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -613,6 +615,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
     <div class="brand"><svg class="logo" viewBox="0 0 352 110" role="img" aria-label="coco"><g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round"><path d="M78.4 31.8 A34 34 0 1 0 78.4 78.2"/><circle cx="136" cy="55" r="34"/><path d="M230.4 31.8 A34 34 0 1 0 230.4 78.2"/><circle cx="288" cy="55" r="34"/></g><circle cx="144" cy="47" r="11" fill="currentColor"/><circle cx="296" cy="47" r="11" fill="currentColor"/></svg></div>
     <div class="stats">
       <div class="chip" title="Racha de días"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5.5 1 1.5 1.5 2 2.5 2C12 7 11.5 5 12 3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><span id="streakNum">0</span></div>
+      <button class="chip tema curso" id="crsChip" aria-label="Cambiar de idioma">FR</button>
       <button class="chip tema" id="thToggle" aria-label="Cambiar a modo noche"></button>
       <div class="chip" title="Puntos totales"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><span id="xpNum">0</span></div>
     </div>
@@ -624,7 +627,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
       <div class="figs" aria-hidden="true"><svg style="left:-7%;top:44px;width:150px;height:135px;fill:var(--figAm);transform:rotate(-8deg)" viewBox="0 0 100 90" aria-hidden="true"><path d="M16 4h68a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H42L22 88l4-20H16A14 14 0 0 1 2 54V18A14 14 0 0 1 16 4z"/></svg><svg style="right:-5%;top:22px;width:150px;height:105px;stroke:var(--figCielo)" viewBox="0 0 100 70" aria-hidden="true"><path d="M13 57 50 15 87 57" fill="none" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg style="left:-3%;top:296px;width:46px;height:78px;stroke:var(--figVe)" viewBox="0 0 60 100" aria-hidden="true"><path d="M19 84 41 16" fill="none" stroke-width="24" stroke-linecap="round"/></svg></div>
       <div class="mascot" id="mascot" title="¡Soy Coco! Tócame"></div>
       <h1 class="saludo" id="saludo">Bonjour.</h1>
-      <div class="bubble" id="cocoBubble">¿Cinco minutitos de francés?</div>
+      <div class="bubble" id="cocoBubble">¿Cinco minutitos?</div>
       <div class="acciones">
         <button class="cta" id="btnPlay">
           <span><span class="t">Sesión de hoy</span><span class="s">4 juegos · unos 5 minutos</span></span>
@@ -681,7 +684,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.96</div>
+    <div class="footer-note">Coco · v1.97</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -705,6 +708,11 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
   <div id="scr-settings" class="screen">
     <div class="card">
       <h3>Ajustes</h3>
+      <p class="ajt">Aprendo</p>
+      <div class="btn-row" style="justify-content:flex-start;">
+        <button class="btn small" id="crsFr">Francés</button>
+        <button class="btn small" id="crsEn">Inglés</button>
+      </div>
       <p class="ajt">Pronunciación</p>
       <div class="btn-row" style="justify-content:center;">
         <button class="btn small" id="vgAuto">Coco me escucha</button>
@@ -842,6 +850,16 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
 </div>
 <div class="combo" id="comboBadge">x1</div>
 <script>
+/* 🇬🇧 v1.97 — DOS CURSOS: francés (el de siempre) e inglés. Mateo: «un curso de inglés».
+   El curso vive FUERA de S (localStorage "coco_curso") porque decide de qué caja se lee S.
+   Cada curso tiene su propia caja fuerte: lingualab_fr (NUNCA renombrar) y lingualab_en.
+   Así el progreso de un idioma no toca el del otro. El campo `fr` del contenido es «el
+   idioma que se aprende» (en el curso de inglés guarda inglés): renombrarlo rompería
+   las cajas guardadas, así que se queda. */
+const CURSO = (()=>{ try{ return localStorage.getItem("coco_curso")==="en" ? "en" : "fr"; }catch(e){ return "fr"; } })();
+const EN = CURSO==="en";
+const LENGUA = EN ? "inglés" : "francés";
+const LANG_TAG = EN ? "en-US" : "fr-FR";
 /* ================== CONTENIDO FRANCÉS A1 ================== */
 const THEMES = [
  {
@@ -2454,7 +2472,7 @@ function toast(txt){
    REGLA DE ORO (la de siempre): todo campo nuevo de S se añade a packState() Y a
    applyState(). Son la única lista fija que hay que tocar — save/load/fotos y
    makeCode beben todos de aquí, así que ya no se pueden desincronizar.        */
-const SAFE_MAIN="lingualab_fr", SAFE_BAK="lingualab_fr_bak", SAFE_SNAP="lingualab_fr_snap", SAFE_KEEP=7;
+const SAFE_MAIN=EN?"lingualab_en":"lingualab_fr", SAFE_BAK=EN?"lingualab_en_bak":"lingualab_fr_bak", SAFE_SNAP=EN?"lingualab_en_snap":"lingualab_fr_snap", SAFE_KEEP=7;   // v1.97: una caja por curso
 
 /* ---- LISTA FIJA: el estado entero, en claves cortas ---- */
 function packState(){
@@ -2665,7 +2683,9 @@ const todayStr = () => localISO();
 
 function level(){ let l=1; for(let i=0;i<LVLS.length;i++) if(S.xp>=LVLS[i].xp) l=i+1; return l; }
 /* 🎨 v1.88 — «Bonjour» o «Bonsoir» según el RELOJ (no el tema): Coco no enseña francés equivocado */
-function holaFR(){ const h=new Date().getHours(); return (h>=18||h<5)?"Bonsoir":"Bonjour"; }
+function holaFR(){ const h=new Date().getHours();
+  if(EN) return h>=18||h<5 ? "Good evening" : h<12 ? "Good morning" : "Good afternoon";   // v1.97
+  return (h>=18||h<5)?"Bonsoir":"Bonjour"; }
 function pintaSaludo(){ const e=$("saludo"); if(e) e.textContent=holaFR()+(S.name?", "+S.name:"")+"."; }
 /* la cinta que corre arriba: sus datos de verdad, y la ÚNICA parte que le falta a la puerta */
 function pintaCinta(){
@@ -2686,6 +2706,7 @@ function pintaCinta(){
 /* la barra «camino al italiano» del inicio: el mismo % de la puerta, y al tocarla abre su hoja */
 function pintaRuta(){
   const r=$("ruta"); if(!r) return;
+  if(EN){ r.style.display="none"; return; }   // v1.97: la puerta y el examen son del francés
   const gano=!!(S.exam&&S.exam.passed), p=gano?100:solidPct();
   r.querySelector(".l").innerHTML=`<span>${gano?"Italiano · ganado":frenchSolid()?"Camino al italiano · al examen":"Camino al italiano"}</span><span>${p}%</span>`;
   r.querySelector("i").style.width=p+"%";
@@ -2759,8 +2780,10 @@ function loadCode(code){
 /* ================== VOZ ================== */
 let frVoice = null;
 function pickVoice(){
-  const vs = speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith("fr"));
-  frVoice = vs.find(v=>/female|amelie|thomas|google/i.test(v.name)) || vs[0] || null;
+  const vs = speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith(EN?"en":"fr"));
+  frVoice = EN
+    ? (vs.find(v=>/en-us/i.test(v.lang) && /samantha|google|female|aria|jenny/i.test(v.name)) || vs.find(v=>/en-us/i.test(v.lang)) || vs[0] || null)
+    : (vs.find(v=>/female|amelie|thomas|google/i.test(v.name)) || vs[0] || null);
 }
 if("speechSynthesis" in window){
   pickVoice();
@@ -2788,7 +2811,7 @@ function speakFR(text, rate){
     const go=()=>{
       const u = new SpeechSynthesisUtterance(text);
       currentUtt = u;
-      u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
+      u.lang=LANG_TAG; if(frVoice) u.voice=frVoice;
       u.rate = (rate||0.85) * ((S.prefs&&S.prefs.slow)?0.8:1);   // 🐢 ajuste de velocidad
       u.pitch=1.05;
       const mas = $("mascot"); if(mas) mas.classList.add("talk");
@@ -3456,7 +3479,7 @@ function askName(){
   const ov=document.createElement("div"); ov.className="cheatov"; ov.style.alignItems="center";
   ov.innerHTML=`<div class="cheat" style="border-radius:22px; max-width:420px; text-align:center; padding:26px 20px;">
     <div>${cocoFace(72)}</div>
-    <h2 style="margin:10px 0 2px">¡Bienvenue au Laboratoire!</h2>
+    <h2 style="margin:10px 0 2px">${EN?"Welcome!":"Bienvenue !"}</h2>
     <p style="font-weight:700; opacity:.75; margin:4px 0 14px">Soy <b>Coco</b>, tu perezoso políglota.<br>¿Cómo te llamas?</p>
     <input class="textinput" id="nameInp" maxlength="20" spellcheck="false" autocorrect="off" autocapitalize="words" placeholder="Tu nombre...">
     <button class="btn big green" style="margin-top:14px" id="nameGo">¡A aprender! 🚀</button>
@@ -3467,7 +3490,7 @@ function askName(){
     if(!v){ $("nameInp").style.animation="shake .35s"; setTimeout(()=>$("nameInp").style.animation="",380); return; }
     S.name=v; store.save(); ov.remove(); applyName(); refreshTop();
     cocoSay(`Enchanté, <b>${esc(v)}</b> ! 🦜 ¿Jugamos 5 minutitos?`);
-    speakFR("Enchanté, "+v+" !", 0.9);
+    speakFR(EN ? "Nice to meet you, "+v+"!" : "Enchanté, "+v+" !", 0.9);
   };
   $("nameGo").onclick=go;
   $("nameInp").onkeydown=e=>{ if(e.key==="Enter") go(); };
@@ -3516,7 +3539,7 @@ function gameBlitz(){
       noTimer();   // pensar el orden ES el ejercicio: sin cronómetro
       area.innerHTML=`
         <div class="prompt">${q.es}
-          <span class="sub">${tag} · Ármala en francés, palabra por palabra · ojo: sobran fichas</span>
+          <span class="sub">${tag} · Ármala en ${LENGUA}, palabra por palabra · ojo: sobran fichas</span>
         </div>
         <div id="chipZone"></div>
         <div class="speakresult" id="fb"></div>`;
@@ -3549,7 +3572,7 @@ function gameBlitz(){
       const opts = shuffle([q,...wrong]);
       area.innerHTML=`
         <div class="prompt">${dir?q.fr:q.es}
-          <span class="sub">${tag} · ${dir?"¿Qué significa?":"¿Cómo se dice en francés?"}</span>
+          <span class="sub">${tag} · ${dir?"¿Qué significa?":"¿Cómo se dice en "+LENGUA+"?"}</span>
         </div>
         <div class="options">${opts.map((o,i)=>`<div class="opt" data-i="${i}">${dir?o.es:o.fr}</div>`).join("")}</div>`;
       if(dir) speakFR(q.fr);
@@ -3701,7 +3724,7 @@ function gameSpeak(){
   let recog=null, srOn=false, onHeard=null, onSrError=null;
   if(SR){
     recog=new SR();
-    recog.lang="fr-FR"; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=3;
+    recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=3;
     recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl); };
     recog.onerror=ev=>{
       if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ recog=null; return; }
@@ -4087,7 +4110,7 @@ function gameScene(){
             // v1.33: el personaje contesta EN la ficción (sobre todo en imprevistos)
             // antes de retomar el hilo — corto, natural, como en la vida real
             const rc = o.react ? [o.react, o.reactEs||""]
-                     : (st.twist ? rnd([["Merci !","¡Gracias!"],["Ah, super !","¡Ah, súper!"]]) : null);
+                     : (st.twist ? rnd(EN?[["Thanks!","¡Gracias!"],["Oh, nice!","¡Ah, qué bien!"]]:[["Merci !","¡Gracias!"],["Ah, super !","¡Ah, súper!"]]) : null);
             if(rc){
               npcReact(rc[0], rc[1]);
               if(rc[1]) noteNew(rc[0], rc[1]);
@@ -4214,7 +4237,7 @@ function gameImprov(){
   // dictado por voz opcional: una sola escucha continua para todo el juego
   let recog=null, srOn=false, onHeard=null;
   if(SR){
-    recog=new SR(); recog.lang="fr-FR"; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=1;
+    recog=new SR(); recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=1;
     recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl[0].transcript); };
     recog.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") recog=null; };
     recog.onend=()=>{ srOn=false; };
@@ -4226,7 +4249,7 @@ function gameImprov(){
     const m=ms[mi];
     area.innerHTML=`
       <div class="prompt" style="font-size:1.15rem;">🎬 ${m.t}
-        <span class="sub">misión ${mi+1} de ${ms.length} · Dilo con TUS palabras, en francés — escribe o dicta 🎙️</span>
+        <span class="sub">misión ${mi+1} de ${ms.length} · Dilo con TUS palabras, en ${LENGUA} — escribe o dicta 🎙️</span>
       </div>
       <textarea class="textinput" id="ans" rows="2" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="Improvise en français..."></textarea>
       <div class="btn-row" style="margin-top:10px;">
@@ -4531,7 +4554,7 @@ function gameBuild(){
     const distract=shuffle(allWords.filter(w=>!words.some(x=>norm(x)===norm(w)))).slice(0, Math.min(3, 2+Math.floor(words.length/4)));
     let pos=0, errs=0, done=false;
     area.innerHTML=`<div class="prompt" style="font-size:1.15rem">${q.es}
-        <span class="sub">${q.weak?"🔁 ¡revancha! · ":""}${qi+1} de ${qs.length} · toca las palabras EN ORDEN para armarla en francés · ojo: sobran ${distract.length}</span>
+        <span class="sub">${q.weak?"🔁 ¡revancha! · ":""}${qi+1} de ${qs.length} · toca las palabras EN ORDEN para armarla en ${LENGUA} · ojo: sobran ${distract.length}</span>
         <div style="margin-top:8px"><button class="btn small purple" id="hearB">🔊 Pista de audio</button></div></div>
       <div class="builtline" id="built"></div><div id="chips" style="text-align:center"></div>
       <div class="speakresult" id="bfb"></div>`;
@@ -4632,7 +4655,7 @@ function endSession(){
     : "👆 aquí no hay guardado automático: copia el código para no perder tu progreso";
   show("scr-results");
   if(acc>=.5) confetti();
-  speakFR(acc>=.6?"Magnifique ! Très bien !":"Courage ! À demain !",0.9);
+  speakFR(EN ? (acc>=.6?"Great job!":"Keep going! See you tomorrow!") : (acc>=.6?"Magnifique ! Très bien !":"Courage ! À demain !"),0.9);
 }
 
 /* ================== PANTALLA DE PROGRESO ================== */
@@ -4783,7 +4806,7 @@ function renderMovimiento(){
     queda=`Te faltan: ${faltan.map(f=>f.n+" "+num(f.v)+"/"+num(f.meta)).join(" · ")}.`;
   }
   box.innerHTML=`<div class="card" style="margin-top:12px;">
-    <h3 style="margin-bottom:8px;">Camino al italiano</h3>
+    <h3 style="margin-bottom:8px;">${EN?"Tu avance":"Camino al italiano"}</h3>
     ${mov?`<p style="margin:0 0 8px;">${mov}</p>`:""}
     <p style="margin:0;">${queda}</p>
   </div>`;
@@ -4832,7 +4855,7 @@ $("btnRead").onclick =()=>startSession(["lectura"]);   // 📖 v1.71
 $("btnSongs").onclick=()=>startSession(["songs"]);
 $("btnQuit").onclick =()=>{ stopTimer(); callarACoco(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
-$("mascot").onclick  =()=>{ cocoPose("celebra", 1600); speakFR(rnd(["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
+$("mascot").onclick  =()=>{ cocoPose("celebra", 1600); speakFR(rnd(EN?["Hi!","Hello!","Hey there!","Let's go!","You got this!"]:["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
 $("saveCode").onclick=()=>{
   const code=$("saveCode").textContent;
   (navigator.clipboard? navigator.clipboard.writeText(code) : Promise.reject()).then(
@@ -5494,7 +5517,7 @@ function examSR(){
   let r=null;
   if(SR){
     try{
-      r=new SR(); r.lang="fr-FR"; r.continuous=true; r.interimResults=false; r.maxAlternatives=3;
+      r=new SR(); r.lang=LANG_TAG; r.continuous=true; r.interimResults=false; r.maxAlternatives=3;
       r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(VOZ.onHeard) VOZ.onHeard(rl); };
       r.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ VOZ.sr=null; } };
       r.onend=()=>{ VOZ.srOn=false; };
@@ -5678,7 +5701,7 @@ function examSay(area, cab){
   const q=EXAM.items.say[EXAM.qi];
   const auto = S.prefs.vg!=="self" && !!examSR();
   area.innerHTML=cab+`<div class="prompt" style="font-size:1.25rem;margin-top:6px;">${esc(q.es)}
-      <span class="sub">Dilo en francés — no está escrito a propósito</span></div>
+      <span class="sub">Dilo en ${LENGUA} — no está escrito a propósito</span></div>
     <div class="btn-row" id="exCtl" style="justify-content:center;margin-top:14px;">
       ${auto?'<button class="btn red" id="exMic">🎙️ Grabar</button>':""}
       <button class="linkish" id="exSelf">${auto?"El micrófono no me oye":"Me califico yo"}</button>
@@ -5999,7 +6022,7 @@ $("askInput").addEventListener("keydown", e=>{ if(e.key==="Enter") $("noteAdd").
 $("copyPend").onclick=()=>{
   const pend=S.pending||[];
   if(!pend.length){ toast("El cuaderno está vacío 📓 anota algo primero"); return; }
-  const txt="Tradúceme estas frases al francés para mi app Coco (responde solo las líneas, formato: español = francés):\n"+pend.map(p=>"- "+p).join("\n");
+  const txt="Tradúceme estas frases al "+LENGUA+" para mi app Coco (responde solo las líneas, formato: español = "+LENGUA+"):\n"+pend.map(p=>"- "+p).join("\n");
   (navigator.clipboard? navigator.clipboard.writeText(txt) : Promise.reject()).then(
     ()=>toast("📋 Copiadas — pégaselas a Claude en el chat"),
     ()=>toast("No pude copiar 😅 escríbelas manualmente en el chat")
@@ -6055,7 +6078,7 @@ $("importBtn").onclick=()=>{
     toast(`📥 ${added} frase${added===1?"":"s"} nueva${added===1?"":"s"} en tus lecciones 🎉`);
     cocoSay("¡Cuaderno actualizado! 📓 Tus frases entran a la Mezcla y a tus repasos desde ya.");
   } else {
-    toast("No encontré líneas con formato «español = francés» 🤔");
+    toast("No encontré líneas con formato «español = "+LENGUA+"» 🤔");
   }
 };
 
@@ -6069,6 +6092,7 @@ function paintSettings(){
   set("vgAuto", p.vg!=="self"); set("vgSelf", p.vg==="self");
   set("spNormal", !p.slow); set("spSlow", !!p.slow);
   set("thLight", !p.dark); set("thDark", !!p.dark);
+  set("crsFr", !EN); set("crsEn", EN);
   set("scOpt", !p.free); set("scFree", !!p.free);
   $("vgHint").textContent = p.vg==="self"
     ? "Te escuchas y te calificas tú."
@@ -6112,11 +6136,11 @@ $("micTest").onclick=()=>{
   releaseMic();                          // regla de oro: el oído va solo
   let r, oido=[], err="", termino=false;
   try{ r=new SR(); }catch(e){ linea.push("⛔ No se pudo crear el reconocedor: "+e.message); pinta(); return; }
-  r.lang="fr-FR"; r.continuous=true; r.interimResults=true; r.maxAlternatives=3;
+  r.lang=LANG_TAG; r.continuous=true; r.interimResults=true; r.maxAlternatives=3;
   r.onresult=e=>{ const rl=e.results[e.results.length-1]; if(rl && rl[0]) oido.push(rl[0].transcript); };
   r.onerror=e=>{ err=e.error||"?"; };
   r.onend=()=>{ termino=true; };
-  linea.push("🔴 Habla ahora en francés (o en lo que sea) durante 6 segundos…"); pinta();
+  linea.push("🔴 Habla ahora en "+LENGUA+" (o en lo que sea) durante 6 segundos…"); pinta();
   try{ r.start(); }catch(e){ linea.push("⛔ No arrancó: "+e.message); pinta(); return; }
   setTimeout(()=>{
     try{ r.stop(); }catch(e){}
@@ -6132,8 +6156,8 @@ $("micTest").onclick=()=>{
 };
 $("vgAuto").onclick =()=>{ S.prefs.vg="auto"; store.save(); paintSettings(); };
 $("vgSelf").onclick =()=>{ S.prefs.vg="self"; store.save(); paintSettings(); };
-$("spNormal").onclick=()=>{ S.prefs.slow=false; store.save(); paintSettings(); speakFR("Bonjour !"); };
-$("spSlow").onclick =()=>{ S.prefs.slow=true;  store.save(); paintSettings(); speakFR("Bonjour !"); };
+$("spNormal").onclick=()=>{ S.prefs.slow=false; store.save(); paintSettings(); speakFR(EN?"Hello!":"Bonjour !"); };
+$("spSlow").onclick =()=>{ S.prefs.slow=true;  store.save(); paintSettings(); speakFR(EN?"Hello!":"Bonjour !"); };
 /* 🌙 modo oscuro (📬 buzón directo #2) */
 const ICON_LUNA='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>', ICON_SOL='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 function applyTheme(){
@@ -6145,6 +6169,22 @@ function applyTheme(){
   // la barra del sistema sigue al tema (antes quedaba clara encima del fondo oscuro)
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=noche?"#0F1015":"#F3F5FA";
 }
+/* 🇬🇧 v1.97 — cambiar de curso. Se guarda lo de este curso, se apunta el otro y se
+   recarga: al arrancar se lee la caja del otro idioma. El nombre y el tema viajan
+   (coco_comun) para no volver a preguntar el nombre. */
+function cambiarCurso(c){
+  if(c===CURSO) return;
+  try{
+    store.save();
+    localStorage.setItem("coco_comun", JSON.stringify({nm:S.name||"", dark:!!(S.prefs&&S.prefs.dark)}));
+    localStorage.setItem("coco_curso", c);
+  }catch(e){}
+  location.reload();
+}
+$("crsFr").onclick=()=>cambiarCurso("fr");
+$("crsEn").onclick=()=>cambiarCurso("en");
+$("crsChip").textContent = EN ? "EN" : "FR";
+$("crsChip").onclick=()=>{ $("btnSettings").click(); };
 /* 🌗 v1.89 — Mateo: «que el dark mode se pueda cambiar desde el home, que sea más fácil» */
 $("thToggle").onclick=()=>{ S.prefs.dark=!S.prefs.dark; store.save(); applyTheme(); paintSettings(); };
 $("thLight").onclick=()=>{ S.prefs.dark=false; store.save(); applyTheme(); paintSettings(); };
@@ -6271,6 +6311,8 @@ document.addEventListener("keydown",e=>{
 
 /* ================== ARRANQUE ================== */
 const restored = store.load();
+if(!S.name){ try{ const c=JSON.parse(localStorage.getItem("coco_comun")||"null");
+  if(c && c.nm){ S.name=c.nm; S.prefs=S.prefs||{}; S.prefs.dark=!!c.dark; S.prefs.loro187=1; S.prefs.voz185=1; S.prefs.dia184=1; store.save(); } }catch(e){} }
 /* 🎙️ v1.85: los fallos del oído se cuentan por SESIÓN (antes se arrastraban de un día
    a otro), y UNA vez se rescata a quien quedó atrapado en «Yo me califico» sin
    haberlo escogido — ver vozSoloHoy. */
@@ -6365,6 +6407,7 @@ if(store.rescued){
 (function seedTio(){
   S.prefs=S.prefs||{};
   if(S.prefs.seedTio) return;
+  if(EN){ S.prefs.seedTio=1; store.save(); return; }   // v1.97: son frases en francés
   const added=importLines(
 `quiero practicar contigo = Je veux pratiquer avec toi
 ¿me enseñas? = Tu m'apprends ?
@@ -6395,7 +6438,7 @@ $("saveStatus").textContent = store.ok
   ? "Tu progreso se guarda solo en este teléfono."
   : "Aquí no se guarda solo: usa tu código al terminar.";
 // 🎨 v1.88: «Bonjour, Mateo.» va en grande (pintaSaludo, por reloj); la burbuja acompaña
-if(restored && S.xp>0) cocoSay("¿Cinco minutitos de francés?");
+if(restored && S.xp>0) cocoSay("¿Cinco minutitos de "+LENGUA+"?");
 else cocoSay(rnd(COCO_HOME));
 </script>
 </body>
