@@ -562,6 +562,46 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
 .ajt:first-of-type{margin-top:10px;}
 .card.guardado #btnSafeRestore{margin-top:10px;}
 .ptile .pnum{font-weight:300; font-size:2rem; letter-spacing:-.03em;}
+/* ===== v1.95 — VERSIÓN COMPUTADOR (Mateo: «construyamos la versión desktop») =====
+   Mismo HTML, solo CSS: el celular no cambia. Desde 1000px: las pestañas pasan a una
+   barra lateral, el inicio va a dos columnas (saludo y botones | Coco grande), los
+   juegos en una columna centrada con atajos de teclado visibles, y Progreso/Ajustes
+   en dos columnas. */
+@media (min-width:1000px){
+  #app{max-width:1120px;}
+  body:not([data-scr="scr-game"]):not([data-scr="scr-results"]) #app{padding-left:210px; padding-right:32px;}
+  .tabs{left:max(24px, calc(50% - 560px + 24px)); right:auto; top:118px; bottom:auto; transform:none;
+    width:164px; flex-direction:column; border-radius:28px; padding:8px; gap:2px;}
+  .tabs button{text-align:left; padding:14px 18px; font-size:1rem;}
+  .tabs button:hover{opacity:.85;}
+  /* inicio en dos columnas */
+  .hero{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); column-gap:48px; align-items:center;
+    grid-template-areas:"saludo coco" "bubble coco" "acciones coco" "hopts coco" "ruta ruta"; text-align:left; padding-top:64px;}
+  .hero .figs{max-width:none; left:calc(50% - 89px);}   /* el inicio está corrido 89px por la barra lateral */
+  .hero .mascot{grid-area:coco; justify-self:center; margin:0;}
+  .hero .mascot svg{width:230px !important; height:230px !important;}
+  .saludo{grid-area:saludo; font-size:5.2rem; margin:0 0 12px;}
+  .hero .bubble{grid-area:bubble; margin:0; padding:0; text-align:left; font-size:1.25rem; max-width:none;}
+  .acciones{grid-area:acciones; justify-content:flex-start; margin-top:28px;}
+  .hopts{grid-area:hopts; justify-content:flex-start;}
+  .ruta{grid-area:ruta; margin-top:56px;}
+  .cta:hover,.pill:hover{filter:brightness(1.12);}
+  .hopt:hover{background:var(--soft);}
+  details.plegable>summary:hover{opacity:.7;}
+  /* juegos: una columna cómoda en el centro */
+  #scr-game,#scr-results{width:100%; max-width:720px; margin-inline:auto;}
+  body[data-scr="scr-game"] .topbar,body[data-scr="scr-results"] .topbar{width:100%; max-width:720px; margin-inline:auto;}
+  .prompt{font-size:2.9rem;}
+  #gameArea{counter-reset:opcion;}
+  #gameArea .opt{position:relative; counter-increment:opcion;}
+  #gameArea .opt::before{content:counter(opcion); position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; display:grid; place-items:center; border:1.5px solid var(--soft2); border-radius:7px;
+    font:600 .72rem/1 var(--fm); opacity:.7;}
+  /* Progreso y Ajustes en dos columnas */
+  #scr-progress.active,#scr-settings.active{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start;}
+  #scr-progress .card,#scr-settings .card{margin:0;}
+  #scr-progress>.card:first-child,#scr-settings>.card:first-child{grid-row:span 2;}
+}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -641,7 +681,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.94</div>
+    <div class="footer-note">Coco · v1.95</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -6223,7 +6263,7 @@ window.addEventListener("unhandledrejection", e=>autoBug("Promesa rota: "+String
 document.addEventListener("keydown",e=>{
   if(!$("scr-game").classList.contains("active")) return;
   const n=parseInt(e.key);
-  if(n>=1&&n<=4){
+  if(n>=1&&n<=6){   // v1.95: hasta 6 (el reto 4-5 trae 6 opciones); en computador se ven los números
     const opts=[...document.querySelectorAll("#gameArea .opt, #sceneOpts .opt")];
     if(opts[n-1]) opts[n-1].click();
   }

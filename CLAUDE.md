@@ -92,6 +92,17 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## 🖥️ v1.95 — Versión computador
+Mateo: *«construyamos la versión desktop»*. Solo CSS (`@media (min-width:1000px)`), el celular no cambia (hay prueba).
+- Las pestañas pasan a **barra lateral** a la izquierda (`#tabs` en columna, alineada con el borde del contenido). `#app` deja 210px a la izquierda fuera de juego/resultados.
+- **Inicio en dos columnas** (grid con áreas: saludo/burbuja/acciones/opciones | Coco 230px; la barra «Camino al italiano» abajo a lo ancho). `.figs` a todo el ancho, corrida 89px por la barra lateral.
+- **Juegos y resultados**: columna de 720px centrada (la píldora de arriba también); las opciones muestran su **tecla** (contador CSS `opcion`) y el teclado acepta **1–6** (antes 1–4: el reto 4-5 trae 6 opciones).
+- **Progreso y Ajustes** en dos columnas.
+- Prueba: `v195/desk.mjs` (1440px: barra lateral, dos columnas, sin scroll horizontal, tecla 2 responde; 390px: pestañas abajo).
+
+## 🐻 PENDIENTE — cambiar el animal (oct-2026)
+Mateo: *«el pájaro se parece mucho a Duolingo, hay que cambiar el animal, puede ser un oso o algo así representativo de Colombia»*. Galería con oso de anteojos (recomendado: sus «anteojos» = las o del logotipo), perezoso y tití cabeciblanco, mismas reglas de Coco: https://claude.ai/artifact/VqJTdqr4SSgYqxHUabMeni — esperando su elección. Al cambiarlo: mismas funciones (`_cDibujo`, `cocoCara`, `cocoCuerpo`, `.cpico`), iconos y favicon regenerados, `CACHE` nuevo en `sw.js`.
+
 ## ✂️ v1.94 — Mi progreso, Ajustes y resultados: menos texto
 Siguiendo MENOS ES MÁS. Palabras: Mi progreso 370→~140 · Ajustes 260→~100 · resultados 208→~30.
 - **Resultados**: solo Coco, «¡Bravo!», «5 de 6 bien», «+N PUNTOS», la frase de Coco y «Para repasar» (solo si hubo tropiezos). Fuera las filas por juego/racha/combo y las 3 tarjetas de guardado. Botón «Seguir».
