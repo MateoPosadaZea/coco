@@ -2311,6 +2311,964 @@ const COCO_HOME = [
 ];
 </script>
 <script>
+/* ================== CONTENIDO INGLÉS A1–A2 (v1.97) ==================
+   Misma forma que el francés: `fr` = el idioma que se aprende (aquí, inglés).
+   Si el curso es inglés, al cargar se cambian EN SITIO los arreglos de siempre
+   (THEMES, SCENES, …): todo el motor de juegos sigue igual sin saber de idiomas. */
+// Contenido del curso de inglés (A1→A2) para Coco.
+// Ojo: el campo `fr` guarda el texto en el idioma META (aquí, INGLÉS). `es` = español.
+
+const THEMES_EN = [
+ { id:"greetings", emoji:"👋", name:"Saludos", minLvl:1,
+   vocab:[
+    {fr:"Hi", es:"Hola"},
+    {fr:"Hello", es:"Hola (un poco más formal)"},
+    {fr:"Good morning", es:"Buenos días"},
+    {fr:"Good afternoon", es:"Buenas tardes"},
+    {fr:"Good evening", es:"Buenas noches (al llegar)"},
+    {fr:"Good night", es:"Buenas noches (al despedirse)"},
+    {fr:"Bye", es:"Chao"},
+    {fr:"See you later", es:"Nos vemos"},
+    {fr:"How are you?", es:"¿Cómo estás?"},
+    {fr:"I'm good", es:"Estoy bien"},
+    {fr:"Thanks", es:"Gracias"},
+    {fr:"You're welcome", es:"De nada"},
+   ],
+   speak:[
+    {fr:"Hi, how are you?", es:"Hola, ¿cómo estás?"},
+    {fr:"Good morning! I'm good, thanks.", es:"¡Buenos días! Estoy bien, gracias."},
+    {fr:"Nice to see you again.", es:"Qué bueno verte otra vez."},
+    {fr:"See you tomorrow!", es:"¡Nos vemos mañana!"},
+   ] },
+
+ { id:"introductions", emoji:"🙋", name:"Presentarme", minLvl:1,
+   vocab:[
+    {fr:"My name is...", es:"Me llamo..."},
+    {fr:"Nice to meet you", es:"Mucho gusto"},
+    {fr:"I'm from...", es:"Soy de..."},
+    {fr:"I live in...", es:"Vivo en..."},
+    {fr:"I work in...", es:"Trabajo en..."},
+    {fr:"Designer", es:"Diseñador"},
+    {fr:"Developer", es:"Desarrollador"},
+    {fr:"Company", es:"Empresa"},
+    {fr:"Years old", es:"Años (de edad)"},
+    {fr:"Where are you from?", es:"¿De dónde eres?"},
+    {fr:"What do you do?", es:"¿A qué te dedicas?"},
+    {fr:"And you?", es:"¿Y tú?"},
+   ],
+   speak:[
+    {fr:"Hi, I'm Mateo. Nice to meet you.", es:"Hola, soy Mateo. Mucho gusto."},
+    {fr:"I'm from Colombia. I live in Barranquilla.", es:"Soy de Colombia. Vivo en Barranquilla."},
+    {fr:"I have a small software company.", es:"Tengo una pequeña empresa de software."},
+    {fr:"And you? Where are you from?", es:"¿Y tú? ¿De dónde eres?"},
+   ] },
+
+ { id:"sos", emoji:"🆘", name:"Cuando me quedo en blanco", minLvl:1,
+   vocab:[
+    {fr:"Sorry?", es:"¿Perdón? (no te oí)"},
+    {fr:"Can you repeat that?", es:"¿Puedes repetir?"},
+    {fr:"Slower, please", es:"Más despacio, por favor"},
+    {fr:"I don't understand", es:"No entiendo"},
+    {fr:"How do you say...?", es:"¿Cómo se dice...?"},
+    {fr:"What does it mean?", es:"¿Qué significa?"},
+    {fr:"Just a second", es:"Un segundo"},
+    {fr:"Let me think", es:"Déjame pensar"},
+    {fr:"I'm learning English", es:"Estoy aprendiendo inglés"},
+    {fr:"Can you write it?", es:"¿Me lo puedes escribir?"},
+    {fr:"Got it", es:"Entendido"},
+    {fr:"My English isn't perfect", es:"Mi inglés no es perfecto"},
+   ],
+   speak:[
+    {fr:"Sorry, can you repeat that?", es:"Perdón, ¿puedes repetir?"},
+    {fr:"Slower, please. I'm learning English.", es:"Más despacio, por favor. Estoy aprendiendo inglés."},
+    {fr:"What does that word mean?", es:"¿Qué significa esa palabra?"},
+    {fr:"Let me think for a second.", es:"Déjame pensar un segundo."},
+   ] },
+
+ { id:"cafe", emoji:"☕", name:"Café y restaurante", minLvl:1,
+   vocab:[
+    {fr:"Coffee", es:"Café"},
+    {fr:"Water", es:"Agua"},
+    {fr:"A table for two", es:"Una mesa para dos"},
+    {fr:"The menu", es:"La carta"},
+    {fr:"I'd like...", es:"Quisiera..."},
+    {fr:"To go", es:"Para llevar"},
+    {fr:"For here", es:"Para tomar aquí"},
+    {fr:"The check", es:"La cuenta"},
+    {fr:"Tip", es:"Propina"},
+    {fr:"Delicious", es:"Delicioso"},
+    {fr:"Breakfast", es:"Desayuno"},
+    {fr:"Dinner", es:"Cena"},
+   ],
+   speak:[
+    {fr:"Can I get a coffee, please?", es:"¿Me das un café, por favor?"},
+    {fr:"A table for two, please.", es:"Una mesa para dos, por favor."},
+    {fr:"Can we have the check, please?", es:"¿Nos traes la cuenta, por favor?"},
+    {fr:"This is delicious!", es:"¡Esto está delicioso!"},
+   ] },
+
+ { id:"city", emoji:"🏙️", name:"En la ciudad", minLvl:1,
+   vocab:[
+    {fr:"Where is...?", es:"¿Dónde está...?"},
+    {fr:"Street", es:"Calle"},
+    {fr:"Corner", es:"Esquina"},
+    {fr:"Turn left", es:"Gira a la izquierda"},
+    {fr:"Turn right", es:"Gira a la derecha"},
+    {fr:"Go straight", es:"Sigue derecho"},
+    {fr:"Near", es:"Cerca"},
+    {fr:"Far", es:"Lejos"},
+    {fr:"Subway", es:"Metro"},
+    {fr:"Bus stop", es:"Paradero"},
+    {fr:"Block", es:"Cuadra"},
+    {fr:"Next to", es:"Al lado de"},
+   ],
+   speak:[
+    {fr:"Excuse me, where is the subway?", es:"Disculpa, ¿dónde está el metro?"},
+    {fr:"Is it far from here?", es:"¿Queda lejos de aquí?"},
+    {fr:"Go straight and turn left.", es:"Sigue derecho y gira a la izquierda."},
+    {fr:"It's two blocks from here.", es:"Queda a dos cuadras de aquí."},
+   ] },
+
+ { id:"shopping", emoji:"🛍️", name:"De compras", minLvl:1,
+   vocab:[
+    {fr:"How much is it?", es:"¿Cuánto cuesta?"},
+    {fr:"Expensive", es:"Caro"},
+    {fr:"Cheap", es:"Barato"},
+    {fr:"Size", es:"Talla"},
+    {fr:"Can I try it on?", es:"¿Me lo puedo medir?"},
+    {fr:"Cash", es:"Efectivo"},
+    {fr:"Card", es:"Tarjeta"},
+    {fr:"Receipt", es:"Recibo"},
+    {fr:"On sale", es:"En oferta"},
+    {fr:"I'm just looking", es:"Solo estoy mirando"},
+    {fr:"Bag", es:"Bolsa"},
+    {fr:"Do you have...?", es:"¿Tienes...?"},
+   ],
+   speak:[
+    {fr:"How much is this shirt?", es:"¿Cuánto cuesta esta camisa?"},
+    {fr:"Can I pay with card?", es:"¿Puedo pagar con tarjeta?"},
+    {fr:"I'm just looking, thanks.", es:"Solo estoy mirando, gracias."},
+    {fr:"Do you have it in a medium?", es:"¿La tienes en talla M?"},
+   ] },
+
+ { id:"travel", emoji:"✈️", name:"Aeropuerto y hotel", minLvl:1,
+   vocab:[
+    {fr:"Passport", es:"Pasaporte"},
+    {fr:"Flight", es:"Vuelo"},
+    {fr:"Gate", es:"Puerta de embarque"},
+    {fr:"Boarding pass", es:"Pase de abordar"},
+    {fr:"Luggage", es:"Equipaje"},
+    {fr:"Window seat", es:"Puesto en la ventana"},
+    {fr:"Aisle seat", es:"Puesto en el pasillo"},
+    {fr:"Reservation", es:"Reserva"},
+    {fr:"Room", es:"Habitación"},
+    {fr:"Check-in", es:"Registro (llegada)"},
+    {fr:"Key", es:"Llave"},
+    {fr:"Delayed", es:"Retrasado"},
+   ],
+   speak:[
+    {fr:"Here is my passport.", es:"Aquí está mi pasaporte."},
+    {fr:"I have a reservation under Mateo.", es:"Tengo una reserva a nombre de Mateo."},
+    {fr:"What time is boarding?", es:"¿A qué hora es el abordaje?"},
+    {fr:"Is my flight delayed?", es:"¿Mi vuelo está retrasado?"},
+   ] },
+
+ { id:"feelings", emoji:"💛", name:"Cómo estoy de verdad", minLvl:1,
+   vocab:[
+    {fr:"Happy", es:"Feliz"},
+    {fr:"Tired", es:"Cansado"},
+    {fr:"Stressed", es:"Estresado"},
+    {fr:"Relaxed", es:"Relajado"},
+    {fr:"Excited", es:"Emocionado, con ganas (no es «excitado»)"},
+    {fr:"Nervous", es:"Nervioso"},
+    {fr:"Bored", es:"Aburrido"},
+    {fr:"Hungry", es:"Con hambre"},
+    {fr:"Proud", es:"Orgulloso"},
+    {fr:"Sad", es:"Triste"},
+    {fr:"Calm", es:"Tranquilo"},
+    {fr:"I feel...", es:"Me siento..."},
+   ],
+   speak:[
+    {fr:"Honestly, I'm a little tired today.", es:"La verdad, hoy estoy un poco cansado."},
+    {fr:"I'm excited about the weekend.", es:"Estoy emocionado por el fin de semana."},
+    {fr:"I feel calm and happy.", es:"Me siento tranquilo y feliz."},
+    {fr:"I'm proud of my team.", es:"Estoy orgulloso de mi equipo."},
+   ] },
+
+ { id:"daily", emoji:"🌅", name:"Vida diaria", minLvl:2,
+   vocab:[
+    {fr:"Wake up", es:"Despertarse"},
+    {fr:"Get up", es:"Levantarse"},
+    {fr:"Take a shower", es:"Bañarse"},
+    {fr:"Have breakfast", es:"Desayunar"},
+    {fr:"Go to work", es:"Ir a trabajar"},
+    {fr:"Work out", es:"Hacer ejercicio"},
+    {fr:"Cook", es:"Cocinar"},
+    {fr:"Take a nap", es:"Hacer una siesta"},
+    {fr:"Go to bed", es:"Acostarse"},
+    {fr:"Every day", es:"Todos los días"},
+    {fr:"In the morning", es:"Por la mañana"},
+    {fr:"At night", es:"Por la noche"},
+   ],
+   speak:[
+    {fr:"I wake up at six every day.", es:"Me despierto a las seis todos los días."},
+    {fr:"I work out in the morning.", es:"Hago ejercicio por la mañana."},
+    {fr:"After work, I cook dinner.", es:"Después del trabajo, cocino la cena."},
+    {fr:"I go to bed at eleven.", es:"Me acuesto a las once."},
+   ] },
+
+ { id:"likes", emoji:"⚽", name:"Lo que me gusta", minLvl:2,
+   vocab:[
+    {fr:"Soccer", es:"Fútbol (en EE. UU. «football» es otro deporte)"},
+    {fr:"Boxing", es:"Boxeo"},
+    {fr:"TV show", es:"Serie"},
+    {fr:"Movie", es:"Película"},
+    {fr:"Music", es:"Música"},
+    {fr:"Book", es:"Libro"},
+    {fr:"Beach", es:"Playa"},
+    {fr:"Game", es:"Partido"},
+    {fr:"Fan", es:"Hincha"},
+    {fr:"Favorite", es:"Favorito"},
+    {fr:"I love...", es:"Me encanta..."},
+    {fr:"I can't stand...", es:"No soporto..."},
+   ],
+   speak:[
+    {fr:"I love soccer and boxing.", es:"Me encantan el fútbol y el boxeo."},
+    {fr:"I'm watching Mad Men. It's amazing.", es:"Estoy viendo Mad Men. Es buenísima."},
+    {fr:"What kind of music do you like?", es:"¿Qué tipo de música te gusta?"},
+    {fr:"My favorite place is the beach.", es:"Mi lugar favorito es la playa."},
+   ] },
+
+ { id:"home", emoji:"🏠", name:"Casa, familia y mascota", minLvl:2,
+   vocab:[
+    {fr:"House", es:"Casa"},
+    {fr:"Apartment", es:"Apartamento"},
+    {fr:"Family", es:"Familia"},
+    {fr:"Parents", es:"Papás (no es «parientes»)"},
+    {fr:"Mom", es:"Mamá"},
+    {fr:"Dad", es:"Papá"},
+    {fr:"Brother", es:"Hermano"},
+    {fr:"Sister", es:"Hermana"},
+    {fr:"Cat", es:"Gato / gata"},
+    {fr:"Pet", es:"Mascota"},
+    {fr:"Neighbor", es:"Vecino"},
+    {fr:"Kitchen", es:"Cocina"},
+   ],
+   speak:[
+    {fr:"I have a cat. Her name is Cliff.", es:"Tengo una gata. Se llama Cliff."},
+    {fr:"I love spending time with my parents.", es:"Me encanta pasar tiempo con mis papás."},
+    {fr:"My family is very important to me.", es:"Mi familia es muy importante para mí."},
+    {fr:"My apartment is small, but it's cool.", es:"Mi apartamento es pequeño, pero es chévere."},
+   ] },
+
+ { id:"work", emoji:"💼", name:"El trabajo", minLvl:2,
+   vocab:[
+    {fr:"Meeting", es:"Reunión"},
+    {fr:"Deadline", es:"Fecha límite"},
+    {fr:"Client", es:"Cliente"},
+    {fr:"Team", es:"Equipo"},
+    {fr:"Email", es:"Correo"},
+    {fr:"Project", es:"Proyecto"},
+    {fr:"Boss", es:"Jefe"},
+    {fr:"Call", es:"Llamada"},
+    {fr:"Budget", es:"Presupuesto"},
+    {fr:"Feedback", es:"Comentarios, retroalimentación"},
+    {fr:"Schedule", es:"Agenda, horario"},
+    {fr:"I'm busy", es:"Estoy ocupado"},
+   ],
+   speak:[
+    {fr:"I have a meeting at ten.", es:"Tengo una reunión a las diez."},
+    {fr:"Can we move the call to tomorrow?", es:"¿Podemos pasar la llamada para mañana?"},
+    {fr:"I'll send you an email today.", es:"Hoy te mando un correo."},
+    {fr:"The project is going well.", es:"El proyecto va bien."},
+   ] },
+
+ { id:"body", emoji:"🩺", name:"Cuerpo y salud", minLvl:2,
+   vocab:[
+    {fr:"Head", es:"Cabeza"},
+    {fr:"Stomach", es:"Estómago"},
+    {fr:"Back", es:"Espalda"},
+    {fr:"Throat", es:"Garganta"},
+    {fr:"Headache", es:"Dolor de cabeza"},
+    {fr:"Fever", es:"Fiebre"},
+    {fr:"A cold", es:"Un resfriado"},
+    {fr:"Pharmacy", es:"Farmacia"},
+    {fr:"Medicine", es:"Medicina"},
+    {fr:"Doctor", es:"Médico"},
+    {fr:"It hurts", es:"Me duele"},
+    {fr:"Sunscreen", es:"Bloqueador solar"},
+   ],
+   speak:[
+    {fr:"I have a headache.", es:"Me duele la cabeza."},
+    {fr:"My back hurts.", es:"Me duele la espalda."},
+    {fr:"Where is the nearest pharmacy?", es:"¿Dónde está la farmacia más cercana?"},
+    {fr:"I need something for a cold.", es:"Necesito algo para el resfriado."},
+   ] },
+
+ { id:"opinions", emoji:"💬", name:"Opinar", minLvl:3,
+   vocab:[
+    {fr:"I think...", es:"Creo que..."},
+    {fr:"In my opinion", es:"En mi opinión"},
+    {fr:"I agree", es:"Estoy de acuerdo"},
+    {fr:"I disagree", es:"No estoy de acuerdo"},
+    {fr:"Maybe", es:"Tal vez"},
+    {fr:"Of course", es:"Claro"},
+    {fr:"It depends", es:"Depende"},
+    {fr:"I'm not sure", es:"No estoy seguro"},
+    {fr:"Good point", es:"Buen punto"},
+    {fr:"Exactly", es:"Exacto"},
+    {fr:"To be honest", es:"Para ser honesto"},
+    {fr:"Actually", es:"En realidad (no es «actualmente»)"},
+   ],
+   speak:[
+    {fr:"I think you're right.", es:"Creo que tienes razón."},
+    {fr:"To be honest, I'm not sure.", es:"Para ser honesto, no estoy seguro."},
+    {fr:"It depends on the price.", es:"Depende del precio."},
+    {fr:"Good point. I agree.", es:"Buen punto. Estoy de acuerdo."},
+   ] },
+
+ { id:"connectors", emoji:"🔗", name:"Conectores", minLvl:3,
+   vocab:[
+    {fr:"And", es:"Y"},
+    {fr:"But", es:"Pero"},
+    {fr:"Because", es:"Porque"},
+    {fr:"So", es:"Así que"},
+    {fr:"Then", es:"Luego"},
+    {fr:"Also", es:"También"},
+    {fr:"Or", es:"O"},
+    {fr:"If", es:"Si"},
+    {fr:"When", es:"Cuando"},
+    {fr:"After", es:"Después de"},
+    {fr:"Before", es:"Antes de"},
+    {fr:"Anyway", es:"En fin, bueno"},
+   ],
+   speak:[
+    {fr:"I'm tired, but I'm happy.", es:"Estoy cansado, pero estoy feliz."},
+    {fr:"I'm learning English because I love to travel.", es:"Estoy aprendiendo inglés porque me encanta viajar."},
+    {fr:"It's hot, so let's go to the beach.", es:"Hace calor, así que vamos a la playa."},
+    {fr:"First coffee, then work.", es:"Primero café, luego trabajo."},
+   ] },
+
+ { id:"time", emoji:"⏰", name:"Tiempo y frecuencia", minLvl:3,
+   vocab:[
+    {fr:"Today", es:"Hoy"},
+    {fr:"Tomorrow", es:"Mañana"},
+    {fr:"Yesterday", es:"Ayer"},
+    {fr:"Now", es:"Ahora"},
+    {fr:"Later", es:"Más tarde"},
+    {fr:"Always", es:"Siempre"},
+    {fr:"Usually", es:"Normalmente"},
+    {fr:"Sometimes", es:"A veces"},
+    {fr:"Never", es:"Nunca"},
+    {fr:"Once a week", es:"Una vez por semana"},
+    {fr:"Weekend", es:"Fin de semana"},
+    {fr:"What time is it?", es:"¿Qué hora es?"},
+   ],
+   speak:[
+    {fr:"What time is it?", es:"¿Qué hora es?"},
+    {fr:"I usually work out in the morning.", es:"Normalmente hago ejercicio por la mañana."},
+    {fr:"I never work on Sundays.", es:"Nunca trabajo los domingos."},
+    {fr:"See you this weekend!", es:"¡Nos vemos este fin de semana!"},
+   ] },
+];
+
+const SCENES_EN = [
+ {
+  id:"coffee-shop", themes:["cafe","daily"], title:"☕ En una cafetería de Nueva York", npc:"🧑‍🍳", npcName:"The barista",
+  vars:{
+   drink:[{fr:"coffee",es:"café"},{fr:"latte",es:"latte"},{fr:"cappuccino",es:"capuchino"},{fr:"cold brew",es:"café frío"}],
+   size:[{fr:"small",es:"pequeño"},{fr:"medium",es:"mediano"},{fr:"large",es:"grande"}],
+  },
+  steps:[
+   {npc:"Hi! What can I get you?", npcEs:"¡Hola! ¿Qué te sirvo?",
+    options:[
+     {fr:"Can I get a {drink}, please?", es:"¿Me das un {drink}, por favor?", ok:true, react:"Sure thing!", reactEs:"¡Claro!"},
+     {fr:"The check, please", es:"La cuenta, por favor", ok:false, why:"¡Todavía no has pedido nada! 😅"},
+     {fr:"Good night!", es:"¡Buenas noches! (al despedirse)", ok:false, why:"¡Acabas de llegar! 😂"},
+    ]},
+   {npc:"What size?", npcEs:"¿De qué tamaño?",
+    options:[
+     {fr:"A {size} one, please", es:"Uno {size}, por favor", ok:true, react:"Perfect.", reactEs:"Perfecto."},
+     {fr:"I'm from Colombia", es:"Soy de Colombia", ok:false, why:"Lindo dato, pero te preguntó el tamaño 😄"},
+     {fr:"Yes, I'm tired", es:"Sí, estoy cansado", ok:false, why:"Justo por eso pides café, pero primero el tamaño ☕"},
+    ]},
+   {npc:"For here or to go?", npcEs:"¿Para tomar aquí o para llevar?",
+    options:[
+     {fr:"To go, please", es:"Para llevar, por favor", ok:true, react:"You got it.", reactEs:"Listo."},
+     {fr:"For here, thanks", es:"Para tomar aquí, gracias", ok:true, react:"Great, have a seat.", reactEs:"Genial, siéntate."},
+     {fr:"Turn left", es:"Gira a la izquierda", ok:false, why:"Eso es para dar direcciones, no para pedir café 🧭"},
+    ]},
+   {npc:"Can I get a name for the order?", npcEs:"¿Me das un nombre para el pedido?",
+    options:[
+     {fr:"It's Mateo", es:"Es Mateo", ok:true, react:"Got it, Mateo!", reactEs:"¡Anotado, Mateo!"},
+     {fr:"I'm thirty years old", es:"Tengo treinta años", ok:false, why:"Te pidió el nombre, no la edad 😄"},
+     {fr:"No, thank you", es:"No, gracias", ok:false, why:"Tranquilo, no te está coqueteando: es para gritarlo cuando esté listo 😂"},
+    ]},
+   {id:"pay", npc:"That's five dollars.", npcEs:"Son cinco dólares.",
+    options:[
+     {fr:"Can I pay with card?", es:"¿Puedo pagar con tarjeta?", ok:true, react:"Of course! Just tap here.", reactEs:"¡Claro! Acerca la tarjeta aquí."},
+     {fr:"Here you go", es:"Aquí tienes", ok:true, react:"Thanks!", reactEs:"¡Gracias!"},
+     {fr:"That's too expensive, bye!", es:"¡Muy caro, chao!", ok:false, why:"Cinco dólares por un café en Nueva York es casi una ganga 😅"},
+    ]},
+   {npc:"Here's your {drink}. Enjoy!", npcEs:"Aquí está tu {drink}. ¡Que lo disfrutes!",
+    options:[
+     {fr:"Thank you so much!", es:"¡Muchas gracias!", ok:true, react:"Have a great day!", reactEs:"¡Que tengas un gran día!"},
+     {fr:"Thanks, you too!", es:"¡Gracias, igualmente!", ok:true, react:"Ha, thanks!", reactEs:"¡Ja, gracias!", alt:"Clásico: a todos se nos sale el «you too» 😄"},
+     {fr:"Nice to meet you", es:"Mucho gusto", ok:false, why:"Ya se conocían desde hace tres minutos 😄"},
+    ]},
+  ],
+ },
+
+ {
+  id:"party", themes:["introductions","likes"], title:"🎉 En una fiesta en Miami", npc:"🧑", npcName:"Sam",
+  vars:{
+   hobby:[{fr:"soccer",es:"el fútbol"},{fr:"boxing",es:"el boxeo"},{fr:"live music",es:"la música en vivo"},{fr:"the beach",es:"la playa"}],
+   drink2:[{fr:"a lemonade",es:"una limonada"},{fr:"a beer",es:"una cerveza"},{fr:"some water",es:"agua"}],
+  },
+  steps:[
+   {npc:"Hey! I don't think we've met. I'm Sam.", npcEs:"¡Hola! Creo que no nos conocemos. Soy Sam.",
+    options:[
+     {fr:"Hi Sam, I'm Mateo. Nice to meet you!", es:"Hola, Sam, soy Mateo. ¡Mucho gusto!", ok:true, react:"Nice to meet you too, Mateo!", reactEs:"¡Igualmente, Mateo!"},
+     {fr:"I'm fine, thanks", es:"Estoy bien, gracias", ok:false, why:"Te dijo su nombre, no te preguntó cómo estás 😄"},
+     {fr:"Goodbye, Sam!", es:"¡Adiós, Sam!", ok:false, why:"¡Apenas te saludó y ya te vas! 🏃"},
+    ]},
+   {npc:"So, where are you from?", npcEs:"Y, ¿de dónde eres?",
+    options:[
+     {fr:"I'm from Colombia, from Barranquilla.", es:"Soy de Colombia, de Barranquilla.", ok:true, react:"Oh, nice! I hear it's really hot there.", reactEs:"¡Qué bien! Dicen que allá hace mucho calor."},
+     {fr:"I'm twenty-five", es:"Tengo veinticinco", ok:false, why:"Eso es la edad; te preguntó de dónde eres 🌎"},
+     {fr:"At nine o'clock", es:"A las nueve", ok:false, why:"Eso es una hora, no un lugar ⏰"},
+    ]},
+   {npc:"Ha, it's hot here too! What do you do?", npcEs:"¡Ja, aquí también hace calor! ¿A qué te dedicas?",
+    options:[
+     {fr:"I have a software company.", es:"Tengo una empresa de software.", ok:true, react:"That's so cool!", reactEs:"¡Qué chévere!"},
+     {fr:"I'm a designer. I love my job.", es:"Soy diseñador. Me encanta mi trabajo.", ok:true, react:"That's awesome!", reactEs:"¡Qué bacano!"},
+     {fr:"I'm doing well", es:"Me va bien", ok:false, why:"«What do you do?» pregunta tu trabajo, no cómo estás 💼"},
+    ]},
+   {npc:"What do you like to do for fun?", npcEs:"¿Qué te gusta hacer en tu tiempo libre?",
+    options:[
+     {fr:"I love {hobby}.", es:"Me encanta {hobby}.", ok:true, react:"Me too! We should hang out sometime.", reactEs:"¡A mí también! Deberíamos salir un día."},
+     {fr:"My name is Mateo", es:"Me llamo Mateo", ok:false, why:"Eso ya se lo dijiste al principio 😉"},
+     {fr:"It's on the left", es:"Queda a la izquierda", ok:false, why:"Nadie te preguntó dónde queda algo 🧭😂"},
+    ]},
+   {npc:"Can I get you something to drink?", npcEs:"¿Te traigo algo de tomar?",
+    options:[
+     {fr:"Yes, {drink2}, please.", es:"Sí, {drink2}, por favor.", ok:true, react:"Coming right up!", reactEs:"¡Ya te lo traigo!"},
+     {fr:"No, thanks. I'm good.", es:"No, gracias. Estoy bien.", ok:true, react:"Okay, no problem!", reactEs:"¡Bueno, no hay problema!"},
+     {fr:"Yes, a table for two", es:"Sí, una mesa para dos", ok:false, why:"Estás en una fiesta, no en un restaurante 😂"},
+    ]},
+   {npc:"It was great talking to you!", npcEs:"¡Qué bueno hablar contigo!",
+    options:[
+     {fr:"You too! See you around.", es:"¡Igualmente! Nos vemos.", ok:true, react:"See you!", reactEs:"¡Nos vemos!"},
+     {fr:"Same here! Let's keep in touch.", es:"¡Igual yo! Sigamos en contacto.", ok:true, react:"Definitely!", reactEs:"¡Claro que sí!"},
+     {fr:"Excuse me, where is the subway?", es:"Disculpa, ¿dónde está el metro?", ok:false, why:"Sam se está despidiendo, no es el mapa del metro 🚇😄"},
+    ]},
+  ],
+ },
+
+ {
+  id:"airport", themes:["travel"], title:"✈️ Check-in en el aeropuerto", npc:"🧑‍💼", npcName:"The agent",
+  vars:{
+   dest:[{fr:"Lisbon",es:"Lisboa"},{fr:"New York",es:"Nueva York"},{fr:"Madrid",es:"Madrid"},{fr:"Miami",es:"Miami"}],
+   seat:[{fr:"a window seat",es:"un puesto en la ventana"},{fr:"an aisle seat",es:"un puesto en el pasillo"}],
+  },
+  steps:[
+   {npc:"Good morning! Where are you flying today?", npcEs:"¡Buenos días! ¿A dónde vuela hoy?",
+    options:[
+     {fr:"To {dest}.", es:"A {dest}.", ok:true, react:"Great choice!", reactEs:"¡Buena elección!"},
+     {fr:"Two coffees, please", es:"Dos cafés, por favor", ok:false, why:"Esto es el mostrador de la aerolínea, no la cafetería ☕😄"},
+     {fr:"I'm flying very happy", es:"Vuelo muy feliz", ok:false, why:"Qué buena energía, pero te preguntó el destino 🌎"},
+    ]},
+   {npc:"Can I see your passport, please?", npcEs:"¿Me muestra su pasaporte, por favor?",
+    options:[
+     {fr:"Sure, here you go.", es:"Claro, aquí tiene.", ok:true, react:"Thank you.", reactEs:"Gracias."},
+     {fr:"Here is my passport.", es:"Aquí está mi pasaporte.", ok:true, react:"Thanks. One moment.", reactEs:"Gracias. Un momento."},
+     {fr:"No, it's a secret", es:"No, es un secreto", ok:false, why:"Sin pasaporte no hay viaje, ¡ni secretos! 🛂😂"},
+    ]},
+   {npc:"Are you checking any bags?", npcEs:"¿Va a documentar maletas?",
+    options:[
+     {fr:"Yes, just one bag.", es:"Sí, solo una maleta.", ok:true, react:"Okay, please put it here.", reactEs:"Bueno, póngala aquí, por favor."},
+     {fr:"No, only a carry-on.", es:"No, solo equipaje de mano.", ok:true, react:"Perfect.", reactEs:"Perfecto."},
+     {fr:"I'm checking my phone", es:"Estoy revisando mi celular", ok:false, why:"«Check» aquí es documentar maletas; el celular no cuenta 📱😄"},
+    ]},
+   {npc:"Window or aisle?", npcEs:"¿Ventana o pasillo?",
+    options:[
+     {fr:"I'd like {seat}, please.", es:"Quisiera {seat}, por favor.", ok:true, react:"No problem.", reactEs:"No hay problema."},
+     {fr:"The menu, please", es:"La carta, por favor", ok:false, why:"El menú viene en el avión, si hay suerte 🥨"},
+     {fr:"Left, then right", es:"Izquierda, luego derecha", ok:false, why:"Eso suena a indicaciones de calle, no a puesto 🧭"},
+    ]},
+   {npc:"Your flight is delayed thirty minutes. Sorry about that.", npcEs:"Su vuelo está retrasado treinta minutos. Disculpe.",
+    options:[
+     {fr:"No problem. What time is boarding now?", es:"No hay problema. ¿A qué hora es el abordaje ahora?", ok:true, react:"Boarding is at ten fifteen, at gate twelve.", reactEs:"El abordaje es a las diez y quince, en la puerta doce."},
+     {fr:"That's okay. Thanks for letting me know.", es:"Está bien. Gracias por avisarme.", ok:true, react:"Thank you for understanding.", reactEs:"Gracias por su comprensión."},
+     {fr:"Congratulations!", es:"¡Felicitaciones!", ok:false, why:"¿Felicitar por un retraso? Bueno, al menos eres optimista 😅"},
+    ]},
+   {npc:"Here's your boarding pass. Have a nice flight!", npcEs:"Aquí está su pase de abordar. ¡Buen vuelo!",
+    options:[
+     {fr:"Thank you! Have a great day.", es:"¡Gracias! Que tenga un gran día.", ok:true, react:"You too!", reactEs:"¡Igualmente!"},
+     {fr:"How much is it?", es:"¿Cuánto cuesta?", ok:false, why:"El pase de abordar ya viene con el tiquete 🎫"},
+     {fr:"Nice to meet you, I'm a pilot", es:"Mucho gusto, soy piloto", ok:false, why:"¿Ah, sí? Entonces la puerta es la de la cabina 😂✈️"},
+    ]},
+  ],
+ },
+
+ {
+  id:"hotel", themes:["travel","sos"], title:"🏨 En la recepción del hotel", npc:"🛎️", npcName:"The receptionist",
+  vars:{
+   nights:[{fr:"two nights",es:"dos noches"},{fr:"three nights",es:"tres noches"},{fr:"a week",es:"una semana"}],
+   need:[{fr:"a towel",es:"una toalla"},{fr:"the Wi-Fi password",es:"la clave del wifi"},{fr:"an extra pillow",es:"una almohada extra"}],
+  },
+  steps:[
+   {npc:"Good evening! Welcome. How can I help you?", npcEs:"¡Buenas noches! Bienvenido. ¿En qué le puedo ayudar?",
+    options:[
+     {fr:"Hi, I have a reservation under Mateo.", es:"Hola, tengo una reserva a nombre de Mateo.", ok:true, react:"Let me check... Yes, here it is.", reactEs:"Déjeme revisar... Sí, aquí está."},
+     {fr:"Good night!", es:"¡Buenas noches! (al despedirse)", ok:false, why:"«Good night» es para despedirse; ¡acabas de llegar! 🌙"},
+     {fr:"Where is the beach?", es:"¿Dónde está la playa?", ok:false, why:"Primero la habitación, luego la playa 🏖️"},
+    ]},
+   {id:"stay", npc:"You're staying for {nights}, right?", npcEs:"Se queda {nights}, ¿cierto?",
+    options:[
+     {fr:"Yes, that's right.", es:"Sí, así es.", ok:true, react:"Perfect.", reactEs:"Perfecto."},
+     {fr:"Sorry, can you repeat that?", es:"Perdón, ¿puede repetir?", ok:true, react:"Sure! {nights}, right?", reactEs:"¡Claro! {nights}, ¿cierto?", alt:"Pedir que repitan es de expertos 👌"},
+     {fr:"No, I'm from Colombia", es:"No, soy de Colombia", ok:false, why:"Te preguntó cuántas noches, no de dónde eres 😄"},
+    ]},
+   {npc:"Can I see an ID and a credit card?", npcEs:"¿Me muestra un documento y una tarjeta de crédito?",
+    options:[
+     {fr:"Sure, here you go.", es:"Claro, aquí tiene.", ok:true, react:"Thank you.", reactEs:"Gracias."},
+     {fr:"Can I pay in cash?", es:"¿Puedo pagar en efectivo?", ok:true, react:"Of course, you can pay at checkout.", reactEs:"Claro, puede pagar al salir."},
+     {fr:"My cat's name is Cliff", es:"Mi gata se llama Cliff", ok:false, why:"Cliff es encantadora, pero no es un documento 🐱"},
+    ]},
+   {npc:"Your room is on the third floor. Here's your key.", npcEs:"Su habitación está en el tercer piso. Aquí está su llave.",
+    options:[
+     {fr:"Thank you! What time is breakfast?", es:"¡Gracias! ¿A qué hora es el desayuno?", ok:true, react:"Breakfast is from seven to ten.", reactEs:"El desayuno es de siete a diez."},
+     {fr:"Is there an elevator?", es:"¿Hay ascensor?", ok:true, react:"Yes, it's right behind you.", reactEs:"Sí, está justo detrás de usted."},
+     {fr:"The check, please", es:"La cuenta, por favor", ok:false, why:"¡Todavía ni has dormido aquí! 😂"},
+    ]},
+   {npc:"Is there anything else you need?", npcEs:"¿Necesita algo más?",
+    options:[
+     {fr:"Yes, can I get {need}, please?", es:"Sí, ¿me da {need}, por favor?", ok:true, react:"Of course, right away.", reactEs:"Claro, de inmediato."},
+     {fr:"No, I'm good. Thanks!", es:"No, estoy bien. ¡Gracias!", ok:true, react:"Enjoy your stay!", reactEs:"¡Disfrute su estadía!"},
+     {fr:"Yes, I need a nap", es:"Sí, necesito una siesta", ok:false, why:"Eso lo resuelves tú solito en la habitación 😴"},
+    ]},
+  ],
+ },
+
+ {
+  id:"client-call", themes:["work","sos"], title:"💻 Videollamada con una clienta", npc:"👩‍💼", npcName:"Jessica (client)",
+  vars:{
+   day:[{fr:"Monday",es:"el lunes"},{fr:"Wednesday",es:"el miércoles"},{fr:"Friday",es:"el viernes"}],
+   part:[{fr:"the design",es:"el diseño"},{fr:"the new app",es:"la nueva app"},{fr:"the website",es:"la página web"}],
+  },
+  steps:[
+   {npc:"Hi Mateo! Can you hear me okay?", npcEs:"¡Hola, Mateo! ¿Me escuchas bien?",
+    options:[
+     {fr:"Yes, I can hear you perfectly.", es:"Sí, te escucho perfecto.", ok:true, react:"Great! Let's get started.", reactEs:"¡Genial! Empecemos."},
+     {fr:"Sorry, you're breaking up a little.", es:"Perdón, se te corta un poco.", ok:true, react:"Oh, let me move closer to the router. Better?", reactEs:"Ay, déjame acercarme al router. ¿Mejor?", alt:"Clásico de toda videollamada 📶"},
+     {fr:"Yes, I'm hungry", es:"Sí, tengo hambre", ok:false, why:"Te preguntó si la escuchas, no si almorzaste 🍽️😄"},
+    ]},
+   {npc:"So, how's {part} going?", npcEs:"Bueno, ¿cómo va {part}?",
+    options:[
+     {fr:"It's going well. We're almost done.", es:"Va bien. Ya casi terminamos.", ok:true, react:"That's great to hear!", reactEs:"¡Qué bueno saberlo!"},
+     {fr:"Good, but we need a little more time.", es:"Bien, pero necesitamos un poco más de tiempo.", ok:true, react:"Okay, I understand.", reactEs:"Bueno, entiendo.", alt:"Ser honesto con los tiempos también es ser profesional 👍"},
+     {fr:"It's two blocks from here", es:"Queda a dos cuadras de aquí", ok:false, why:"No te preguntó dónde queda, sino cómo va 😄"},
+    ]},
+   {npc:"When can you send it?", npcEs:"¿Cuándo nos lo puedes enviar?",
+    options:[
+     {fr:"We can send it by {day}.", es:"Lo podemos enviar para {day}.", ok:true, react:"Perfect, {day} works for us.", reactEs:"Perfecto, {day} nos sirve."},
+     {fr:"Yesterday", es:"Ayer", ok:false, why:"Si fue ayer, ¿dónde está? 😂"},
+     {fr:"In my opinion, yes", es:"En mi opinión, sí", ok:false, why:"Te preguntó cuándo, no si estás de acuerdo 📅"},
+    ]},
+   {npc:"Also, the budget is a little tight this month.", npcEs:"Además, el presupuesto está un poco apretado este mes.",
+    options:[
+     {fr:"I understand. Let's talk about options.", es:"Entiendo. Hablemos de opciones.", ok:true, react:"Thanks, I appreciate that.", reactEs:"Gracias, te lo agradezco."},
+     {fr:"Sorry, can you say that more slowly?", es:"Perdón, ¿lo puedes decir más despacio?", ok:true, react:"Sure. The budget... is a little tight.", reactEs:"Claro. El presupuesto... está un poco apretado."},
+     {fr:"Great, congratulations!", es:"¡Genial, felicitaciones!", ok:false, why:"Un presupuesto apretado no se celebra 😅💸"},
+    ]},
+   {npc:"Any questions for me?", npcEs:"¿Alguna pregunta?",
+    options:[
+     {fr:"Yes, who gives the final feedback?", es:"Sí, ¿quién da los comentarios finales?", ok:true, react:"That's me. I'll send it by email.", reactEs:"Esa soy yo. Te los mando por correo."},
+     {fr:"No, everything is clear. Thanks!", es:"No, todo está claro. ¡Gracias!", ok:true, react:"Perfect!", reactEs:"¡Perfecto!"},
+     {fr:"What time is it in Paris?", es:"¿Qué hora es en París?", ok:false, why:"Curioso, pero no tiene nada que ver con el proyecto 🗼😄"},
+    ]},
+   {npc:"Great meeting! Talk soon.", npcEs:"¡Buena reunión! Hablamos pronto.",
+    options:[
+     {fr:"Thanks, Jessica. Have a great day!", es:"Gracias, Jessica. ¡Que tengas un gran día!", ok:true, react:"You too, bye!", reactEs:"¡Igualmente, chao!"},
+     {fr:"Good morning!", es:"¡Buenos días!", ok:false, why:"Eso es para saludar; ya se están despidiendo 👋"},
+     {fr:"Can I try it on?", es:"¿Me lo puedo medir?", ok:false, why:"¡Es una videollamada, no una tienda de ropa! 👕😂"},
+    ]},
+  ],
+ },
+
+ {
+  id:"directions", themes:["city","sos"], title:"🗺️ Perdido en Londres", npc:"🧔", npcName:"A local",
+  vars:{
+   place:[{fr:"the subway",es:"el metro"},{fr:"the museum",es:"el museo"},{fr:"the train station",es:"la estación de tren"}],
+   dir:[{fr:"left",es:"a la izquierda"},{fr:"right",es:"a la derecha"}],
+  },
+  steps:[
+   {npc:"Hi! You look a little lost. Can I help?", npcEs:"¡Hola! Te ves un poco perdido. ¿Te ayudo?",
+    options:[
+     {fr:"Yes, please! Where is {place}?", es:"¡Sí, por favor! ¿Dónde está {place}?", ok:true, react:"Oh, it's not far.", reactEs:"Ah, no queda lejos."},
+     {fr:"Yes, a large coffee", es:"Sí, un café grande", ok:false, why:"Es un señor en la calle, no un barista ☕😄"},
+     {fr:"I'm lost in love", es:"Estoy perdido de amor", ok:false, why:"Muy poético, pero estabas buscando una dirección 😅"},
+    ]},
+   {npc:"Go straight and turn {dir} at the corner.", npcEs:"Sigue derecho y gira {dir} en la esquina.",
+    options:[
+     {fr:"Sorry, can you repeat that?", es:"Perdón, ¿puedes repetir?", ok:true, react:"Sure. Straight, then {dir} at the corner.", reactEs:"Claro. Derecho, y luego {dir} en la esquina."},
+     {fr:"Okay, straight and then {dir}. Thanks!", es:"Listo, derecho y luego {dir}. ¡Gracias!", ok:true, react:"Exactly!", reactEs:"¡Exacto!"},
+     {fr:"How much is it?", es:"¿Cuánto cuesta?", ok:false, why:"Las indicaciones son gratis 😄"},
+    ]},
+   {npc:"It's about ten minutes on foot.", npcEs:"Queda como a diez minutos a pie.",
+    options:[
+     {fr:"Great, I like to walk.", es:"Genial, me gusta caminar.", ok:true, react:"Good! It's a nice walk.", reactEs:"¡Bien! Es una caminata bonita."},
+     {fr:"Is there a bus?", es:"¿Hay algún bus?", ok:true, react:"Yes, the bus stop is right there.", reactEs:"Sí, el paradero está justo ahí."},
+     {fr:"I have a headache", es:"Me duele la cabeza", ok:false, why:"Diez minutos caminando no son para tanto 😅"},
+    ]},
+   {npc:"Where are you from, by the way?", npcEs:"¿Y de dónde eres, por cierto?",
+    options:[
+     {fr:"I'm from Colombia.", es:"Soy de Colombia.", ok:true, react:"Colombia! I'd love to visit someday.", reactEs:"¡Colombia! Me encantaría conocerla algún día."},
+     {fr:"I'm from the subway", es:"Soy del metro", ok:false, why:"Vas para el metro, pero no eres de ahí 😂"},
+     {fr:"By the way, yes", es:"Por cierto, sí", ok:false, why:"Te preguntó de dónde eres: «yes» no es un país 🌎"},
+    ]},
+   {npc:"Enjoy London! Have a good one.", npcEs:"¡Disfruta Londres! Que te vaya bien.",
+    options:[
+     {fr:"Thank you so much for your help!", es:"¡Muchas gracias por tu ayuda!", ok:true, react:"Anytime!", reactEs:"¡Cuando quieras!"},
+     {fr:"Thanks! You too.", es:"¡Gracias! Igualmente.", ok:true, react:"Cheers!", reactEs:"¡Salud! (así se dice «gracias, chao» en Londres)"},
+     {fr:"You're welcome!", es:"¡De nada!", ok:false, why:"«De nada» lo dice quien ayuda; aquí te ayudaron a ti 😉"},
+    ]},
+  ],
+ },
+
+ {
+  id:"pharmacy", themes:["body","feelings"], title:"💊 En la farmacia", npc:"🧑‍⚕️", npcName:"The pharmacist",
+  vars:{
+   pain:[{fr:"a headache",es:"dolor de cabeza"},{fr:"a sore throat",es:"dolor de garganta"},{fr:"a stomachache",es:"dolor de estómago"}],
+  },
+  steps:[
+   {npc:"Hi there. How can I help you?", npcEs:"Hola. ¿En qué te puedo ayudar?",
+    options:[
+     {fr:"Hi, I have {pain}.", es:"Hola, tengo {pain}.", ok:true, react:"Oh, I'm sorry to hear that.", reactEs:"Ay, lo siento mucho."},
+     {fr:"I have a cat", es:"Tengo una gata", ok:false, why:"Qué lindo, pero aquí venden medicinas, no comida para gatos 🐱"},
+     {fr:"Two tickets, please", es:"Dos boletas, por favor", ok:false, why:"Esto es una farmacia, no un cine 🎬😄"},
+    ]},
+   {npc:"How long have you had {pain}?", npcEs:"¿Hace cuánto tienes {pain}?",
+    options:[
+     {fr:"Since yesterday.", es:"Desde ayer.", ok:true, react:"Okay, that's not too long.", reactEs:"Bueno, no es mucho tiempo."},
+     {fr:"For two days.", es:"Hace dos días.", ok:true, react:"Okay, I see.", reactEs:"Bueno, ya veo."},
+     {fr:"Since I was born", es:"Desde que nací", ok:false, why:"¡Ojalá que no! Eso sería demasiado tiempo 😅"},
+    ]},
+   {npc:"Do you have a fever?", npcEs:"¿Tienes fiebre?",
+    options:[
+     {fr:"No, I don't.", es:"No, no tengo.", ok:true, react:"Good.", reactEs:"Bien."},
+     {fr:"I think so, a little.", es:"Creo que sí, un poco.", ok:true, react:"Okay, let's keep an eye on it.", reactEs:"Bueno, hay que estar pendientes."},
+     {fr:"I'm feeling great!", es:"¡Me siento súper bien!", ok:false, why:"Si estás perfecto, ¿qué haces en la farmacia? 😄"},
+    ]},
+   {npc:"Are you allergic to any medicine?", npcEs:"¿Eres alérgico a algún medicamento?",
+    options:[
+     {fr:"No, I'm not.", es:"No, no soy alérgico.", ok:true, react:"Great.", reactEs:"Perfecto."},
+     {fr:"Yes, to penicillin.", es:"Sí, a la penicilina.", ok:true, react:"Thanks for telling me.", reactEs:"Gracias por decírmelo."},
+     {fr:"I'm allergic to Mondays", es:"Soy alérgico a los lunes", ok:false, why:"A todos nos pasa, pero eso no cuenta 😂"},
+    ]},
+   {npc:"Take one pill every eight hours, with food.", npcEs:"Tómate una pastilla cada ocho horas, con comida.",
+    options:[
+     {fr:"Every eight hours, with food. Got it.", es:"Cada ocho horas, con comida. Entendido.", ok:true, react:"Exactly.", reactEs:"Exacto."},
+     {fr:"Sorry, slower, please?", es:"Perdón, ¿más despacio, por favor?", ok:true, react:"Of course. One pill... every eight hours... with food.", reactEs:"Claro. Una pastilla... cada ocho horas... con comida."},
+     {fr:"Can I take them all now?", es:"¿Me las puedo tomar todas ya?", ok:false, why:"Ni lo pienses: la medicina no va de una 😅🚫"},
+    ]},
+   {npc:"Feel better soon!", npcEs:"¡Que te mejores pronto!",
+    options:[
+     {fr:"Thank you so much!", es:"¡Muchas gracias!", ok:true, react:"Take care!", reactEs:"¡Cuídate!"},
+     {fr:"Thanks, have a good day!", es:"¡Gracias, que tengas buen día!", ok:true, react:"You too!", reactEs:"¡Igualmente!"},
+     {fr:"Enjoy your meal!", es:"¡Buen provecho!", ok:false, why:"¿Provecho? ¡Te deseó que te mejores! 😄"},
+    ]},
+  ],
+ },
+];
+
+const TWISTS_EN = [
+ {npc:"(Someone walks up) Excuse me... do you know what time it is?", themes:["time"], npcEs:"(Alguien se acerca) Disculpa... ¿sabes qué hora es?",
+  options:[
+   {fr:"Yes, it's three o'clock", es:"Sí, son las tres", ok:true, react:"Thanks a lot! Have a good one!", reactEs:"¡Muchas gracias! ¡Que te vaya bien!"},
+   {fr:"Sorry, I don't know", es:"Lo siento, no sé", ok:true, react:"No worries, thanks anyway!", reactEs:"No pasa nada, ¡gracias igual!"},
+   {fr:"Enjoy your meal!", es:"¡Buen provecho!", ok:false, why:"¿Provecho de qué? ¡Te preguntó la hora! 😅"},
+  ]},
+ {npc:"(Your phone rings) Hey, it's me! Are you free tonight?", themes:["time","likes"], npcEs:"(Te suena el celular) ¡Hola, soy yo! ¿Estás libre esta noche?",
+  options:[
+   {fr:"Yes! What's the plan?", es:"¡Sí! ¿Cuál es el plan?", ok:true, react:"Let's watch the game!", reactEs:"¡Veamos el partido!"},
+   {fr:"Sorry, I'm busy. Maybe tomorrow?", es:"Perdón, estoy ocupado. ¿Mañana, tal vez?", ok:true, react:"Sure, tomorrow then!", reactEs:"¡Listo, mañana entonces!"},
+   {fr:"Turn right at the corner", es:"Gira a la derecha en la esquina", ok:false, why:"Tu amigo te invitó a salir, no te pidió direcciones 😂"},
+  ]},
+ {npc:"(A dog runs up to you) Oh, sorry! He's very friendly.", themes:["home","feelings"], npcEs:"(Un perro corre hacia ti) ¡Ay, perdón! Es muy amigable.",
+  options:[
+   {fr:"No problem! He's so cute.", es:"¡No hay problema! Es muy lindo.", ok:true, react:"Thanks! His name is Max.", reactEs:"¡Gracias! Se llama Max."},
+   {fr:"It's okay. I have a cat.", es:"Tranquilo. Yo tengo una gata.", ok:true, react:"Ha! Cats are great too.", reactEs:"¡Ja! Los gatos también son geniales."},
+   {fr:"Can I see the menu?", es:"¿Me muestras la carta?", ok:false, why:"Es un perro, no un mesero 🐶"},
+  ]},
+ {npc:"(Someone bumps into you) Oh! I'm so sorry!", themes:["greetings","sos"], npcEs:"(Alguien se tropieza contigo) ¡Ay! ¡Lo siento mucho!",
+  options:[
+   {fr:"Don't worry, it's okay.", es:"Tranquilo, no pasa nada.", ok:true, react:"Thanks. Have a good one!", reactEs:"Gracias. ¡Que te vaya bien!"},
+   {fr:"No problem!", es:"¡No hay problema!", ok:true, react:"Phew, thanks!", reactEs:"¡Uf, gracias!"},
+   {fr:"You're welcome!", es:"¡De nada!", ok:false, why:"«You're welcome» es «de nada»; aquí va «no pasa nada» 😉"},
+  ]},
+ {npc:"(A tourist) Excuse me, do you speak English?", themes:["sos","introductions"], npcEs:"(Un turista) Disculpa, ¿hablas inglés?",
+  options:[
+   {fr:"Yes, a little.", es:"Sí, un poco.", ok:true, react:"Great! Is the beach far from here?", reactEs:"¡Genial! ¿La playa queda lejos de aquí?"},
+   {fr:"I'm learning, but yes!", es:"Estoy aprendiendo, ¡pero sí!", ok:true, react:"Your English sounds good!", reactEs:"¡Tu inglés suena bien!"},
+   {fr:"No, I don't speak English", es:"No, no hablo inglés", ok:false, why:"¡Lo dijiste en inglés perfecto! 😂"},
+  ]},
+ {npc:"(Someone next to you) Wow, it's so hot today!", themes:["opinions","feelings"], npcEs:"(Alguien a tu lado) ¡Uf, qué calor hace hoy!",
+  options:[
+   {fr:"I know! I love the heat, though.", es:"¡Sí! Aunque a mí me encanta el calor.", ok:true, react:"Ha, you must live near the beach!", reactEs:"¡Ja, seguro vives cerca de la playa!"},
+   {fr:"Yes! Let's get something cold.", es:"¡Sí! Tomemos algo frío.", ok:true, react:"Good idea!", reactEs:"¡Buena idea!"},
+   {fr:"Yes, I have a fever", es:"Sí, tengo fiebre", ok:false, why:"Hace calor, pero no es para tanto 🌡️😄"},
+  ]},
+ {npc:"(A waiter passes by) Would you like some water?", themes:["cafe"], npcEs:"(Pasa un mesero) ¿Quiere un poco de agua?", skip:["pharmacy","airport"],
+  options:[
+   {fr:"Yes, please. Thank you!", es:"Sí, por favor. ¡Gracias!", ok:true, react:"Here you go.", reactEs:"Aquí tiene."},
+   {fr:"No, thanks. I'm good.", es:"No, gracias. Estoy bien.", ok:true, react:"Okay, just let me know.", reactEs:"Bueno, me avisa."},
+   {fr:"I'm from Colombia", es:"Soy de Colombia", ok:false, why:"Te ofreció agua, no te preguntó de dónde eres 💧😄"},
+  ]},
+ {npc:"(A message from your boss) Can we have a quick call in five minutes?", themes:["work","time"], npcEs:"(Un mensaje de tu jefe) ¿Podemos hacer una llamada rápida en cinco minutos?", skip:["client-call"],
+  options:[
+   {fr:"Sure, I'll call you in five.", es:"Claro, te llamo en cinco.", ok:true, react:"Perfect, talk soon.", reactEs:"Perfecto, hablamos."},
+   {fr:"Can we do it in an hour? I'm out right now.", es:"¿Lo hacemos en una hora? Ahora estoy afuera.", ok:true, react:"No problem, in an hour then.", reactEs:"No hay problema, en una hora entonces."},
+   {fr:"Good night, sweet dreams", es:"Buenas noches, dulces sueños", ok:false, why:"Es tu jefe y es de día 😂"},
+  ]},
+];
+
+const IMPROV_EN = [
+ {t:"Pide un café grande para llevar, con cortesía",
+  keys:[["coffee"],["large","big"],["to go"],["please"]],
+  model:"Hi! Can I get a large coffee to go, please?"},
+ {t:"Preséntate: tu nombre y de dónde eres",
+  keys:[["my name","i am","im mateo"],["from"],["colombia","barranquilla"]],
+  model:"Hi, my name is Mateo and I'm from Barranquilla, Colombia."},
+ {t:"Cuenta a qué te dedicas: tienes una empresa de software",
+  keys:[["company","business","startup"],["software","design","apps"],["i have","i run","i own","ive got"]],
+  model:"I have a small software company."},
+ {t:"Pregunta con cortesía dónde queda el metro",
+  keys:[["where"],["subway","metro","train station"],["excuse me","sorry","hello"]],
+  model:"Excuse me, where is the subway?"},
+ {t:"Pregunta cuánto cuesta una camisa y si puedes pagar con tarjeta",
+  keys:[["how much"],["shirt"],["card"]],
+  model:"How much is this shirt? Can I pay by card?"},
+ {t:"Comenta con alguien el calor que está haciendo hoy",
+  keys:[["hot","heat"],["today","right now"],["really","very","so hot","super"]],
+  model:"Wow, it's really hot today!"},
+ {t:"Di que te encanta el fútbol y que ves todos los partidos",
+  keys:[["soccer","football"],["love","like"],["watch","games","matches","team"]],
+  model:"I love soccer. I watch every game with my friends."},
+ {t:"Recomienda la serie que estás viendo (Mad Men)",
+  keys:[["watching","watch"],["series","show"],["good","great","amazing","love"]],
+  model:"I'm watching a great show called Mad Men."},
+ {t:"Di cómo estás de verdad: un poco cansado, pero contento",
+  keys:[["tired"],["but","however","though"],["happy","good","fine"]],
+  model:"Honestly, I'm a little tired, but happy."},
+ {t:"Cuenta tu plan del fin de semana: ir a la playa",
+  keys:[["weekend","saturday","sunday"],["beach"],["going to","gonna","want to","will"]],
+  model:"This weekend I'm going to the beach with my friends."},
+ {t:"Invita a alguien a tomar algo después del trabajo",
+  keys:[["do you want","would you like","wanna","how about"],["drink","beer","coffee"],["after work","tonight","later"]],
+  model:"Do you want to get a drink after work?"},
+ {t:"Discúlpate por llegar tarde y di por qué",
+  keys:[["sorry","apologize"],["late"],["traffic","bus","meeting","alarm"]],
+  model:"Sorry I'm late, the traffic was terrible."},
+ {t:"Pide que te repitan, más despacio",
+  keys:[["repeat","say that again","again"],["slow","slower","slowly"],["please","sorry"]],
+  model:"Sorry, can you repeat that more slowly, please?"},
+ {t:"Habla de tus papás: los quieres y los visitas",
+  keys:[["parents","mom","dad","mother"],["love","miss","visit"]],
+  model:"I love my parents. I visit them every Sunday."},
+ {t:"Presenta a tu gata Cliff",
+  keys:[["cat","kitty"],["name","called"],["cliff"]],
+  model:"I have a cat. Her name is Cliff."},
+ {t:"Cuenta tu sueño: vivir cerca de la playa, en Portugal",
+  keys:[["dream","someday","one day","would love"],["live","living"],["portugal","beach"]],
+  model:"My dream is to live by the beach in Portugal."},
+ {t:"En el aeropuerto: pide un puesto en la ventana",
+  keys:[["window"],["seat"],["please","could","can i"]],
+  model:"Can I have a window seat, please?"},
+ {t:"En el hotel: di que tienes una reserva a tu nombre",
+  keys:[["reservation","booking"],["under","name"],["have","got"]],
+  model:"Hi, I have a reservation under Mateo."},
+ {t:"En el hotel: pregunta a qué hora es el desayuno",
+  keys:[["what time","when"],["breakfast"]],
+  model:"What time is breakfast?"},
+ {t:"Propón pasar la reunión para mañana",
+  keys:[["meeting","call"],["tomorrow"],["move","change","reschedule","postpone"]],
+  model:"Can we move the meeting to tomorrow?"},
+ {t:"Promete que mandas el correo antes del viernes",
+  keys:[["email","mail"],["send"],["friday","end of the day","monday"]],
+  model:"I'll send you the email by Friday."},
+ {t:"Pide la cuenta en un restaurante",
+  keys:[["check","bill"],["please","can we","could we","can i"]],
+  model:"Excuse me, can we get the check, please?"},
+ {t:"Pide una mesa para dos",
+  keys:[["table"],["two"],["please","for us"]],
+  model:"Hi, a table for two, please."},
+ {t:"Di con respeto que no estás de acuerdo, y da tu opinión",
+  keys:[["dont agree","disagree","not sure","do not agree"],["think","opinion","believe"]],
+  model:"I see your point, but I don't agree. I think it's too expensive."},
+ {t:"Pregúntale a alguien de dónde es y a qué se dedica",
+  keys:[["where are you from","where you from","where do you live"],["what do you do","your job","work","job"]],
+  model:"Where are you from? And what do you do?"},
+ {t:"Cuenta por qué estás aprendiendo inglés",
+  keys:[["learning","studying"],["english"],["because","since","so i can"]],
+  model:"I'm learning English because I love to travel."},
+ {t:"Describe tu mañana: te levantas, haces ejercicio y luego café",
+  keys:[["wake up","get up"],["work out","exercise","gym","run"],["morning","then","after"]],
+  model:"I wake up early, I work out, and then I have coffee."},
+ {t:"En la farmacia: te duele la cabeza, pide algo",
+  keys:[["headache","head hurts"],["something","medicine","pill"]],
+  model:"Hi, I have a headache. Do you have something for it?"},
+ {t:"Felicita a tu equipo por un buen trabajo",
+  keys:[["great job","good job","great work","well done"],["thank","proud","team"]],
+  model:"Great job, team! I'm really proud of you."},
+ {t:"Despídete y di que fue un gusto hablar",
+  keys:[["nice","great","good","pleasure"],["talking","talk","meeting","to meet"],["bye","see you","take care"]],
+  model:"It was really nice talking to you. See you soon!"},
+];
+
+const VERB_FAMILIES_EN = [
+ {name:"🏛️ Los pilares", verbs:[
+  {fr:"To be — ser / estar", ex:[{fr:"To be",es:"Ser / estar"},{fr:"I am",es:"Yo soy / estoy"}], f:"I am · you are · he is · we are · they are"},
+  {fr:"To have — tener", ex:[{fr:"To have",es:"Tener"},{fr:"I have",es:"Yo tengo"}], f:"I have · you have · he has · we have"},
+  {fr:"To do — hacer", ex:[{fr:"To do",es:"Hacer"},{fr:"I do",es:"Yo hago"}], f:"I do · you do · she does · did (pasado)"},
+ ]},
+ {name:"🚶 Movimiento", verbs:[
+  {fr:"To go — ir", ex:[{fr:"To go",es:"Ir"},{fr:"I go",es:"Yo voy"}], f:"I go · he goes · went (pasado) · I'm going to (voy a)"},
+  {fr:"To come — venir", ex:[{fr:"To come",es:"Venir"},{fr:"I come",es:"Yo vengo"}], f:"I come · she comes · came (pasado)"},
+  {fr:"To leave — irse / salir", ex:[{fr:"To leave",es:"Irse / salir"},{fr:"I leave",es:"Yo me voy"}], f:"I leave · he leaves · left (pasado)"},
+ ]},
+ {name:"🔑 Modales", verbs:[
+  {fr:"Can — poder", ex:[{fr:"Can",es:"Poder"},{fr:"I can",es:"Yo puedo"}], f:"I can · you can · she can · can't (no puede)"},
+  {fr:"To want — querer", ex:[{fr:"To want",es:"Querer"},{fr:"I want",es:"Yo quiero"}], f:"I want · he wants · I want to (quiero...)"},
+  {fr:"To have to — tener que", ex:[{fr:"To have to",es:"Tener que"},{fr:"I have to",es:"Yo tengo que"}], f:"I have to · she has to · I need to (necesito)"},
+ ]},
+ {name:"☀️ Los de todos los días", verbs:[
+  {fr:"To eat — comer", ex:[{fr:"To eat",es:"Comer"},{fr:"I eat",es:"Yo como"}], f:"I eat · he eats · ate (pasado)"},
+  {fr:"To work — trabajar", ex:[{fr:"To work",es:"Trabajar"},{fr:"I work",es:"Yo trabajo"}], f:"I work · she works · worked (pasado)"},
+  {fr:"To sleep — dormir", ex:[{fr:"To sleep",es:"Dormir"},{fr:"I sleep",es:"Yo duermo"}], f:"I sleep · he sleeps · slept (pasado)"},
+ ]},
+ {name:"💬 Comunicación", verbs:[
+  {fr:"To say — decir", ex:[{fr:"To say",es:"Decir"},{fr:"I say",es:"Yo digo"}], f:"I say · he says · said (pasado)"},
+  {fr:"To tell — contar, decirle a alguien", ex:[{fr:"To tell",es:"Contar, decirle a alguien"},{fr:"I tell you",es:"Yo te digo"}], f:"I tell you · she tells me · told (pasado)"},
+  {fr:"To speak / to talk — hablar", ex:[{fr:"To speak",es:"Hablar"},{fr:"I speak",es:"Yo hablo"}], f:"I speak English · I talk to you · spoke (pasado)"},
+ ]},
+];
+
+const LECTURAS_EN = [
+ { id:"morning", titulo:"Una mañana en Nueva York", fuente:"Texto original para Coco", aviso:"Nivel A1. Frases cortas.",
+   pasajes:[
+    {fr:"It is seven in the morning.", es:"Son las siete de la mañana."},
+    {fr:"The city is already awake.", es:"La ciudad ya está despierta."},
+    {fr:"Mateo walks to a small coffee shop.", es:"Mateo camina hasta una pequeña cafetería."},
+    {fr:"He orders a large coffee to go.", es:"Pide un café grande para llevar."},
+    {fr:"The barista smiles and says his name.", es:"La barista sonríe y dice su nombre."},
+    {fr:"Outside, people walk very fast.", es:"Afuera, la gente camina muy rápido."},
+    {fr:"Mateo walks slowly because he is not in a hurry.", es:"Mateo camina despacio porque no tiene prisa."},
+    {fr:"It is a good day to start.", es:"Es un buen día para empezar."},
+   ] },
+ { id:"match", titulo:"Noche de fútbol", fuente:"Texto original para Coco", aviso:"Nivel A1. Frases cortas.",
+   pasajes:[
+    {fr:"Tonight there is a big soccer game.", es:"Esta noche hay un partido de fútbol importante."},
+    {fr:"Mateo invites his friends to his apartment.", es:"Mateo invita a sus amigos a su apartamento."},
+    {fr:"They buy snacks and cold drinks.", es:"Compran pasabocas y bebidas frías."},
+    {fr:"The game starts at eight.", es:"El partido empieza a las ocho."},
+    {fr:"In the first half, nobody scores.", es:"En el primer tiempo, nadie hace gol."},
+    {fr:"In the second half, his team scores a goal.", es:"En el segundo tiempo, su equipo mete un gol."},
+    {fr:"Everybody jumps and shouts.", es:"Todos saltan y gritan."},
+    {fr:"Cliff, the cat, hides under the sofa.", es:"Cliff, la gata, se esconde debajo del sofá."},
+   ] },
+ { id:"beach", titulo:"Un día de playa", fuente:"Texto original para Coco", aviso:"Nivel A1. Frases cortas.",
+   pasajes:[
+    {fr:"It is Saturday and it is very hot.", es:"Es sábado y hace mucho calor."},
+    {fr:"Mateo and his parents drive to the beach.", es:"Mateo y sus papás van en carro a la playa."},
+    {fr:"The sea is blue and calm.", es:"El mar está azul y tranquilo."},
+    {fr:"His mom puts on sunscreen.", es:"Su mamá se echa bloqueador."},
+    {fr:"His dad buys fresh fish for lunch.", es:"Su papá compra pescado fresco para el almuerzo."},
+    {fr:"Mateo swims and then reads a book.", es:"Mateo nada y luego lee un libro."},
+    {fr:"At sunset, the sky turns orange.", es:"Al atardecer, el cielo se pone naranja."},
+    {fr:"His dad says that this is the good life.", es:"Su papá dice que esto sí es vida."},
+   ] },
+ { id:"stoic", titulo:"Lo que depende de ti", fuente:"Texto original para Coco", aviso:"Nivel A2. Una idea sencilla.",
+   pasajes:[
+    {fr:"Some things depend on you.", es:"Algunas cosas dependen de ti."},
+    {fr:"Other things do not depend on you.", es:"Otras cosas no dependen de ti."},
+    {fr:"The weather does not depend on you.", es:"El clima no depende de ti."},
+    {fr:"The traffic does not depend on you.", es:"El tráfico no depende de ti."},
+    {fr:"Your effort depends on you.", es:"Tu esfuerzo depende de ti."},
+    {fr:"Your attitude also depends on you.", es:"Tu actitud también depende de ti."},
+    {fr:"So, put your energy where you have control.", es:"Entonces, pon tu energía donde tienes el control."},
+    {fr:"That is a calm way to live.", es:"Esa es una forma tranquila de vivir."},
+   ] },
+];
+
+const COCO_GOOD_EN = [
+ "Nice! 🎉",
+ "Great job ✨",
+ "Eso sonó muy natural 🌿",
+ "Perfect! 👌",
+ "¡Así se dice! 🔥",
+ "Smooth 😎",
+ "Tal cual lo diría un nativo 🗽",
+ "You got it! 💪",
+];
+
+const COCO_MEH_EN = [
+ "Casi. Mañana sale 🌱",
+ "Tranqui, así se aprende 🙌",
+ "Ya la viste una vez: la próxima es más fácil ✨",
+ "Buen intento. Vamos con otra 💪",
+ "Equivocarse también es practicar 🌿",
+ "Poco a poco, sin afán 🦥",
+];
+
+const COCO_HOME_EN = [
+ "¿Cinco minutitos de inglés?",
+ "Ready cuando tú quieras ☕",
+ "Hoy, una frase nueva y listo.",
+ "Qué bueno verte por aquí 🙂",
+ "¿Un café y un poquito de English?",
+ "Sin afán: a tu ritmo 🦥",
+ "Let's go, sin presión.",
+ "Volviste. Eso es lo que cuenta 🌿",
+ "Hoy toca hablar un poquito 🎙️",
+ "¿Practicamos para el próximo viaje? ✈️",
+];
+
+// Glosario de las lecturas: cada palabra de 4+ letras (limpia como palabraLimpia) → su sentido en el texto.
+const LEX_LEC_EN = {
+ "seven":"siete", "morning":"mañana", "city":"ciudad", "already":"ya", "awake":"despierta",
+ "mateo":"Mateo (nombre)", "walks":"camina", "small":"pequeña", "coffee":"café", "shop":"tienda (coffee shop = cafetería)",
+ "orders":"pide", "large":"grande", "barista":"barista", "smiles":"sonríe", "says":"dice",
+ "name":"nombre", "outside":"afuera", "people":"la gente", "walk":"caminan", "very":"muy",
+ "fast":"rápido", "slowly":"despacio", "because":"porque", "hurry":"prisa", "good":"buen / buena",
+ "start":"empezar", "tonight":"esta noche", "there":"(there is = hay)", "soccer":"fútbol", "game":"partido",
+ "invites":"invita", "friends":"amigos", "apartment":"apartamento", "they":"ellos", "snacks":"pasabocas",
+ "cold":"frías", "drinks":"bebidas", "starts":"empieza", "eight":"ocho", "first":"primer",
+ "half":"tiempo (mitad del partido)", "nobody":"nadie", "scores":"marca, hace gol", "second":"segundo", "team":"equipo",
+ "goal":"gol", "everybody":"todos", "jumps":"saltan", "shouts":"gritan", "cliff":"Cliff (la gata)",
+ "hides":"se esconde", "under":"debajo de", "sofa":"sofá", "saturday":"sábado", "parents":"papás (no «parientes»)",
+ "drive":"van en carro", "beach":"playa", "blue":"azul", "calm":"tranquilo / tranquila", "puts":"se pone (puts on = se echa)",
+ "sunscreen":"bloqueador solar", "buys":"compra", "fresh":"fresco", "fish":"pescado", "lunch":"almuerzo",
+ "swims":"nada", "then":"luego", "reads":"lee", "book":"libro", "sunset":"atardecer",
+ "turns":"se pone, se vuelve", "orange":"naranja", "that":"que / esa", "this":"esto", "life":"vida",
+ "some":"algunas", "things":"cosas", "depend":"dependen", "other":"otras", "weather":"clima",
+ "does":"(auxiliar: does not = no)", "traffic":"tráfico", "your":"tu", "effort":"esfuerzo", "depends":"depende",
+ "attitude":"actitud", "also":"también", "energy":"energía", "where":"donde", "have":"tienes",
+ "control":"control", "live":"vivir",
+};
+if(EN){
+  const pon=(a,b)=>{ a.length=0; b.forEach(x=>a.push(x)); };
+  // un tema de verbos sale de las familias (la chuleta de verbos se abre desde él)
+  if(!THEMES_EN.some(t=>t.id==="verbs")){
+    const ex=VERB_FAMILIES_EN.flatMap(f=>f.verbs.map(v=>v.ex[1]));   // «I am», «I have»…
+    THEMES_EN.push({id:"verbs", emoji:"⚙️", name:"Verbos esenciales", minLvl:2, vocab:ex, speak:ex.slice(0,4)});
+  }
+  pon(THEMES,THEMES_EN); pon(SCENES,SCENES_EN); pon(TWISTS,TWISTS_EN); pon(IMPROV,IMPROV_EN);
+  pon(VERB_FAMILIES,VERB_FAMILIES_EN); pon(COCO_GOOD,COCO_GOOD_EN); pon(COCO_MEH,COCO_MEH_EN); pon(COCO_HOME,COCO_HOME_EN);
+}
+</script>
+<script>
 /* ================== ESTADO ================== */
 const S = {
   xp: 0, streak: 0, bestStreak: 0, lastDay: null,
@@ -2697,9 +3655,9 @@ function pintaCinta(){
   const bits=[holaFR().toUpperCase()+(S.name?", "+S.name.toUpperCase():""),
     S.streak>0 ? `RACHA ${S.streak} DÍA${S.streak===1?"":"S"}` : "",
     `${cifra(S.xp)} PUNTOS`,
-    (S.exam&&S.exam.passed) ? "ITALIANO GANADO" : floja ? `LO QUE FALTA: ${floja[0]} · ${cifra(floja[1])} DE ${cifra(floja[2])}` : "LISTO PARA EL EXAMEN",
+    (S.exam&&S.exam.passed) ? (EN?"EXAMEN APROBADO":"ITALIANO GANADO") : floja ? `LO QUE FALTA: ${floja[0]} · ${cifra(floja[1])} DE ${cifra(floja[2])}` : "LISTO PARA EL EXAMEN",
     nd ? `${nd} PARA REPASAR HOY` : "",
-    "ON Y VA"].filter(Boolean);
+    (EN?"LET'S GO":"ON Y VA")].filter(Boolean);
   const t=esc(bits.join("  ✦  "))+"  ✦  ";
   c.innerHTML=`<div>${t}${t}</div>`;
 }
@@ -3045,7 +4003,7 @@ function openCheat(t){
   const inner=document.createElement("div"); inner.className="cheat";
   let rows=`<h3 style="margin-top:0">${t.emoji} ${t.name} — la chuleta 📖</h3>
     <p class="hint" style="text-align:left; margin-top:0">🔊 para oírla · ⭐ = "esta quiero dominarla" (va a tus repasos)</p>`;
-  if(t.id==="verbes"){
+  if(t.id==="verbes"||t.id==="verbs"){   // v1.97: el tema de verbos del inglés
     VERB_FAMILIES.forEach((f,fi)=>{
       rows+=`<div class="cheatfam">${f.name}</div>`;
       f.verbs.forEach((v,vi)=>{
@@ -4128,7 +5086,7 @@ function gameScene(){
           if(/pardon/i.test(o.fr)){
             reactFr="Je dis : "+st.npc; reactEs="Digo: "+st.npcEs;   // ¿Pardon? → te lo repite, no te regaña
           } else {
-            const r=rnd([["Euh... comment ?","Eh... ¿cómo?"],["Je n'ai pas bien compris...","No entendí bien..."],["Hein ?! 😅","¡¿Ah?!"]]);
+            const r=rnd(EN?[["Uh... sorry?","Eh... ¿cómo?"],["I didn't quite get that...","No entendí bien..."],["Huh?! 😅","¡¿Ah?!"]]:[["Euh... comment ?","Eh... ¿cómo?"],["Je n'ai pas bien compris...","No entendí bien..."],["Hein ?! 😅","¡¿Ah?!"]]);
             reactFr=r[0]; reactEs=r[1];
           }
           npcReact(reactFr, reactEs);
@@ -5039,6 +5997,8 @@ const LEX_LEC = {
  "million":"millón", "oblige":"obliga", "avenir":"futuro", "passé":"pasado",
  "ensemble":"juntos", "forts":"fuertes", "lion":"león"
 };
+if(EN){ Object.keys(LEX_LEC).forEach(k=>delete LEX_LEC[k]); Object.assign(LEX_LEC, LEX_LEC_EN); }   // v1.97
+
 
 const LECTURAS = [{
   id:"spinoza",
@@ -5237,6 +6197,8 @@ const LECTURAS = [{
    {fr:"Ensemble, nous sommes plus forts qu'un lion.", es:"Juntos somos más fuertes que un león."}
   ]}
 ];
+if(EN){ LECTURAS.length=0; LECTURAS_EN.forEach(x=>LECTURAS.push(x)); }   // v1.97
+
 
 /* limpia una palabra para buscarla en el glosario (sin puntuación, sin mayúsculas) */
 function palabraLimpia(w){ return w.toLowerCase().replace(/[«»"'"'!?,.;:()…]/g,"").replace(/^[-–]|[-–]$/g,"").trim(); }

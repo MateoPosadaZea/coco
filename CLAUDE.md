@@ -92,6 +92,15 @@ Mateo, al ver la v1.80: *«cambió la tipografía pero el diseño ui se ve igual
 - Referentes que mandó en esta búsqueda: SuperHi (le gustaron los colores, el logotipo tipográfico y la «vida») · Le Puzz (amarillo, letra gruesa, carita en el logo) · lesa.app (juego de lectura para niños de 6–10 de Revera/14islands; Awwwards la describe como «vibrant, fun and sophisticated»). Tablero con SuperHi + Le Puzz: https://claude.ai/artifact/1mGm5aidYPLffnsacvskcX — ojo: ese tablero es MÁS infantil de lo que ahora pide.
 - El entorno remoto **no puede abrir** lesa.app (ni la mayoría de webs externas): pedirle capturas a Mateo.
 
+## 🇺🇸 v1.97 — Curso de inglés (al lado del francés, no después)
+Mateo: *«agreguemos inglés… un curso de inglés»*. Es un **segundo curso** para hispanohablantes, no el «siguiente idioma» de la puerta (esa sigue siendo 🇫🇷 → 🇮🇹 → 🇵🇹).
+- **Un curso a la vez por arranque**: `CURSO` sale de `localStorage.coco_curso` (`"fr"` por defecto). Constantes `EN`, `LENGUA` («francés»/«inglés»), `LANG_TAG` (`fr-FR`/`en-US`) — voz de Coco y reconocedor usan `LANG_TAG`. Cambiar = Ajustes → **Aprendo** (`#crsFr/#crsEn`) o el chip **FR/EN** de arriba (abre Ajustes). `cambiarCurso()` guarda y recarga.
+- 🔒 **Cajas separadas**: inglés = `lingualab_en` / `_en_bak` / `_en_snap`. **`lingualab_fr` no se toca ni se renombra.** Solo pasan de un curso a otro el nombre y día/noche (`coco_comun`), y solo si el curso nuevo aún no tiene nombre.
+- **Contenido** en un `<script>` propio tras el del francés: `THEMES_EN` (16 + «verbs» armado de las familias), `SCENES_EN` (7), `TWISTS_EN` (8), `IMPROV_EN` (30), `VERB_FAMILIES_EN`, `LECTURAS_EN` (4), `LEX_LEC_EN`, `COCO_*_EN`. El campo sigue llamándose **`fr`** (= el idioma que se aprende). Si `EN`, se cambian **EN SITIO** los arreglos de siempre antes del PRISTINE: el motor de juegos no sabe de idiomas.
+- En inglés no salen «Camino al italiano» ni el chiste del tío (son del francés). Trampas para hispanohablantes en las pistas: *excited, parents, actually*. Cliff es **she**.
+- Al añadir textos de interfaz que nombren el idioma: usar `LENGUA`, y frases habladas con `EN ? "…" : "…"`.
+- Prueba: `v197/en.mjs` (23: cambio de curso, cajas separadas, 92.353 ⭐ del francés intactas, los 8 juegos en inglés, vuelta al francés).
+
 ## 🖥️ v1.95 — Versión computador
 Mateo: *«construyamos la versión desktop»*. Solo CSS (`@media (min-width:1000px)`), el celular no cambia (hay prueba).
 - Las pestañas pasan a **barra lateral** a la izquierda (`#tabs` en columna, alineada con el borde del contenido). `#app` deja 210px a la izquierda fuera de juego/resultados.
