@@ -100,8 +100,12 @@ Mateo: *«construyamos la versión desktop»*. Solo CSS (`@media (min-width:1000
 - **Progreso y Ajustes** en dos columnas.
 - Prueba: `v195/desk.mjs` (1440px: barra lateral, dos columnas, sin scroll horizontal, tecla 2 responde; 390px: pestañas abajo).
 
-## 🐻 PENDIENTE — cambiar el animal (oct-2026)
-Mateo: *«el pájaro se parece mucho a Duolingo, hay que cambiar el animal, puede ser un oso o algo así representativo de Colombia»*. Galería con oso de anteojos (recomendado: sus «anteojos» = las o del logotipo), perezoso y tití cabeciblanco, mismas reglas de Coco: https://claude.ai/artifact/VqJTdqr4SSgYqxHUabMeni — esperando su elección. Al cambiarlo: mismas funciones (`_cDibujo`, `cocoCara`, `cocoCuerpo`, `.cpico`), iconos y favicon regenerados, `CACHE` nuevo en `sw.js`.
+## 🦥 COCO ES UN PEREZOSO (v1.96) — personaje vigente
+Mateo: *«el pájaro se parece mucho a Duolingo, hay que cambiar el animal… representativo de Colombia»*. De la galería (oso de anteojos, perezoso, tití cabeciblanco — https://claude.ai/artifact/VqJTdqr4SSgYqxHUabMeni) escogió: *«el perezoso me gusta… ese fue»*. Vive en el Caribe y la Amazonía colombianos; siempre parece sonreír y va a su ritmo.
+- `_cDibujo(animo)` dibuja: círculo azul (`--pAzul`), cara crema (`--pCrema`), **antifaz que baja hacia afuera** (`--pAzulOsc`; si sube, parece bravo), DOS OJOS (blanco + pupila), nariz, boca en `<g class="cpico">` (nombre heredado: es lo que se mueve al hablar). Envuelto en `<g data-animo="…">`: **las pruebas miran `data-animo`**, no trazos sueltos (así un rediseño no rompe las pruebas).
+- Mismos estados y funciones (`cocoCara`, `cocoCuerpo`, `feliz · guino · uy · duerme · escucha · celebra`); reacciones intactas.
+- Contenido: el chiste del tío ahora es **«Un paresseux qui s'appelle Coco»** — en francés *paresseux* es perezoso Y flojo, el chiste sale solo. Bienvenida: «Soy Coco, tu perezoso políglota».
+- Iconos (192/512, apple-touch, favicon) = el perezoso sobre azul. `sw.js` → `CACHE="coco-v6"`.
 
 ## ✂️ v1.94 — Mi progreso, Ajustes y resultados: menos texto
 Siguiendo MENOS ES MÁS. Palabras: Mi progreso 370→~140 · Ajustes 260→~100 · resultados 208→~30.
