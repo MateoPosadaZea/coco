@@ -632,6 +632,9 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
 .chtarget{font-size:1.1rem; margin-top:6px;}
 .chpalabras{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px;}
 .chpal{border:none; background:var(--tint); color:var(--ink); border-radius:99px; padding:5px 12px; font:500 .9rem var(--f); cursor:pointer;}
+/* 🎙️ v1.99 — el oído se está abriendo (aún no oye): se nota que tocaste, sin parecer que ya graba */
+.micbtn.prep,.btn.prep{opacity:.72; filter:saturate(.55); transform:scale(.96);}
+.chcorr{margin:6px 0;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -712,7 +715,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.98</div>
+    <div class="footer-note">Coco · v1.99</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -4053,6 +4056,445 @@ const THEME_VIAJE = EN ? THEME_VIAJE_EN : THEME_VIAJE_FR;
 THEMES.push(THEME_VIAJE);   // TODO ES EJERCITABLE: lo básico del viaje también se juega
 </script>
 <script>
+/* ================== 🧗 FRANCÉS A FONDO, A2+/B1 (v1.99) ==================
+   Mateo: «quiero sentir un mayor avance y poder decir cosas más complejas,
+   oraciones más largas, ideas más completas… siento que ahorita está muy fácil».
+   Todo lo anterior es A1 (3-8 palabras). Esto son ideas completas de 9-18
+   palabras: pasado, planes, opinar con razones, contar, hipótesis, su empresa
+   y su familia. Las misiones piden 3-4 cosas a la vez. */
+/* ================== FRANCÉS MÁS DIFÍCIL (v1.99): A2+/B1 ==================
+   Oraciones largas, ideas completas: conectores, pasado, futuro, condicional.
+   fr = el idioma que se aprende; es = traducción. */
+
+const THEMES_B1_FR = [
+ { id:"raconter", emoji:"🕰️", name:"Contar lo que pasó", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"Hier soir, je suis resté à la maison parce que j'étais vraiment fatigué.", es:"Anoche me quedé en la casa porque estaba muy cansado."},
+    {fr:"La semaine dernière, j'ai travaillé tard presque tous les soirs pour finir un projet.", es:"La semana pasada trabajé hasta tarde casi todas las noches para terminar un proyecto."},
+    {fr:"Je suis allé à la plage dimanche matin et je me suis baigné pendant une heure.", es:"El domingo por la mañana fui a la playa y me bañé durante una hora."},
+    {fr:"J'ai regardé trois épisodes de Mad Men d'affilée, et je n'ai pas vu le temps passer.", es:"Vi tres capítulos de Mad Men seguidos y ni sentí pasar el tiempo."},
+    {fr:"J'apprends le français depuis quelques mois, et je comprends déjà beaucoup plus de choses.", es:"Llevo unos meses aprendiendo francés y ya entiendo muchas más cosas."},
+    {fr:"Ce matin, Cliff m'a réveillé à cinq heures parce qu'elle avait faim.", es:"Esta mañana Cliff me despertó a las cinco porque tenía hambre."},
+    {fr:"On est sortis avec des amis samedi, et on est rentrés vers deux heures du matin.", es:"El sábado salimos con unos amigos y volvimos como a las dos de la mañana."},
+    {fr:"Je n'ai pas pu venir à la réunion, parce que mon vol a été annulé.", es:"No pude ir a la reunión porque me cancelaron el vuelo."},
+    {fr:"Pendant les vacances, j'ai lu deux livres et j'ai enfin pu me reposer.", es:"En las vacaciones leí dos libros y por fin pude descansar."},
+    {fr:"Mes parents sont venus me voir le mois dernier, et ça m'a fait très plaisir.", es:"Mis papás vinieron a visitarme el mes pasado y me dio mucho gusto."},
+    {fr:"Ça fait deux ans que je ne l'ai pas vu, mais on s'écrit tout le temps.", es:"Hace dos años que no lo veo, pero nos escribimos todo el tiempo."},
+    {fr:"Il y a deux semaines, j'ai commencé la boxe et, depuis, je dors beaucoup mieux.", es:"Hace dos semanas empecé boxeo y, desde entonces, duermo mucho mejor."}
+   ],
+   speak:[
+    {fr:"Hier, j'ai eu une journée chargée, mais le soir je suis allé courir sur la plage.", es:"Ayer tuve un día muy pesado, pero por la noche me fui a trotar a la playa."},
+    {fr:"Le week-end dernier, je suis allé voir mes parents et on a mangé ensemble.", es:"El fin de semana pasado fui a ver a mis papás y comimos juntos."},
+    {fr:"Depuis que j'ai lancé Matriz, j'ai appris énormément de choses sur moi-même.", es:"Desde que arranqué Matriz he aprendido muchísimo sobre mí mismo."},
+    {fr:"J'ai vu le match hier soir, et franchement, je ne m'attendais pas à ce résultat.", es:"Anoche vi el partido y, la verdad, no me esperaba ese resultado."}
+   ] },
+
+ { id:"projets", emoji:"🧭", name:"Planes y sueños", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"Ce week-end, je vais me reposer, parce que la semaine a été très intense.", es:"Este fin de semana voy a descansar, porque la semana fue muy intensa."},
+    {fr:"L'année prochaine, j'aimerais passer quelques semaines en France pour pratiquer mon français.", es:"El próximo año me gustaría pasar unas semanas en Francia para practicar mi francés."},
+    {fr:"Je compte embaucher deux personnes chez Matriz avant la fin de l'année.", es:"Pienso contratar a dos personas en Matriz antes de que termine el año."},
+    {fr:"Un jour, j'habiterai au Portugal, dans une petite maison près de la mer.", es:"Algún día viviré en Portugal, en una casita cerca del mar."},
+    {fr:"Avant de partir en voyage, je dois finir le projet d'un client important.", es:"Antes de irme de viaje tengo que terminar el proyecto de un cliente importante."},
+    {fr:"Quand je serai à Paris, je t'appellerai pour qu'on prenne un café ensemble.", es:"Cuando esté en París te llamo para que nos tomemos un café."},
+    {fr:"Je vais essayer de faire du sport au moins trois fois par semaine.", es:"Voy a tratar de hacer ejercicio por lo menos tres veces por semana."},
+    {fr:"Mon objectif, c'est de pouvoir parler avec mon oncle sans chercher mes mots.", es:"Mi meta es poder hablar con mi tío sin quedarme buscando las palabras."},
+    {fr:"J'aimerais emmener mes parents en voyage, parce qu'ils ont toujours tout fait pour moi.", es:"Me gustaría llevar a mis papás de viaje, porque siempre lo han hecho todo por mí."},
+    {fr:"Dans cinq ans, je me vois avec une équipe plus grande et plus de temps libre.", es:"En cinco años me veo con un equipo más grande y más tiempo libre."},
+    {fr:"On va bientôt lancer une nouvelle version de l'application, et j'ai hâte de la montrer.", es:"Pronto vamos a lanzar una nueva versión de la aplicación y me muero por mostrarla."},
+    {fr:"Je ne sais pas encore ce que je ferai cet été, mais sûrement un voyage.", es:"Todavía no sé qué voy a hacer en vacaciones de mitad de año, pero seguro un viaje."}
+   ],
+   speak:[
+    {fr:"Le mois prochain, je vais commencer un projet, et je compte y mettre toute mon énergie.", es:"El próximo mes voy a empezar un proyecto y pienso ponerle toda mi energía."},
+    {fr:"Avant de m'installer au Portugal, j'aimerais apprendre la langue et visiter plusieurs villes.", es:"Antes de irme a vivir a Portugal, me gustaría aprender el idioma y conocer varias ciudades."},
+    {fr:"Si tout va bien, j'irai en France l'année prochaine pour te rendre visite.", es:"Si todo sale bien, el próximo año voy a Francia a visitarte."},
+    {fr:"Je vais essayer de te parler en français sans avoir peur de me tromper.", es:"Voy a tratar de hablarte en francés sin miedo a equivocarme."}
+   ] },
+
+ { id:"argumenter", emoji:"⚖️", name:"Opinar con razones", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"À mon avis, le football colombien a beaucoup progressé ces dernières années.", es:"En mi opinión, el fútbol colombiano ha mejorado mucho en los últimos años."},
+    {fr:"Je trouve que Mad Men est une série géniale, parce que les personnages sont très complexes.", es:"Me parece que Mad Men es una serie genial, porque los personajes son muy complejos."},
+    {fr:"Il fait très chaud à Barranquilla, pourtant je ne changerais de ville pour rien au monde.", es:"En Barranquilla hace mucho calor; sin embargo, no cambiaría de ciudad por nada del mundo."},
+    {fr:"La ville est vivante et joyeuse ; par contre, la circulation est vraiment pénible.", es:"La ciudad es viva y alegre; en cambio, el tráfico es una tortura."},
+    {fr:"D'un côté, travailler à la maison, c'est pratique ; de l'autre, on se sent un peu seul.", es:"Por un lado, trabajar desde la casa es práctico; por el otro, uno se siente un poco solo."},
+    {fr:"Je ne suis pas d'accord : les réseaux sociaux ne remplacent pas une vraie conversation.", es:"No estoy de acuerdo: las redes sociales no reemplazan una conversación de verdad."},
+    {fr:"Le projet coûte cher, donc il faut bien expliquer au client ce qu'il va gagner.", es:"El proyecto es caro, así que hay que explicarle bien al cliente lo que va a ganar."},
+    {fr:"Pour moi, le plus important dans une entreprise, c'est la confiance entre les gens.", es:"Para mí, lo más importante en una empresa es la confianza entre las personas."},
+    {fr:"Je comprends ton point de vue, mais je vois les choses un peu autrement.", es:"Entiendo tu punto de vista, pero yo veo las cosas un poco distinto."},
+    {fr:"Ce n'est pas parce qu'un film est populaire qu'il est forcément bon.", es:"Que una película sea popular no quiere decir que sea buena."},
+    {fr:"Il vaut mieux apprendre un peu chaque jour que beaucoup une fois par semaine.", es:"Es mejor aprender un poco cada día que mucho una vez a la semana."},
+    {fr:"Franchement, je pense que tu as raison, même si c'est difficile à accepter.", es:"La verdad, creo que tienes razón, aunque sea difícil de aceptar."}
+   ],
+   speak:[
+    {fr:"À mon avis, apprendre une langue, c'est surtout oser parler, même avec des erreurs.", es:"En mi opinión, aprender un idioma es sobre todo atreverse a hablar, aun con errores."},
+    {fr:"Je préfère les séries aux films, parce qu'on a le temps de connaître les personnages.", es:"Prefiero las series a las películas, porque uno alcanza a conocer a los personajes."},
+    {fr:"D'un côté, Paris est cher ; de l'autre, il y a tellement de choses à faire.", es:"Por un lado, París es caro; por el otro, hay muchísimas cosas para hacer."},
+    {fr:"On a perdu le match, pourtant je trouve que l'équipe a très bien joué.", es:"Perdimos el partido; sin embargo, me parece que el equipo jugó muy bien."}
+   ] },
+
+ { id:"histoire", emoji:"📖", name:"Contar una anécdota", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"D'abord, on a raté le bus, ensuite il s'est mis à pleuvoir très fort.", es:"Primero perdimos el bus y después se puso a llover durísimo."},
+    {fr:"Je marchais tranquillement sur la plage quand, tout à coup, j'ai vu un vieil ami.", es:"Iba caminando tranquilo por la playa cuando, de repente, vi a un viejo amigo."},
+    {fr:"Il n'y avait plus de taxis, du coup on est rentrés à pied jusqu'à l'hôtel.", es:"Ya no había taxis, así que nos devolvimos a pie hasta el hotel."},
+    {fr:"Finalement, tout s'est bien passé, et on en rigole encore aujourd'hui.", es:"Al final todo salió bien, y todavía hoy nos reímos de eso."},
+    {fr:"Quand j'étais petit, je passais toutes mes vacances chez ma grand-mère.", es:"Cuando era pequeño, pasaba todas mis vacaciones donde mi abuela."},
+    {fr:"Il faisait déjà nuit, et on ne savait pas du tout où on était.", es:"Ya era de noche y no teníamos ni idea de dónde estábamos."},
+    {fr:"Au début, j'avais un peu peur, mais après quelques minutes je me suis détendu.", es:"Al principio me daba un poco de miedo, pero a los pocos minutos me relajé."},
+    {fr:"Le serveur s'est trompé de plat, mais au final c'était le meilleur repas du voyage.", es:"El mesero se equivocó de plato, pero al final fue la mejor comida del viaje."},
+    {fr:"Pendant qu'on attendait le train, une dame nous a raconté toute sa vie.", es:"Mientras esperábamos el tren, una señora nos contó toda su vida."},
+    {fr:"Ensuite, on a trouvé un petit restaurant où personne ne parlait espagnol.", es:"Después encontramos un restaurantico donde nadie hablaba español."},
+    {fr:"Tout à coup, la lumière s'est éteinte et tout le monde s'est mis à crier.", es:"De repente se fue la luz y todo el mundo se puso a gritar."},
+    {fr:"Le plus drôle, c'est que mon oncle ne m'avait pas reconnu à l'aéroport.", es:"Lo más chistoso es que mi tío no me había reconocido en el aeropuerto."}
+   ],
+   speak:[
+    {fr:"Il était tard et j'étais très fatigué, mais tout à coup mon téléphone a sonné.", es:"Era tarde y yo estaba muy cansado, pero de repente sonó mi celular."},
+    {fr:"D'abord je n'ai pas réagi, ensuite j'ai compris que c'était une blague.", es:"Primero no reaccioné, después entendí que era una broma."},
+    {fr:"On avait perdu nos valises, du coup on a dû acheter des vêtements le premier jour.", es:"Habíamos perdido las maletas, así que tuvimos que comprar ropa el primer día."},
+    {fr:"Finalement, ce voyage raté est devenu un de mes meilleurs souvenirs.", es:"Al final, ese viaje fallido se volvió uno de mis mejores recuerdos."}
+   ] },
+
+ { id:"hypotheses", emoji:"💭", name:"Si fuera…", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"Si j'avais plus de temps, j'apprendrais aussi l'italien et le portugais.", es:"Si tuviera más tiempo, también aprendería italiano y portugués."},
+    {fr:"Si je vivais au Portugal, j'irais à la plage tous les matins avant de travailler.", es:"Si viviera en Portugal, iría a la playa todas las mañanas antes de trabajar."},
+    {fr:"À ta place, je lui parlerais directement, parce que les messages créent des malentendus.", es:"Yo en tu lugar le hablaría directamente, porque los mensajes crean malentendidos."},
+    {fr:"Ce serait génial de faire ce voyage ensemble, mais il faut trouver les bonnes dates.", es:"Sería genial hacer ese viaje juntos, pero hay que encontrar las fechas."},
+    {fr:"Je voudrais te demander un conseil, si tu as cinq minutes ce soir.", es:"Quisiera pedirte un consejo, si tienes cinco minutos esta noche."},
+    {fr:"Si j'étais toi, je n'accepterais pas ce client : il paie toujours en retard.", es:"Si yo fuera tú, no aceptaría a ese cliente: siempre paga tarde."},
+    {fr:"Si on gagnait au loto, qu'est-ce que tu ferais en premier ?", es:"Si nos ganáramos la lotería, ¿qué harías primero?"},
+    {fr:"J'aimerais bien qu'on se voie plus souvent, même si on est très occupés.", es:"Me gustaría que nos viéramos más seguido, aunque estemos muy ocupados."},
+    {fr:"Si Cliff pouvait parler, je crois qu'elle se plaindrait toute la journée.", es:"Si Cliff pudiera hablar, creo que se quejaría todo el día."},
+    {fr:"Ça m'aiderait beaucoup si tu pouvais me corriger quand je fais une erreur.", es:"Me ayudaría mucho que me corrigieras cuando cometo un error."},
+    {fr:"Si je n'avais pas créé Matriz, je travaillerais sûrement pour une grande entreprise.", es:"Si no hubiera creado Matriz, seguramente trabajaría para una empresa grande."},
+    {fr:"On pourrait se retrouver samedi, sauf si tu as déjà quelque chose de prévu.", es:"Podríamos vernos el sábado, a menos que ya tengas algo planeado."}
+   ],
+   speak:[
+    {fr:"Si je pouvais vivre n'importe où, je choisirais une petite ville au bord de la mer.", es:"Si pudiera vivir en cualquier parte, escogería un pueblito a la orilla del mar."},
+    {fr:"À ta place, je prendrais le temps de réfléchir avant de dire oui.", es:"Yo en tu lugar me tomaría el tiempo de pensarlo antes de decir que sí."},
+    {fr:"Ce serait un rêve d'emmener mes parents en Europe pour leur montrer tout ça.", es:"Sería un sueño llevar a mis papás a Europa para mostrarles todo eso."},
+    {fr:"Si j'avais su que c'était si agréable, j'aurais commencé le français beaucoup plus tôt.", es:"Si hubiera sabido que era tan agradable, habría empezado el francés mucho antes."}
+   ] },
+
+ { id:"pro", emoji:"💼", name:"Mi empresa a fondo", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"Chez Matriz, on conçoit et on développe des logiciels sur mesure pour des entreprises.", es:"En Matriz diseñamos y desarrollamos software a la medida para empresas."},
+    {fr:"Avant de vous faire une proposition, j'aimerais comprendre comment vous travaillez.", es:"Antes de hacerle una propuesta, me gustaría entender cómo trabajan ustedes."},
+    {fr:"Notre objectif, c'est de vous faire gagner du temps sur les tâches répétitives.", es:"Nuestro objetivo es que ustedes ahorren tiempo en las tareas repetitivas."},
+    {fr:"On peut livrer une première version dans six semaines, si on valide le budget cette semaine.", es:"Podemos entregar una primera versión en seis semanas, si aprobamos el presupuesto esta semana."},
+    {fr:"Je vous envoie le devis d'ici vendredi, avec deux options selon votre budget.", es:"Le mando la cotización a más tardar el viernes, con dos opciones según su presupuesto."},
+    {fr:"Je comprends votre inquiétude, c'est pour ça qu'on travaille par étapes courtes.", es:"Entiendo su preocupación; por eso trabajamos por etapas cortas."},
+    {fr:"Ce délai me paraît un peu serré ; est-ce qu'on pourrait le repousser d'une semaine ?", es:"Ese plazo me parece un poco justo; ¿lo podríamos correr una semana?"},
+    {fr:"Nos clients apprécient surtout qu'on reste disponibles après la livraison du projet.", es:"Lo que más valoran nuestros clientes es que seguimos disponibles después de la entrega."},
+    {fr:"Si le prix vous semble élevé, on peut réduire le périmètre de la première phase.", es:"Si el precio le parece alto, podemos reducir el alcance de la primera fase."},
+    {fr:"Nous avons déjà réalisé un projet similaire pour une entreprise de logistique à Barranquilla.", es:"Ya hicimos un proyecto parecido para una empresa de logística en Barranquilla."},
+    {fr:"Je vous propose qu'on fasse un point chaque vendredi pour suivre l'avancement.", es:"Le propongo que hagamos una reunión de seguimiento cada viernes para ver el avance."},
+    {fr:"Merci pour votre confiance, on va tout faire pour que ce projet soit une réussite.", es:"Gracias por su confianza; vamos a hacer todo para que este proyecto sea un éxito."}
+   ],
+   speak:[
+    {fr:"Notre équipe est petite, ce qui nous permet d'être rapides et proches de nos clients.", es:"Nuestro equipo es pequeño, y eso nos permite ser rápidos y cercanos a nuestros clientes."},
+    {fr:"Pourriez-vous m'expliquer quel est le problème principal que vous voulez résoudre ?", es:"¿Me podría explicar cuál es el problema principal que quiere resolver?"},
+    {fr:"Je préfère vous donner un délai réaliste plutôt que de vous promettre l'impossible.", es:"Prefiero darle un plazo realista en vez de prometerle lo imposible."},
+    {fr:"Si vous êtes d'accord, je vous envoie un résumé de notre réunion dès cet après-midi.", es:"Si está de acuerdo, le mando un resumen de nuestra reunión esta misma tarde."}
+   ] },
+
+ { id:"liens", emoji:"🫶", name:"Familia y lo que importa", minLvl:1, nivel:"B1",
+   vocab:[
+    {fr:"Je suis très fier de mes parents, parce qu'ils ont travaillé dur toute leur vie.", es:"Estoy muy orgulloso de mis papás, porque trabajaron duro toda la vida."},
+    {fr:"Ça me touche beaucoup quand ma mère me dit qu'elle est contente de moi.", es:"Me conmueve mucho cuando mi mamá me dice que está contenta conmigo."},
+    {fr:"J'ai envie de passer plus de temps avec ma famille, même si je travaille beaucoup.", es:"Tengo ganas de pasar más tiempo con mi familia, aunque trabaje mucho."},
+    {fr:"Je travaille dur pour que mes parents puissent enfin se reposer et profiter de la vie.", es:"Trabajo duro para que mis papás por fin puedan descansar y disfrutar la vida."},
+    {fr:"Ma grand-mère me manque, mais je pense souvent à tout ce qu'elle m'a appris.", es:"Extraño a mi abuela, pero pienso mucho en todo lo que me enseñó."},
+    {fr:"Pour moi, aider les gens, c'est ce qui donne du sens à mon travail.", es:"Para mí, ayudar a la gente es lo que le da sentido a mi trabajo."},
+    {fr:"Mon oncle m'a toujours encouragé, et c'est un peu grâce à lui que j'apprends le français.", es:"Mi tío siempre me ha apoyado, y es un poco gracias a él que aprendo francés."},
+    {fr:"Ça me rend heureux de voir mes amis réussir ce qu'ils ont entrepris.", es:"Me hace feliz ver a mis amigos lograr lo que se propusieron."},
+    {fr:"J'apprends à prendre soin de moi, à me reposer et à moins m'inquiéter.", es:"Estoy aprendiendo a cuidarme, a descansar y a preocuparme menos."},
+    {fr:"Quand je rentre, Cliff vient toujours me saluer, et ça me fait du bien.", es:"Cuando llego a la casa, Cliff siempre viene a saludarme, y eso me hace bien."},
+    {fr:"Ce que j'aime le plus chez mes parents, c'est leur générosité.", es:"Lo que más me gusta de mis papás es lo generosos que son."},
+    {fr:"Je les appelle tous les dimanches pour qu'ils sachent que je pense à eux.", es:"Los llamo todos los domingos para que sepan que pienso en ellos."}
+   ],
+   speak:[
+    {fr:"Ce qui compte vraiment pour moi, c'est la santé de ma famille et la paix intérieure.", es:"Lo que de verdad me importa es la salud de mi familia y la paz interior."},
+    {fr:"Je suis fier du chemin parcouru, même si j'ai encore beaucoup de choses à apprendre.", es:"Estoy orgulloso del camino recorrido, aunque todavía tengo mucho por aprender."},
+    {fr:"J'ai envie d'offrir un beau voyage à mes parents pour les remercier de tout.", es:"Tengo ganas de regalarles un buen viaje a mis papás para agradecerles todo."},
+    {fr:"Ça me touche que tu prennes le temps de m'aider avec mon français chaque semaine.", es:"Me conmueve que te tomes el tiempo de ayudarme con mi francés cada semana."}
+   ] }
+];
+
+const CHARLAS_B1_FR = [
+ { id:"oncle-semaine", grupo:"fondo", emoji:"📞", title:"Tu semana, con tu tío", npc:"🧔", npcName:"Ton oncle",
+   intro:"Tu tío te llama desde Francia, como cada domingo. Quiere saber de tu semana y de tus planes.",
+   steps:[
+    { npc:"Salut Mateo ! Ça fait plaisir de t'entendre. Alors, raconte-moi, comment s'est passée ta semaine ?",
+      npcEs:"¡Hola, Mateo! Qué alegría oírte. A ver, cuéntame, ¿cómo te fue en la semana?",
+      guia:"Te pide un resumen. Di cómo fue y por qué, en passé composé: «a été», «j'ai eu», «j'ai fait».",
+      says:[ {fr:"Elle a été assez chargée, parce qu'on a lancé un nouveau projet chez Matriz.", es:"Bastante pesada, porque arrancamos un proyecto nuevo en Matriz."},
+             {fr:"Plutôt bien ! J'ai beaucoup travaillé, mais j'ai aussi pris le temps de me reposer.", es:"¡Bastante bien! Trabajé mucho, pero también saqué tiempo para descansar."} ] },
+    { npc:"Un nouveau projet ? Super ! Et à part le travail, qu'est-ce que tu as fait de beau ?",
+      npcEs:"¿Un proyecto nuevo? ¡Qué bien! ¿Y aparte del trabajo, qué hiciste de bueno?",
+      guia:"Cuenta algo que hiciste fuera del trabajo: qué, cuándo y con quién.",
+      says:[ {fr:"Samedi, je suis allé à la plage avec des amis, et on a mangé du poisson frit.", es:"El sábado fui a la playa con unos amigos y comimos pescado frito."},
+             {fr:"Je suis allé voir un match avec un ami, et l'ambiance au stade était incroyable.", es:"Fui a ver un partido con un amigo y el ambiente en el estadio estaba increíble.", r:["Ah, je t'envie ! Ici, je regarde tout à la télé.","¡Ay, qué envidia! Aquí yo veo todo por televisión."]} ],
+      tip:"Aller, venir, sortir y rentrer van con «être»: «je suis allé», nunca «j'ai allé»." },
+    { npc:"Ah, la belle vie à Barranquilla ! Ici, il fait froid et il pleut depuis lundi.",
+      npcEs:"¡Ah, la buena vida en Barranquilla! Aquí hace frío y llueve desde el lunes.",
+      guia:"Reacciona y compara con tu clima. Contrasta con «par contre» (en cambio).",
+      says:[ {fr:"Ici, par contre, il fait très chaud, et j'ai parfois du mal à dormir la nuit.", es:"Aquí, en cambio, hace mucho calor, y a veces me cuesta dormir por la noche."},
+             {fr:"Mon pauvre ! Ici, il fait trente degrés, et parfois je rêve d'un peu de fraîcheur.", es:"¡Pobrecito! Aquí hace treinta grados, y a veces sueño con un poquito de fresco.", r:["Ha ha, on échange quand tu veux !","¡Jaja, cambiamos cuando quieras!"]} ] },
+    { npc:"Et ton français, ça avance ? Tu travailles toujours avec ton application ?",
+      npcEs:"¿Y tu francés cómo va? ¿Sigues practicando con tu aplicación?",
+      guia:"Di desde cuándo practicas y qué notas ya. «Depuis» va con presente: «je pratique depuis…».",
+      says:[ {fr:"Oui, je pratique tous les jours depuis des mois, et je comprends beaucoup mieux les conversations.", es:"Sí, llevo meses practicando todos los días y entiendo mucho mejor las conversaciones."},
+             {fr:"Oui, et depuis quelques semaines, j'essaie de faire des phrases plus longues, comme maintenant.", es:"Sí, y desde hace unas semanas trato de hacer frases más largas, como ahora."} ],
+      tip:"«Depuis» va con presente: «j'apprends depuis six mois» = llevo seis meses aprendiendo. Nada de «j'ai appris depuis»." },
+    { npc:"Ça s'entend, tu parles de mieux en mieux ! Et la semaine prochaine, tu as des projets ?",
+      npcEs:"¡Se nota, hablas cada vez mejor! ¿Y la próxima semana tienes planes?",
+      guia:"Cuenta tus planes con futur proche («je vais» + infinitivo) y agrega para qué o por qué.",
+      says:[ {fr:"Je vais présenter une proposition à un gros client, donc je vais bien la préparer.", es:"Voy a presentarle una propuesta a un cliente grande, así que la voy a preparar bien."},
+             {fr:"Je vais emmener mes parents dîner, parce que c'est l'anniversaire de ma mère jeudi.", es:"Voy a llevar a mis papás a comer, porque el jueves es el cumpleaños de mi mamá.", r:["Oh, souhaite-lui un bon anniversaire de ma part !","¡Ay, deséale feliz cumpleaños de mi parte!"]} ] },
+    { npc:"C'est bien, ça. Et quand est-ce que tu viens nous voir en France ?",
+      npcEs:"Qué bien. ¿Y cuándo vienes a visitarnos a Francia?",
+      guia:"Responde con un plan a futuro y una condición: «si tout va bien, je viendrai…».",
+      says:[ {fr:"Si tout va bien, je viendrai l'été prochain, et j'aimerais rester au moins deux semaines.", es:"Si todo sale bien, voy a mitad del próximo año, y me gustaría quedarme por lo menos dos semanas."},
+             {fr:"Je ne sais pas encore, mais je compte économiser pour venir avant la fin de l'année.", es:"Todavía no sé, pero pienso ahorrar para ir antes de que se acabe el año."} ],
+      tip:"«Si» + presente y luego futuro: «si tout va bien, je viendrai». Justo después de «si» nunca va el futuro." },
+    { npc:"Génial, on t'attend ! Bon, je te laisse, ta tante m'appelle pour manger.",
+      npcEs:"¡Genial, te esperamos! Bueno, te dejo, que tu tía me está llamando a comer.",
+      guia:"Despídete con cariño y deja algo pendiente para la próxima llamada.",
+      says:[ {fr:"D'accord, embrasse-la de ma part, et on se rappelle dimanche prochain comme d'habitude.", es:"Listo, dale un abrazo de mi parte, y hablamos el otro domingo como siempre."},
+             {fr:"Merci pour l'appel, ça me fait toujours du bien de te parler. Bon appétit !", es:"Gracias por la llamada, siempre me hace bien hablar contigo. ¡Buen provecho!"} ] }
+   ] },
+
+ { id:"diner-debat", grupo:"fondo", emoji:"🍷", title:"Cena con debate", npc:"🧑", npcName:"Julien",
+   intro:"Cena en casa de Julien, en Lyon. Entre amigos franceses la charla se calienta: fútbol, series, Colombia.",
+   steps:[
+    { npc:"Alors Mateo, toi qui aimes le foot : c'est qui, le meilleur joueur colombien de l'histoire ?",
+      npcEs:"Bueno, Mateo, tú que eres futbolero: ¿quién es el mejor jugador colombiano de la historia?",
+      guia:"Da tu opinión y justifícala con «parce que». Un nombre solo no basta: di por qué.",
+      says:[ {fr:"À mon avis, c'est Valderrama, parce qu'il voyait le jeu avant tout le monde.", es:"Para mí es el Pibe Valderrama, porque veía la jugada antes que todos."},
+             {fr:"Pour moi, c'est James Rodríguez, parce qu'il a marqué des buts incroyables en Coupe du monde.", es:"Para mí es James Rodríguez, porque hizo goles increíbles en el Mundial."},
+             {fr:"Difficile à dire, mais je dirais Falcao, parce qu'il a marqué partout où il est passé.", es:"Difícil decirlo, pero yo diría Falcao, porque hizo goles en todos los equipos donde jugó."} ] },
+    { npc:"Mouais… Moi, je trouve que le foot d'aujourd'hui, c'est surtout du business. Tu n'es pas d'accord ?",
+      npcEs:"Mmm… Yo pienso que el fútbol de hoy es sobre todo negocio. ¿No estás de acuerdo?",
+      guia:"Matiza: dale parte de razón y luego contrasta con «par contre» o «pourtant».",
+      says:[ {fr:"C'est vrai qu'il y a beaucoup d'argent ; par contre, la passion des supporters est toujours la même.", es:"Es verdad que hay mucha plata; en cambio, la pasión de los hinchas sigue igual."},
+             {fr:"En partie, oui. Pourtant, un bon match me fait encore vibrer comme quand j'étais petit.", es:"En parte, sí. Sin embargo, un buen partido todavía me emociona como cuando era niño."} ],
+      tip:"«Par contre» = en cambio. «Pourtant» = sin embargo (algo que sorprende). Los dos matizan sin cerrar la discusión." },
+    { npc:"Bon, changeons de sujet. Vous regardez quoi comme séries en ce moment ?",
+      npcEs:"Bueno, cambiemos de tema. ¿Qué series están viendo ahora?",
+      guia:"Di qué estás viendo y por qué te gusta: algo concreto (los personajes, la época…).",
+      says:[ {fr:"Je regarde Mad Men, et j'adore, parce que chaque personnage cache un secret.", es:"Estoy viendo Mad Men y me encanta, porque cada personaje esconde un secreto.", r:["Ah oui, Don Draper ! Quel personnage…","¡Ah, sí, Don Draper! Qué personaje…"]},
+             {fr:"En ce moment, je regarde Mad Men ; ce qui me plaît, c'est l'ambiance des années soixante.", es:"Ahora estoy viendo Mad Men; lo que me gusta es el ambiente de los años sesenta."} ] },
+    { npc:"Mad Men ? C'est un peu lent, non ? Moi, je préfère les séries avec plus d'action.",
+      npcEs:"¿Mad Men? Es un poco lenta, ¿no? Yo prefiero las series con más acción.",
+      guia:"Defiende tu gusto sin pelear: reconoce su punto y di qué ganas tú. Usa «d'un côté… de l'autre».",
+      says:[ {fr:"D'un côté, c'est lent, c'est vrai ; de l'autre, c'est ce qui rend les dialogues si forts.", es:"Por un lado, es lenta, es verdad; por el otro, eso es lo que hace tan fuertes los diálogos."},
+             {fr:"Je comprends, mais justement, j'aime les séries qui prennent le temps de raconter une histoire.", es:"Te entiendo, pero justamente me gustan las series que se toman el tiempo de contar una historia."} ],
+      tip:"«D'un côté… de l'autre…» = por un lado… por el otro. Sirve para darle la razón al otro y defender lo tuyo a la vez." },
+    { npc:"Et la Colombie, alors ? Ici, les gens en ont encore une image un peu bizarre.",
+      npcEs:"¿Y Colombia qué? Aquí la gente todavía tiene una imagen un poco rara del país.",
+      guia:"Corrige la imagen con tu experiencia, sin regañar. Da un ejemplo concreto.",
+      says:[ {fr:"Je sais, mais le pays a beaucoup changé, et les gens là-bas sont vraiment accueillants.", es:"Ya sé, pero el país ha cambiado mucho, y la gente allá es muy acogedora."},
+             {fr:"C'est dommage, parce que la Colombie, c'est surtout la musique, la nature et des gens très chaleureux.", es:"Qué lástima, porque Colombia es sobre todo música, naturaleza y gente muy cálida."},
+             {fr:"Venez à Barranquilla pendant le carnaval, et vous verrez que cette image est fausse.", es:"Vengan a Barranquilla en carnaval y van a ver que esa imagen es falsa."} ] },
+    { npc:"Tu me donnes envie ! Mais toi, honnêtement, tu préfères vivre là-bas ou ici, en Europe ?",
+      npcEs:"¡Me provocas! Pero tú, honestamente, ¿prefieres vivir allá o aquí, en Europa?",
+      guia:"Pregunta difícil: compara los dos lados y cierra con una conclusión («donc», «au final»).",
+      says:[ {fr:"J'adore ma ville, mais je rêve du Portugal, donc peut-être un jour, un peu des deux.", es:"Amo mi ciudad, pero sueño con Portugal, así que tal vez algún día, un poco de las dos."},
+             {fr:"Là-bas, j'ai ma famille ; ici, il y a la culture, donc au final, je n'arrive pas à choisir.", es:"Allá tengo a mi familia; aquí está la cultura, así que al final no soy capaz de escoger."} ],
+      tip:"«Donc» cierra la idea: primero los dos lados, luego tu conclusión. Así suena a opinión pensada, no a frase suelta." },
+    { npc:"Ha ha, la réponse parfaite ! Allez, on trinque à la Colombie et au Portugal !",
+      npcEs:"¡Jaja, la respuesta perfecta! ¡Vamos, brindemos por Colombia y por Portugal!",
+      guia:"Brinda y agradece la noche con una frase que cierre bien.",
+      says:[ {fr:"Santé ! Merci pour ce dîner, c'était délicieux, et j'ai adoré nos discussions.", es:"¡Salud! Gracias por esta comida, estaba deliciosa, y me encantaron nuestras discusiones."},
+             {fr:"À la vôtre ! La prochaine fois, c'est moi qui vous prépare un plat colombien.", es:"¡Salud! La próxima vez soy yo el que les prepara un plato colombiano."} ] }
+   ] },
+
+ { id:"client-pitch", grupo:"fondo", emoji:"💼", title:"Convencer a un cliente", npc:"👩‍💼", npcName:"Mme Laurent",
+   intro:"Videollamada con Mme Laurent, que dirige una empresa de transporte en Lyon y busca quien le haga un software.",
+   steps:[
+    { npc:"Bonjour, monsieur. Merci d'avoir pris le temps. Pouvez-vous me présenter votre entreprise en quelques mots ?",
+      npcEs:"Buenos días, señor. Gracias por sacar el tiempo. ¿Me puede presentar su empresa en pocas palabras?",
+      guia:"Preséntate con «vous»: qué hace Matriz y qué la hace distinta.",
+      says:[ {fr:"Bien sûr. Matriz conçoit des logiciels sur mesure pour aider les entreprises à gagner du temps.", es:"Claro. Matriz diseña software a la medida para ayudar a las empresas a ahorrar tiempo."},
+             {fr:"Avec plaisir. Nous sommes une petite équipe qui crée des applications simples, solides et faciles à utiliser.", es:"Con gusto. Somos un equipo pequeño que hace aplicaciones sencillas, sólidas y fáciles de usar."} ],
+      tip:"Con un cliente, siempre «vous». Y para presentar tu empresa, «nous sommes», «nous créons» suena más formal que «on»." },
+    { npc:"Très bien. Notre problème, c'est que nous gérons encore toutes les livraisons sur des fichiers Excel.",
+      npcEs:"Muy bien. Nuestro problema es que todavía manejamos todas las entregas en archivos de Excel.",
+      guia:"Antes de vender, entiende. Haz una pregunta para conocer bien la necesidad.",
+      says:[ {fr:"Je vois. Qu'est-ce qui vous fait perdre le plus de temps avec ces fichiers aujourd'hui ?", es:"Ya veo. ¿Qué es lo que más tiempo les hace perder hoy con esos archivos?"},
+             {fr:"D'accord. Pourriez-vous me décrire une journée type, pour que je comprenne bien comment vous travaillez ?", es:"De acuerdo. ¿Me podría describir un día normal, para entender bien cómo trabajan?"} ] },
+    { npc:"Il y a beaucoup d'erreurs, et mes équipes passent des heures à tout vérifier à la main.",
+      npcEs:"Hay muchos errores, y mis equipos pasan horas revisando todo a mano.",
+      guia:"Propón una solución concreta y di qué gana ella. Usa «nous pourrions» (podríamos).",
+      says:[ {fr:"Nous pourrions automatiser ces vérifications, et vos équipes gagneraient plusieurs heures par semaine.", es:"Podríamos automatizar esas revisiones, y sus equipos ganarían varias horas a la semana."},
+             {fr:"Je vous propose un outil simple, qui centralise les livraisons et signale les erreurs tout de suite.", es:"Le propongo una herramienta sencilla, que centralice las entregas y avise de los errores de inmediato."} ],
+      tip:"El condicional («nous pourrions», «vous gagneriez») propone sin imponer. Con un cliente suena más cortés que el presente." },
+    { npc:"Intéressant. Et en combien de temps pourriez-vous livrer une première version ?",
+      npcEs:"Interesante. ¿Y en cuánto tiempo podrían entregar una primera versión?",
+      guia:"Da un plazo realista y su condición. Mejor prometer poco y cumplir.",
+      says:[ {fr:"Nous pourrions livrer une première version en six semaines, si nous commençons au début du mois.", es:"Podríamos entregar una primera versión en seis semanas, si empezamos a principios de mes."},
+             {fr:"Je préfère être honnête : il nous faudrait environ deux mois pour livrer quelque chose de solide.", es:"Prefiero ser honesto: necesitaríamos unos dos meses para entregar algo sólido."} ] },
+    { npc:"Hmm, c'est un peu long pour nous. Et le prix, c'est dans quel ordre de grandeur ?",
+      npcEs:"Mmm, es un poco largo para nosotros. ¿Y el precio, más o menos de cuánto estamos hablando?",
+      guia:"Negocia con cortesía: ofrece opciones en vez de bajar el precio de una.",
+      says:[ {fr:"Je vous enverrai un devis précis demain, avec deux options, selon les fonctionnalités que vous choisirez.", es:"Mañana le mando una cotización precisa, con dos opciones, según las funciones que escoja."},
+             {fr:"Si le délai est un problème, nous pouvons commencer par une version plus simple et moins chère.", es:"Si el plazo es un problema, podemos empezar por una versión más sencilla y más barata."} ],
+      tip:"«Si le délai est un problème, nous pouvons…»: negociar es ofrecer un camino, no solo decir que no." },
+    { npc:"Ça me paraît raisonnable. Mais comment je peux être sûre que le projet avancera bien ?",
+      npcEs:"Me parece razonable. ¿Pero cómo puedo estar segura de que el proyecto va a avanzar bien?",
+      guia:"Dale confianza con un método concreto: reuniones, entregas, transparencia.",
+      says:[ {fr:"Nous ferons un point avec vous chaque vendredi, pour que vous puissiez suivre l'avancement en temps réel.", es:"Haremos una reunión con usted cada viernes, para que pueda seguir el avance en tiempo real."},
+             {fr:"Vous verrez une démo toutes les deux semaines, et vous pourrez changer les priorités si besoin.", es:"Verá una demostración cada dos semanas, y podrá cambiar las prioridades si hace falta."} ] },
+    { npc:"Parfait. Envoyez-moi tout ça par mail, et j'en parle à mon associé cette semaine.",
+      npcEs:"Perfecto. Mándeme todo eso por correo, y lo hablo con mi socio esta semana.",
+      guia:"Cierra con cortesía: agradece y confirma el siguiente paso y cuándo.",
+      says:[ {fr:"Merci beaucoup pour votre temps, je vous envoie la proposition complète dès demain matin.", es:"Muchas gracias por su tiempo; le mando la propuesta completa mañana a primera hora."},
+             {fr:"Avec plaisir. N'hésitez pas à me contacter si vous ou votre associé avez des questions.", es:"Con mucho gusto. No dude en escribirme si usted o su socio tienen preguntas.", r:["Merci à vous, à bientôt.","Gracias a usted, hasta pronto."]} ] }
+   ] },
+
+ { id:"second-rdv", grupo:"fondo", emoji:"🌅", title:"La segunda cita", npc:"👩", npcName:"Camille",
+   intro:"Segunda cita con Camille, en una terraza junto al río. Esta vez la charla va más a fondo.",
+   steps:[
+    { npc:"Je suis contente qu'on se revoie. Tu sais, j'ai beaucoup repensé à notre conversation.",
+      npcEs:"Me alegra que nos volvamos a ver. ¿Sabes? Pensé mucho en nuestra conversación.",
+      guia:"Dile que tú también y por qué: qué te gustó de la primera vez.",
+      says:[ {fr:"Moi aussi, j'ai adoré parler avec toi, parce que j'avais l'impression de te connaître depuis longtemps.", es:"Yo también, me encantó hablar contigo, porque sentía que te conocía desde hace mucho."},
+             {fr:"Moi aussi. C'est rare de rencontrer quelqu'un avec qui on parle aussi facilement.", es:"Yo también. Es raro conocer a alguien con quien se habla tan fácil."} ] },
+    { npc:"L'autre jour, tu m'as parlé du Portugal. Pourquoi le Portugal, et pas la France ?",
+      npcEs:"El otro día me hablaste de Portugal. ¿Por qué Portugal y no Francia?",
+      guia:"Explica tu sueño con razones. Puedes arrancar con «ce qui me plaît, c'est…».",
+      says:[ {fr:"Ce qui me plaît, c'est la mer et le calme, et les gens me rappellent la Colombie.", es:"Lo que me gusta es el mar y la calma, y la gente me recuerda a Colombia."},
+             {fr:"J'aime la France, mais au Portugal la vie est plus tranquille, et l'océan n'est jamais loin.", es:"Me gusta Francia, pero en Portugal la vida es más tranquila, y el mar nunca queda lejos.", r:["C'est vrai, Lisbonne au coucher du soleil, c'est magique.","Es verdad, Lisboa al atardecer es mágica."]} ] },
+    { npc:"Et si tu pouvais partir demain, tu partirais ? Qu'est-ce qui te retient ici ?",
+      npcEs:"¿Y si pudieras irte mañana, te irías? ¿Qué te retiene aquí?",
+      guia:"Hipótesis: «si» + imparfait, y luego condicional. Di qué harías y qué te detiene.",
+      says:[ {fr:"Si je pouvais, je partirais, mais je ne voudrais pas laisser mes parents seuls.", es:"Si pudiera, me iría, pero no quisiera dejar a mis papás solos."},
+             {fr:"Si Matriz marchait sans moi, je partirais demain, mais pour l'instant, l'entreprise a besoin de moi.", es:"Si Matriz funcionara sin mí, me iría mañana, pero por ahora la empresa me necesita."} ],
+      tip:"«Si je pouvais, je partirais»: después de «si» va imparfait, nunca condicional. «Si je pourrais» es el error clásico." },
+    { npc:"Tu parles souvent de tes parents. Vous êtes très proches ?",
+      npcEs:"Hablas mucho de tus papás. ¿Son muy unidos?",
+      guia:"Habla de lo que te importa: tu familia y por qué. Usa «je suis fier de» o «j'ai envie de».",
+      says:[ {fr:"Oui, très. Je suis fier d'eux, parce qu'ils ont tout donné pour que je puisse étudier.", es:"Sí, mucho. Estoy orgulloso de ellos, porque lo dieron todo para que yo pudiera estudiar."},
+             {fr:"Oui, et j'ai envie de leur rendre tout ce qu'ils m'ont donné, petit à petit.", es:"Sí, y tengo ganas de devolverles todo lo que me han dado, poco a poco."} ] },
+    { npc:"C'est beau, ça. Moi, je suis plus proche de ma grand-mère que de mes parents.",
+      npcEs:"Qué bonito. Yo soy más unida a mi abuela que a mis papás.",
+      guia:"Conecta con ella: comparte algo tuyo parecido y hazle una pregunta.",
+      says:[ {fr:"Ça me touche, parce que ma grand-mère comptait beaucoup pour moi aussi. Elle est comment, la tienne ?", es:"Eso me conmueve, porque mi abuela también significaba mucho para mí. ¿Cómo es la tuya?"},
+             {fr:"Je te comprends, j'étais très proche de la mienne. Qu'est-ce qu'elle t'a appris de plus important ?", es:"Te entiendo, yo era muy unido a la mía. ¿Qué es lo más importante que te enseñó?"} ],
+      tip:"«La tienne», «la mienne» = la tuya, la mía. Evitan repetir «ta grand-mère»: suena mucho más fluido." },
+    { npc:"Elle m'a appris à profiter des petites choses. Et toi, qu'est-ce qui te rend vraiment heureux ?",
+      npcEs:"Me enseñó a disfrutar las cosas pequeñas. ¿Y a ti qué te hace realmente feliz?",
+      guia:"Responde con algo concreto y una razón. Una idea completa, no una lista suelta.",
+      says:[ {fr:"Ce qui me rend heureux, c'est un dimanche simple : la plage, un bon livre et ma famille.", es:"Lo que me hace feliz es un domingo sencillo: la playa, un buen libro y mi familia."},
+             {fr:"Aider les gens, parce que c'est ce qui donne du sens à tout ce que je fais.", es:"Ayudar a la gente, porque eso es lo que le da sentido a todo lo que hago."} ] },
+    { npc:"J'aime bien ta façon de voir la vie. On pourrait refaire ça bientôt, tu ne crois pas ?",
+      npcEs:"Me gusta tu forma de ver la vida. Podríamos repetir esto pronto, ¿no crees?",
+      guia:"Acepta y propón un plan con condicional: «ce serait», «on pourrait».",
+      says:[ {fr:"Avec plaisir ! Ce serait génial d'aller au marché ensemble samedi, si tu es libre.", es:"¡Con mucho gusto! Sería genial ir juntos al mercado el sábado, si estás libre."},
+             {fr:"Oui, j'adorerais. La prochaine fois, je t'invite à goûter un vrai café colombien.", es:"Sí, me encantaría. La próxima vez te invito a probar un café colombiano de verdad."} ],
+      tip:"«Ce serait génial de…» = sería genial… El condicional invita sin presionar y le deja espacio para decir que sí." }
+   ] },
+
+ { id:"anecdote", grupo:"fondo", emoji:"🎒", title:"Cuéntame una historia", npc:"🧑", npcName:"Thomas",
+   intro:"Thomas, un amigo de tu tío, quiere oír una historia de viaje. Cuéntala con principio, nudo y final.",
+   steps:[
+    { npc:"Ton oncle m'a dit que tu avais vécu une aventure incroyable en voyage. Raconte !",
+      npcEs:"Tu tío me dijo que viviste una aventura increíble en un viaje. ¡Cuenta!",
+      guia:"Arranca situando la historia: dónde, cuándo y con quién. Para el decorado, imparfait.",
+      says:[ {fr:"C'était il y a deux ans, j'étais à Carthagène avec deux amis pour un long week-end.", es:"Fue hace dos años, estaba en Cartagena con dos amigos en un puente festivo."},
+             {fr:"Alors, j'étais en voyage à Medellín avec mon meilleur ami, et il faisait un temps magnifique.", es:"Bueno, estaba de viaje en Medellín con mi mejor amigo, y hacía un tiempo espectacular."} ],
+      tip:"Imparfait para el decorado (c'était, j'étais, il faisait); passé composé para lo que pasó. Es el eje de toda historia." },
+    { npc:"Ah oui ? Et qu'est-ce qui s'est passé ?",
+      npcEs:"¿Ah, sí? ¿Y qué pasó?",
+      guia:"Cuenta los primeros hechos en orden con «d'abord» y «ensuite».",
+      says:[ {fr:"D'abord, on a loué une petite voiture, ensuite on est partis vers un village dans les montagnes.", es:"Primero alquilamos un carrito, después arrancamos hacia un pueblo en las montañas."},
+             {fr:"D'abord, tout allait bien, ensuite on a décidé de partir en bateau pour visiter une île.", es:"Primero todo iba bien, después decidimos irnos en lancha a conocer una isla."} ] },
+    { npc:"Jusque-là, ça a l'air plutôt tranquille…",
+      npcEs:"Hasta ahí suena bastante tranquilo…",
+      guia:"Llega el nudo: algo inesperado. «Tout à coup» y luego passé composé.",
+      says:[ {fr:"Oui, mais tout à coup, le moteur s'est arrêté, et on s'est retrouvés au milieu de nulle part.", es:"Sí, pero de repente se apagó el motor y quedamos en la mitad de la nada."},
+             {fr:"Justement ! Tout à coup, il s'est mis à pleuvoir si fort qu'on ne voyait plus rien.", es:"¡Justamente! De repente se puso a llover tan duro que no se veía nada."} ],
+      tip:"«Tout à coup» corta el decorado y lanza la acción: después va passé composé («s'est arrêté», «s'est mis à»)." },
+    { npc:"Oh non ! Et vous avez fait comment ? Vous aviez du réseau, au moins ?",
+      npcEs:"¡Ay, no! ¿Y cómo hicieron? ¿Por lo menos tenían señal?",
+      guia:"Di la consecuencia con «du coup» (entonces, así que) y qué hicieron.",
+      says:[ {fr:"Non, pas du tout, du coup on a marché pendant une heure jusqu'à une petite maison.", es:"No, para nada, así que caminamos durante una hora hasta una casita."},
+             {fr:"Il n'y avait aucun réseau, du coup on a demandé de l'aide à un monsieur qui passait.", es:"No había nada de señal, así que le pedimos ayuda a un señor que iba pasando."} ],
+      tip:"«Du coup» = entonces, así que. Es muy hablado y muy francés; por escrito se dice «donc»." },
+    { npc:"Et les gens vous ont aidés ?",
+      npcEs:"¿Y la gente los ayudó?",
+      guia:"Cuenta cómo se resolvió: imparfait para cómo eran las cosas, passé composé para lo que hicieron.",
+      says:[ {fr:"Oui, une famille très gentille nous a accueillis, et la grand-mère nous a préparé un repas délicieux.", es:"Sí, una familia muy amable nos recibió, y la abuela nos preparó una comida deliciosa."},
+             {fr:"Oui, le monsieur était adorable : il nous a prêté son téléphone et il a appelé un mécanicien.", es:"Sí, el señor era un amor: nos prestó su celular y llamó a un mecánico."} ] },
+    { npc:"C'est fou ! Et comment ça s'est terminé ?",
+      npcEs:"¡Qué locura! ¿Y cómo terminó todo?",
+      guia:"Cierra con «finalement» o «au final», y di qué sentiste o qué te dejó.",
+      says:[ {fr:"Finalement, on est rentrés le lendemain, mais ce jour-là est devenu un de mes meilleurs souvenirs.", es:"Al final volvimos al otro día, pero ese día se volvió uno de mis mejores recuerdos."},
+             {fr:"Au final, on a raté notre vol, mais franchement, je referais ce voyage sans hésiter.", es:"Al final perdimos el vuelo, pero la verdad, volvería a hacer ese viaje sin pensarlo."} ] },
+    { npc:"Quelle histoire ! Tu racontes super bien, tu sais. Ton oncle avait raison.",
+      npcEs:"¡Qué historia! Cuentas superbién, ¿sabes? Tu tío tenía razón.",
+      guia:"Agradece y devuélvele la palabra: pídele que te cuente una historia suya.",
+      says:[ {fr:"Merci ! J'ai encore du mal avec le passé, mais je progresse. Et toi, une aventure à raconter ?", es:"¡Gracias! Todavía me cuesta el pasado, pero voy mejorando. ¿Y tú, alguna aventura para contar?"},
+             {fr:"Merci, c'est gentil. À ton tour maintenant : c'est quoi, ton pire souvenir de voyage ?", es:"Gracias, qué amable. Ahora te toca a ti: ¿cuál es tu peor recuerdo de viaje?", r:["Oh là là, j'en ai une très bonne…","Uy, tengo una buenísima…"]} ] }
+   ] }
+];
+
+const IMPROV_B1_FR = [
+ {t:"Cuenta qué hiciste el fin de semana pasado, con quién, y qué fue lo mejor",
+  keys:[["samedi","dimanche","week-end"],["je suis allé","j'ai fait","j'ai passé","on est allés","j'ai vu"],["avec"],["le meilleur","le mieux","j'ai adoré","le plus beau"]],
+  model:"Samedi, je suis allé à la plage avec deux amis, et le meilleur moment, c'était le coucher de soleil sur la mer."},
+ {t:"Cuenta un plan para el próximo año: qué vas a hacer, por qué, y qué necesitas antes",
+  keys:[["l'année prochaine","l'an prochain","dans un an","bientôt"],["je vais","je compte","j'aimerais","je voudrais","j'irai"],["parce qu","pour pouvoir","comme ça"],["avant de","d'abord","il faut que","je dois"]],
+  model:"L'année prochaine, je compte aller en France parce que je veux parler avec mon oncle, mais avant de partir, je dois économiser."},
+ {t:"Da tu opinión sobre una serie que te guste, con una razón y un «pero»",
+  keys:[["à mon avis","je trouve que","je pense que","pour moi","selon moi"],["série","mad men"],["parce qu","grâce à","vu que"],["mais","pourtant","par contre","même si"]],
+  model:"À mon avis, Mad Men est une série géniale parce que les personnages sont complexes, mais le rythme est parfois un peu lent."},
+ {t:"Opina sobre el fútbol de hoy: un lado bueno, un lado malo, y tu conclusión",
+  keys:[["football","foot"],["d'un côté","d'abord","le bon côté"],["de l'autre","par contre","pourtant","mais"],["donc","au final","finalement","en fin de compte"]],
+  model:"D'un côté, le football d'aujourd'hui, c'est beaucoup d'argent ; de l'autre, la passion des gens est intacte, donc je continue à l'adorer."},
+ {t:"Cuenta una anécdota: dónde estabas, qué pasó de repente, y cómo terminó",
+  keys:[["j'étais","c'était","il faisait","on était"],["tout à coup","soudain","d'un coup"],["finalement","au final","à la fin","heureusement"]],
+  model:"J'étais au marché avec ma mère quand, tout à coup, il s'est mis à pleuvoir très fort ; finalement, on a fini dans un café."},
+ {t:"Di qué harías si te ganaras la lotería, para quién, y por qué",
+  keys:[["si je gagnais","si j'avais","si un jour"],["j'achèterais","je ferais","j'offrirais","je donnerais","j'aiderais"],["mes parents","ma famille","ma mère","mon père"],["parce qu","pour qu","pour les"]],
+  model:"Si je gagnais au loto, j'offrirais une maison à mes parents, parce qu'ils ont travaillé toute leur vie pour moi."},
+ {t:"Un amigo quiere renunciar a su trabajo: dile qué harías tú en su lugar, cuándo, y por qué",
+  keys:[["à ta place","si j'étais toi","moi, je"],["je chercherais","je ferais","je parlerais","j'attendrais","je garderais"],["avant de","d'abord","après"],["parce qu","sinon","pour ne pas"]],
+  model:"À ta place, je chercherais un autre poste avant de démissionner, parce qu'on prend de meilleures décisions sans la pression de l'argent."},
+ {t:"Presenta Matriz a un cliente (de usted): qué hace, qué le ofreces, y qué le propones",
+  keys:[["matriz","notre entreprise","notre équipe","nous sommes"],["logiciel","application","outil","plateforme"],["vous","votre"],["je vous propose","nous pourrions","on pourrait","nous proposons","on peut"]],
+  model:"Matriz crée des logiciels sur mesure pour les entreprises ; pour votre équipe, je vous propose une application simple qui évite les erreurs."},
+ {t:"Negocia un plazo con un cliente: muestra que entiendes, explica el problema, y propón una alternativa",
+  keys:[["je comprends","je vois","bien sûr","entendu"],["délai","semaines","date"],["par contre","mais","cependant","malheureusement"],["nous pourrions","on pourrait","je vous propose","on peut","nous pouvons"]],
+  model:"Je comprends votre urgence, mais ce délai est trop court ; par contre, nous pourrions livrer une première version dans trois semaines."},
+ {t:"Cuéntale a tu tío desde cuándo aprendes francés, qué ha cambiado, y qué te falta",
+  keys:[["depuis"],["français"],["maintenant","aujourd'hui","déjà","mieux"],["encore","il me manque","j'ai du mal","pas encore","je dois"]],
+  model:"J'apprends le français depuis quelques mois ; maintenant je comprends presque tout, mais j'ai encore du mal à parler vite."},
+ {t:"Habla de alguien de tu familia: qué te enseñó, por qué estás orgulloso, y qué quieres hacer por él o ella",
+  keys:[["ma mère","mon père","ma grand-mère","mes parents","mon oncle"],["m'a appris","m'a montré","m'a enseigné","m'a donné"],["fier","fière"],["j'ai envie de","je veux","j'aimerais","je voudrais"]],
+  model:"Ma grand-mère m'a appris à profiter des petites choses ; je suis très fier d'elle, et j'aimerais transmettre ça à mes enfants un jour."},
+ {t:"Describe tu vida soñada en Portugal: dónde vivirías, qué harías cada día, y con quién",
+  keys:[["portugal","lisbonne","porto"],["j'habiterais","je vivrais","j'aurais","j'irais","je serais"],["tous les jours","tous les matins","chaque jour","le matin","le soir"],["avec"]],
+  model:"Au Portugal, je vivrais dans une petite maison près de la mer, j'irais nager tous les matins et je travaillerais l'après-midi avec Cliff sur mes genoux."},
+ {t:"Cuenta un problema de trabajo de esta semana, qué hicieron, y qué aprendiste",
+  keys:[["cette semaine","lundi","mardi","mercredi","jeudi"],["problème","souci","erreur","bug"],["du coup","donc","alors","on a décidé","j'ai décidé"],["j'ai appris","m'a appris","j'ai compris","la leçon"]],
+  model:"Mardi, un client a trouvé un bug important, du coup on a travaillé toute la nuit, et j'ai appris à mieux tester avant de livrer."},
+ {t:"Invita a alguien a salir: propón un plan, di por qué te gustaría, y déjale una salida amable",
+  keys:[["ça te dirait","tu veux","on pourrait","tu aimerais","ça te tente"],["samedi","dimanche","ce soir","demain","vendredi"],["j'aimerais","ce serait","j'adorerais","ça me ferait plaisir"],["si tu","sinon","pas de souci","pas de problème","sans pression"]],
+  model:"Ça te dirait d'aller au cinéma samedi ? J'aimerais vraiment passer du temps avec toi, mais si tu es occupée, pas de souci."},
+ {t:"Compara Barranquilla con una ciudad de Francia: una ventaja, una desventaja, y cuál prefieres",
+  keys:[["barranquilla"],["paris","lyon","marseille","la france"],["plus","moins","meilleur","pire"],["je préfère","je choisirais","je reste","mon choix"]],
+  model:"Barranquilla est plus chaude et plus joyeuse que Paris, mais Paris a plus de culture ; au final, je préfère la chaleur de chez moi."}
+];
+if(!EN){
+  THEMES_B1_FR.forEach(t=>THEMES.push({...t, minLvl:7}));   // desde «Cliente habitual» (8.000 ⭐): a quien empieza no le cae encima
+  IMPROV_B1_FR.forEach(m=>IMPROV.push({...m, b1:true}));   // b1: el 📜 examen no las usa (sigue siendo el de A1)
+  CHARLAS_B1_FR.forEach(c=>CHARLAS.push(c));
+}
+</script>
+<script>
 /* ================== ESTADO ================== */
 const S = {
   xp: 0, streak: 0, bestStreak: 0, lastDay: null,
@@ -4623,6 +5065,151 @@ function srNecesitaMicExclusivo(recog){
   return IOS && !!recog && !(S.prefs && S.prefs.vg==="self");
 }
 
+/* ================== 🎙️ EL OÍDO (v1.99) — UNO NUEVO POR CADA TOMA ==================
+   Mateo: «arreglemos lo del micrófono, que a veces no funciona… eso debe estar
+   funcionando sin ningún problema, al oprimirse y luego soltarse».
+   Hasta la v1.98 cada juego abría UN reconocedor continuo y, en cada toque, lo
+   abortaba y lo volvía a arrancar con temporizadores (150/400/700/900 ms). Tres
+   grietas, todas intermitentes —de ahí el «a veces»—:
+     1. El start() iba en un setTimeout, FUERA del toque. iOS es quisquilloso con
+        eso, y si el abort anterior no había terminado, start() fallaba en silencio.
+     2. El onend del abort viejo llegaba TARDE (iOS tarda), marcaba el oído como
+        apagado mientras ya escuchaba, y el «empujón» lo volvía a abortar: lo que
+        dijiste en ese momento se perdía.
+     3. Solo valían los resultados FINALES. En iPhone, al soltar a veces el final
+        nunca llega: «hablé, solté y no calificó».
+   Ahora: un reconocedor NUEVO por toma, arrancado dentro del propio toque, con
+   resultados parciales (se va guardando lo que oye mientras hablas) y, al soltar,
+   se califica con lo último que oyó si el final no llega en 2,5 s. Sin
+   temporizadores de arranque ni reconexiones.
+   Reglas que siguen: en iOS el micro va SOLO al oído (v1.69: releaseMic antes);
+   Coco se calla antes de oír; «me califico» por tomas mudas es solo por hoy (v1.85).
+   No se tocó speakFR/getMic/releaseMic. */
+function unirTomas(lista){
+  // iOS a veces repite en cada resultado todo lo dicho hasta ahí («bonjour»,
+  // «bonjour je», «bonjour je suis»): se une sin duplicar
+  let acc="";
+  for(const t of lista){
+    const c=String(t||"").trim(); if(!c) continue;
+    const a=acc.toLowerCase(), b=c.toLowerCase();
+    if(!acc || b.startsWith(a)) acc=c;
+    else if(!a.endsWith(b)) acc+=" "+c;
+  }
+  return acc.replace(/\s+/g," ").trim();
+}
+function oirToma(o){
+  let fin=false, error="", res=[], r=null, tope=null, t0=Date.now(), dur=0, listo=false;
+  const texto=()=>unirTomas(res.map(x=>x[0]));
+  const alts=()=>{
+    const out=[texto()];
+    const ult=res[res.length-1]||[];
+    const base=unirTomas(res.slice(0,-1).map(x=>x[0]));
+    ult.forEach(a=>out.push(unirTomas([base,a])));
+    res.forEach(x=>x.forEach(a=>out.push(a)));
+    return [...new Set(out.filter(Boolean))];
+  };
+  const terminar=()=>{
+    if(fin) return; fin=true; clearTimeout(tope);
+    if(!dur) dur=Date.now()-t0;
+    o.onFin({texto:texto(), alts:alts(), error, ms:dur});
+  };
+  const ctl={
+    parar(){ if(fin) return; if(!dur) dur=Date.now()-t0; clearTimeout(tope);
+      try{ r&&r.stop(); }catch(e){}
+      tope=setTimeout(terminar, 2500); },             // si el final no llega, vale lo que ya oyó
+    cancelar(){ if(fin) return; fin=true; clearTimeout(tope); try{ r&&r.abort(); }catch(e){} },
+  };
+  const avisaListo=()=>{ if(!listo && !fin){ listo=true; if(o.onListo) o.onListo(); } };
+  callarACoco();                                        // que Coco no se oiga a sí mismo
+  if(!SR){ error="no-sr"; setTimeout(terminar,0); return ctl; }
+  if(IOS) releaseMic();                                 // v1.69: en iOS el oído va solo
+  try{
+    r=new SR(); r.lang=LANG_TAG; r.continuous=true; r.interimResults=true; r.maxAlternatives=3;
+  }catch(e){ error="crear"; setTimeout(terminar,0); return ctl; }
+  r.onstart=()=>setTimeout(avisaListo,120);
+  r.onaudiostart=avisaListo;
+  r.onresult=e=>{
+    const nuevo=[];
+    for(let i=0;i<e.results.length;i++){
+      const rl=e.results[i], a=[];
+      for(let j=0;j<rl.length;j++) if(rl[j] && rl[j].transcript) a.push(String(rl[j].transcript).trim());
+      if(a.length) nuevo.push(a);
+    }
+    if(nuevo.length) res=nuevo;
+    avisaListo();
+    if(o.onParcial && texto()) o.onParcial(texto());
+  };
+  r.onerror=e=>{ error=(e&&e.error)||"error";
+    if(/not-allowed|service-not-allowed|audio-capture/.test(error)) terminar(); };
+  r.onend=()=>terminar();
+  try{ r.start(); }catch(e){ error="start"; setTimeout(terminar,0); return ctl; }
+  setTimeout(avisaListo, 700);                          // hay navegadores que no avisan el arranque
+  tope=setTimeout(()=>ctl.parar(), o.maxMs||30000);
+  return ctl;
+}
+/* El botón: MANTENER oprimido = graba mientras sostienes y al soltar califica (como
+   nota de voz). Toque corto = empieza, otro toque termina. Con «oido:false» hace lo
+   mismo sin reconocedor (para grabarse y calificarse uno mismo). */
+function botonVoz(btn, o){
+  const HOLD=350;
+  let toma=null, downAt=0, esteToque=false, ultPointer=0;
+  const usaOido=()=> typeof o.oido==="function" ? o.oido() : o.oido!==false;
+  const limpiar=()=>{ btn.classList.remove("rec","prep"); };
+  function empezar(){
+    btn.classList.add("prep");
+    const cb={ maxMs:o.maxMs,
+      onListo(){ btn.classList.remove("prep"); btn.classList.add("rec"); if(o.alListo) o.alListo(); },
+      onParcial(t){ if(o.alParcial) o.alParcial(t); },
+      onFin(r){ toma=null; limpiar(); o.alTerminar(r); } };
+    if(usaOido()) toma=oirToma(cb);
+    else {                                              // sin oído: solo marca el tiempo de la toma
+      callarACoco(); const t0=Date.now(); let hecho=false, tp=null;
+      const acaba=()=>{ if(hecho) return; hecho=true; clearTimeout(tp); cb.onFin({texto:"", alts:[], error:"sin-oido", ms:Date.now()-t0}); };
+      toma={ parar:acaba, cancelar(){ hecho=true; clearTimeout(tp); } };
+      setTimeout(()=>cb.onListo(),0); tp=setTimeout(acaba, o.maxMs||30000);
+    }
+    if(o.alEmpezar) o.alEmpezar();
+  }
+  btn.onpointerdown=e=>{
+    e.preventDefault(); ultPointer=Date.now();
+    try{ btn.setPointerCapture(e.pointerId); }catch(_){}
+    downAt=Date.now(); esteToque=false;
+    if(!toma){ esteToque=true; empezar(); }
+  };
+  btn.onpointerup=e=>{
+    e.preventDefault(); ultPointer=Date.now();
+    if(!toma) return;
+    if(!esteToque) toma.parar();                        // segundo toque = terminé
+    else if(Date.now()-downAt>=HOLD) toma.parar();      // lo sostuvo: al soltar, termina
+    else if(o.alToque) o.alToque();                     // toque corto: sigue oyendo
+  };
+  btn.onpointercancel=()=>{ if(toma && esteToque && Date.now()-downAt>=HOLD) toma.parar(); };
+  btn.oncontextmenu=e=>e.preventDefault();
+  // teclado (y click sin puntero): alterna
+  btn.onclick=()=>{ if(Date.now()-ultPointer<700) return; if(toma) toma.parar(); else { esteToque=true; downAt=0; empezar(); if(o.alToque) o.alToque(); } };
+  return { parar(){ if(toma) toma.parar(); }, cancelar(){ if(toma){ toma.cancelar(); toma=null; limpiar(); } }, activo:()=>!!toma };
+}
+/* Qué decir cuando la toma no trajo texto. Solo cuenta como «muda» una toma de
+   verdad (sostenida ≥ 0,7 s, con permiso): así un toque rápido o el permiso de iOS
+   no te mandan a «me califico». Devuelve true si hoy pasa a calificarse él. */
+function vozSinTexto(r, res, alAutocalificar){
+  if(/not-allowed|service-not-allowed/.test(r.error)){
+    const m="Coco no tiene permiso para oírte. En el iPhone: Ajustes › Privacidad › Micrófono y Reconocimiento de voz.";
+    if(alAutocalificar) alAutocalificar(m); else res.innerHTML=m;   // el porqué va con la salida
+    return false;
+  }
+  if(r.ms<700){ res.textContent="Mantén oprimido el micrófono mientras hablas, y suéltalo al terminar."; return false; }
+  S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
+  if(S.prefs.srFails>=2 && !vozSoloHoy){
+    vozSoloHoy=true;                                    // v1.85: solo por hoy, NO se guarda
+    toast("🎧 Hoy el oído no te está captando — por esta sesión te calificas tú. La próxima vez Coco vuelve a intentarlo.");
+    if(alAutocalificar) alAutocalificar("");
+    return true;
+  }
+  res.textContent="Coco no captó tu voz. Mantén oprimido, habla cerca del teléfono y suelta al terminar.";
+  return false;
+}
+
 /* 🎯 v1.70 — SEÑUELOS DEL MISMO TAMAÑO QUE LA RESPUESTA.
    Lo cazó Mateo: si la buena es "Di que aún no hablas muy bien, PERO que tienes
    una meta" y las otras son "El trabajo", "Tienes razón"… se acierta sin saber
@@ -4994,6 +5581,14 @@ function gameSource(){
   const custom=S.custom||[];
   if((S.session && S.session.immersion) || S.theme==="mix"){
     const un=THEMES.filter(x=>x.minLvl<=level());
+    // 🧗 v1.99: desde el reto 3, la MITAD de lo que sale es del nivel nuevo (ideas
+    // completas). Si no, 7 temas difíciles se diluían entre 21 fáciles y no se notaban.
+    const avz=un.filter(x=>x.nivel==="B1"), facil=un.filter(x=>x.nivel!=="B1");
+    if(avz.length && diffFor("mix").tier>=3){
+      const mitad=(a,b)=>a.concat(shuffle(b).slice(0,a.length));
+      return { id:"mix", vocab:mitad(avz.flatMap(x=>x.vocab), facil.flatMap(x=>x.vocab)).concat(custom.filter(c=>!c.big)),
+               speak:mitad(avz.flatMap(x=>x.speak), facil.flatMap(x=>x.speak)).concat(custom) };
+    }
     // el cuaderno 📓 entra a la mezcla: tus frases viven en las lecciones
     // las frases 'big' (kilométricas) no entran a ejercicios de vocabulario/escritura:
     // viven troceadas en pedazos aprendibles; la completa solo se practica hablando
@@ -5463,35 +6058,8 @@ function gameSpeak(){
   const area=$("gameArea");
   let mediaRec=null, chunks=[], lastUrl=null, recActive=false;
 
-  // micrófono y reconocedor se abren UNA vez al entrar al juego y quedan
-  // escuchando en modo continuo hasta terminar: un solo permiso, no uno por frase
-  let recog=null, srOn=false, onHeard=null, onSrError=null;
-  if(SR){
-    recog=new SR();
-    recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=3;
-    recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl); };
-    recog.onerror=ev=>{
-      if(ev.error==="not-allowed"||ev.error==="service-not-allowed"){ recog=null; return; }
-      if(onSrError) onSrError(ev.error);   // red caída, sin voz, etc: avisar en vez de quedarse mudo
-    };
-    // si la escucha se muere MIENTRAS grabas, se reconecta sola
-    recog.onend=()=>{ srOn=false; if(recActive) setTimeout(ensureSR,120); };
-  }
-  // ⚙️ modo "yo me califico": sin reconocedor — grabas, te escuchas y te calificas tú
-  if((S.prefs && S.prefs.vg==="self") || vozSoloHoy) recog=null;
-  function ensureSR(){
-    if(!recog || srOn) return;
-    try{ recog.start(); srOn=true; }
-    catch(e){
-      try{ recog.abort(); }catch(_){}
-      setTimeout(()=>{ try{ recog.start(); srOn=true; }catch(_){} },150);   // reinicio si se enredó
-    }
-  }
-  // el permiso se pide al entrar, pero la ESCUCHA solo arranca cuando tocas el mic
-  // (si escuchara antes, captaría la voz del propio Coco por los parlantes).
-  // v1.69: en iOS NO se pre-pide, porque dejar el micro tomado deja sordo al
-  // reconocedor — él pide su propio permiso al arrancar.
-  if(!srNecesitaMicExclusivo(recog)) getMic().catch(()=>{});
+  // 🎙️ v1.99: ya no hay un reconocedor para todo el juego — botonVoz() abre uno por toma
+  const recog=null;
 
   function ask(){
     if(qi>=qs.length){ if(recog){ try{recog.stop();}catch(e){} } releaseMic(); gameDone("🎤 ¡Suéltalo!",pts); return; }   // v1.42: mic libre apenas termina el juego de hablar
@@ -5560,130 +6128,60 @@ function gameSpeak(){
         r2.onclick=()=>{ qi++; ask(); };
         res.appendChild(row);
       }
+      // 🎯 v1.99: la corrección de pronunciación — qué palabras no se entendieron
+      if(bestHeard && nStars<3){
+        const dw=diffWords(bestHeard, q.fr);
+        const d=document.createElement("div"); d.className="chcorr";
+        d.innerHTML=`<div class="chheard">Coco entendió: «${esc(bestHeard.trim())}»</div><div class="chtarget">${dw.targetHtml}</div>`+
+          (dw.missed.length?`<div class="chpalabras">${dw.missed.slice(0,4).map(w=>`<button class="chpal" data-w="${esc(w)}">🔊 ${esc(w)}</button>`).join("")}</div>`:"");
+        d.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>speakFR(b.dataset.w,0.6));
+        res.insertBefore(d, res.querySelector(".btn-row"));
+      }
     }
 
-    /* Reconocimiento de voz (si existe) + grabación para escucharse */
-    async function startRec(){
-      // re-tocar el mic tras un intento flojo = intentar de nuevo (lo natural)
-      if(scored && !q._adv){ scored=false; bestSim=-1; bestHeard=""; stars.textContent=""; }
-      mic.classList.add("rec"); res.textContent="🔴 Grabando... suelta (o toca de nuevo) para parar"; res.style.color="var(--ink)";
-      pressAt=Date.now();
-      setTimeout(()=>{ if(recOn) ensureSR(); },700);            // segundo empujón al oído si se durmió
-      clearTimeout(autoStop);
-      autoStop=setTimeout(()=>{ if(recOn){ recOn=false; stopRec(); } }, 9000);   // tope de seguridad
-      recActive=true;
-      onSrError=(err)=>{
-        if(scored) return;
-        res.textContent = err==="network" ? "Se cayó la conexión del oído de Coco 😵 reconectando..." : "No capté nada 🎧 habla un poco más fuerte";
-        res.style.color="var(--orange)";
-      };
-      callarACoco();   // callar a Coco: que no se puntúe su propia voz
-      // 🎙️ v1.69: en iOS la grabadora y el reconocedor NO pueden convivir (ver
-      // srNecesitaMicExclusivo). Si toca reconocer, se suelta el micro y el oído va solo.
-      if(srNecesitaMicExclusivo(recog)){
-        releaseMic();
-        const pb=$("playback"); if(pb) pb.style.display="none";
-      } else
-      // grabadora para reproducirse a sí mismo (reutiliza el mismo permiso)
-      try{
-        const stream = await getMic();
-        chunks=[]; mediaRec = new MediaRecorder(stream);
+    /* 🎙️ v1.99 — la toma va por botonVoz(): un oído NUEVO por toma, arrancado dentro del
+       propio toque, que guarda lo que oye mientras hablas. Fuera de iOS, además se graba
+       para «👂 Escucharme» (en iOS el micro va SOLO al oído: v1.69). */
+    const conOido=()=>!!SR && !((S.prefs && S.prefs.vg==="self") || vozSoloHoy);
+    function grabarParaEscucharme(){
+      if(IOS && conOido()) return;
+      getMic().then(stream=>{
+        if(!voz.activo()) return;
+        chunks=[]; mediaRec=new MediaRecorder(stream);
         mediaRec.ondataavailable=e=>chunks.push(e.data);
         mediaRec.onstop=()=>{
-          if(chunks.length){
-            if(lastUrl) URL.revokeObjectURL(lastUrl);
-            lastUrl = URL.createObjectURL(new Blob(chunks,{type:"audio/webm"}));
-            const pb=$("playback");
-            if(pb){ pb.style.display="inline-flex"; pb.onclick=()=>{ new Audio(lastUrl).play(); }; }
-          }
+          if(!chunks.length) return;
+          if(lastUrl) URL.revokeObjectURL(lastUrl);
+          lastUrl=URL.createObjectURL(new Blob(chunks,{type:"audio/webm"}));
+          const pb=$("playback"); if(pb){ pb.style.display="inline-flex"; pb.onclick=()=>{ new Audio(lastUrl).play(); }; }
         };
         mediaRec.start();
-      }catch(err){
-        mic.classList.remove("rec"); mic.style.opacity=".4";
-        res.style.color="var(--ink)";
-        selfRate("🎙️ El micrófono está bloqueado aquí (pasa en la vista previa).<br>¡No importa! Escucha a Coco, <b>dilo en voz alta</b> y califícate:");
-        return;
-      }
-      // FLUSH anti-eco: descartar TODO lo que el oído captó antes de tu toque
-      // (incluida la voz de Coco por los parlantes) y arrancar la escucha limpia.
-      // Luego acumulamos resultados y calificamos LA MEJOR toma, no la primera.
-      // v1.77: en iOS se espera un poco más — acabamos de callar la síntesis y el
-      // sistema tarda en pasar el audio de REPRODUCIR a GRABAR. Arrancar el oído
-      // demasiado pronto lo deja escuchando el silencio de la transición.
-      if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR, IOS?400:150); }
-      if(recog){
-        onHeard=(rl)=>{
-          if(Date.now()-pressAt<400) return;        // resultado viejo/eco: aún no has hablado
-          if(COCO_HABLA) return;       // no puntuar la voz de Coco
-          for(const alt of rl){ const s=similarity(alt.transcript,q.fr); if(s>bestSim){bestSim=s; bestHeard=alt.transcript;} }
-          if(bestSim>=.3){ S.prefs.srFails=0; }      // el oído sí funciona en este equipo
-          res.textContent=`Coco escuchó: "${bestHeard.trim()}"`;
-          if(bestSim>=.8){ onHeard=null; scoreIt(bestSim); }   // clavada: puntúa al instante
-        };
-      }
+      }).catch(()=>{
+        if(!conOido()){ mic.style.opacity=".4"; selfRate("🎙️ El micrófono está bloqueado aquí. Escucha a Coco, <b>dilo en voz alta</b> y califícate:"); }
+      });
     }
-    function stopRec(){
-      mic.classList.remove("rec");
-      recActive=false;
-      clearTimeout(autoStop);
-      if(mediaRec && mediaRec.state!=="inactive") mediaRec.stop();
-      if(recog){
-        // gracia de ~2s tras parar: dejar llegar el resultado completo y puntuar el mejor
-        setTimeout(()=>{
-          if(scored) return;
-          onHeard=null;
-          if(bestSim>=0){ S.prefs.srFails=0; store.save(); scoreIt(bestSim); }
-          else{
-            // el "oído" existe pero no oye (típico de iPhone): tras 2 tomas mudas,
-            // Coco se pasa solo a «Yo me califico» en este equipo — cero frustración
-            S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
-            if(S.prefs.srFails>=2 && !vozSoloHoy){
-              vozSoloHoy=true;                            // v1.85: solo por hoy, NO se guarda
-              try{ recog.abort(); }catch(_){}
-              recog=null;
-              toast("🎧 Hoy el oído no te está captando — por esta sesión te calificas tú. La próxima vez Coco vuelve a intentarlo.");
-              selfRate("Escúchate con «👂 Escucharme», compárate con Coco y califícate:");
-            }else{
-              selfRate(`El reconocedor no captó tu voz 🎧 Toca el mic e intenta otra vez, o escúchate con "👂 Escucharme" y califícate tú:`);
-            }
-          }
-        }, 1900);
-      }
-      if(!recog){
-        // sin reconocimiento: escucharse y autoevaluarse
-        setTimeout(()=>selfRate("Escúchate 👂 y compárate con Coco. ¿Cómo te salió?"), 400);
-      }
-    }
-    // Dos formas de grabar (idea del buzón 🪶 v1.26):
-    //  · MANTENER OPRIMIDO estilo nota de voz de WhatsApp: graba mientras sostienes, al soltar para en seco.
-    //  · TOQUE corto clásico: un toque empieza, otro toque para (igual que antes).
-    // La distinción es la duración de la presión: ≥600ms sosteniendo = modo WhatsApp.
-    const HOLD_MS=600;
-    let downAt=0, startedThisPress=false;
-    mic.onpointerdown=(e)=>{
-      e.preventDefault();
-      try{ mic.setPointerCapture(e.pointerId); }catch(_){}
-      downAt=Date.now(); startedThisPress=false;
-      if(!recOn){ recOn=true; startedThisPress=true; startRec(); }
-      // si ya estaba grabando, este toque es "parar": se resuelve al soltar (pointerup)
-    };
-    mic.onpointerup=(e)=>{
-      e.preventDefault();
-      if(!recOn) return;
-      const held=Date.now()-downAt;
-      if(startedThisPress){
-        if(held>=HOLD_MS){ recOn=false; stopRec(); }      // WhatsApp: soltaste → para ya
-        // toque corto: sigue grabando; el próximo toque la para
-      }else{
-        // segundo toque = parar (modo clásico), con el guardia de "aún no dijiste nada"
-        if(Date.now()-pressAt<450){ res.textContent="Di la frase primero y luego vuelve a tocar 😉"; res.style.color="var(--orange)"; return; }
-        recOn=false; stopRec();
-      }
-    };
-    mic.onpointercancel=()=>{                             // llamada entrante, cambio de app, etc.
-      if(recOn && startedThisPress && Date.now()-downAt>=HOLD_MS){ recOn=false; stopRec(); }
-    };
-    mic.oncontextmenu=(e)=>e.preventDefault();            // sin menú contextual al sostener
+    const voz=botonVoz(mic, {
+      oido:conOido,
+      alEmpezar(){
+        if(scored && !q._adv){ scored=false; bestSim=-1; bestHeard=""; stars.textContent=""; }   // re-tocar = otro intento
+        res.textContent="Preparando el oído…"; res.style.color="var(--ink)";
+        grabarParaEscucharme();
+      },
+      alListo(){ res.textContent="🔴 Habla ahora… y suelta al terminar"; },
+      alToque(){ res.textContent="🔴 Te escucho… toca otra vez al terminar"; },
+      alParcial(t){ res.textContent=`Coco escucha: «${t}»`; },
+      alTerminar(r){
+        try{ if(mediaRec && mediaRec.state!=="inactive") mediaRec.stop(); }catch(e){}
+        if(scored) return;
+        if(!conOido() && r.error==="sin-oido"){ setTimeout(()=>selfRate("Escúchate 👂 y compárate con Coco. ¿Cómo te salió?"), 300); return; }
+        if(r.texto){
+          S.prefs.srFails=0; store.save();
+          r.alts.forEach(a=>{ const sm=similarity(a,q.fr); if(sm>bestSim){ bestSim=sm; bestHeard=a; } });
+          scoreIt(bestSim); return;
+        }
+        vozSinTexto(r, res, (motivo)=>selfRate((motivo?motivo+"<br>":"")+"Dilo en voz alta y califícate:"));
+      },
+    });
   }
   ask();
 }
@@ -5973,6 +6471,7 @@ function abrirCharlas(){
   const g=k=>CHARLAS.filter(c=>c.grupo===k).map(fila).join("");
   ov.innerHTML=`<div class="cheat chsheet">
     <h3>Conversación</h3>
+    ${g("fondo")?`<div class="chgrupo">A fondo</div>${g("fondo")}`:""}
     <div class="chgrupo">Conocer a alguien</div>${g("conocer")}
     <div class="chgrupo">De viaje</div>${g("viaje")}
     <button class="chpick chkit" id="chKit"><span class="chpe">${THEME_VIAJE.emoji}</span><span class="chpt">${esc(THEME_VIAJE.name)}</span></button>
@@ -5996,20 +6495,10 @@ function gameCharla(){
   const chat=$("chat"), box=$("chBox");
   let si=0, pts=0;
 
-  // 🎙️ el oído: uno solo para toda la charla, igual que ¡Suéltalo!
-  let recog=null, srOn=false, onHeard=null, recActive=false;
-  if(SR && !((S.prefs && S.prefs.vg==="self") || vozSoloHoy)){
-    recog=new SR(); recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=3;
-    recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl); };
-    recog.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") recog=null; };
-    recog.onend=()=>{ srOn=false; if(recActive) setTimeout(ensureSR,120); };
-  }
-  function ensureSR(){
-    if(!recog || srOn) return;
-    try{ recog.start(); srOn=true; }
-    catch(e){ try{ recog.abort(); }catch(_){} setTimeout(()=>{ try{ recog.start(); srOn=true; }catch(_){} },150); }
-  }
-  function cerrarOido(){ recActive=false; onHeard=null; if(recog){ try{ recog.stop(); }catch(e){} } releaseMic(); charlaCerrar=null; }
+  // 🎙️ v1.99: el oído es uno NUEVO por toma (botonVoz); aquí solo se guarda el de ahora
+  let voz=null;
+  const conOido=()=>!!SR && !((S.prefs && S.prefs.vg==="self") || vozSoloHoy);
+  function cerrarOido(){ if(voz) voz.cancelar(); releaseMic(); charlaCerrar=null; }
   charlaCerrar=cerrarOido;   // «Salir» a mitad de charla también suelta el oído
 
   function burbuja(cls, html){
@@ -6049,11 +6538,11 @@ function gameCharla(){
       <div class="chsays">${says.map((o,i)=>`<div class="chsay" data-i="${i}"><div class="chfr">${esc(o.fr)}</div><div class="ches">${esc(o.es)}</div>
         <button class="replaybtn" data-oir="${i}" title="escuchar">🔊</button></div>`).join("")}</div>
       <button class="micbtn chmic" id="chMic">🎙️</button>
-      <div class="chres" id="chRes">${recog?"Toca el micrófono y di una":"Escúchala, dila en voz alta y toca la que dijiste"}</div>`;
+      <div class="chres" id="chRes">${conOido()?"Mantén oprimido el micrófono y di una":"Escúchala, dila en voz alta y toca la que dijiste"}</div>`;
     box.querySelectorAll("[data-oir]").forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); speakFR(says[+b.dataset.oir].fr,0.7); });
     const mic=$("chMic"), res=$("chRes");
     setTimeout(()=>{ try{ mic.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(e){} }, 300);
-    let intentos=0, contado=false, ganado=false, ultN=3, ultOido=null, best=null, bestSim=-1, heard="", autoStop=null, pressAt=0;
+    let intentos=0, contado=false, ganado=false, ultN=3, ultOido=null;
 
     function puntuar(i, sim, oido){
       const o=says[i];
@@ -6077,7 +6566,7 @@ function gameCharla(){
       if(n<3 && intentos<3) fila.innerHTML+=`<button class="btn small ghost" id="chOtra">Otra vez</button>`;
       if(n>=2 || intentos>=2) fila.innerHTML+=`<button class="btn green" id="chSeguir">Seguir</button>`;
       res.appendChild(fila);
-      const ot=$("chOtra"); if(ot) ot.onclick=()=>{ best=null; bestSim=-1; heard=""; res.textContent=recog?"Toca el micrófono y dila otra vez":"Dila en voz alta y califícate"; };
+      const ot=$("chOtra"); if(ot) ot.onclick=()=>{ res.textContent=conOido()?"Mantén oprimido el micrófono y dila otra vez":"Dila en voz alta y toca la que dijiste"; };
       const sg=$("chSeguir"); if(sg) sg.onclick=()=>avanzar(o);
       setTimeout(()=>{ try{ res.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(e){} }, 60);   // la corrección, a la vista
     }
@@ -6098,39 +6587,26 @@ function gameCharla(){
       const [a,b,cc]=res.querySelectorAll("button");
       a.onclick=()=>puntuar(i,.9,null); b.onclick=()=>puntuar(i,.6,null); cc.onclick=()=>puntuar(i,.35,null);
     }
-    box.querySelectorAll(".chsay").forEach(e=>e.onclick=()=>{ if(!recog) autocalificar(+e.dataset.i); });
-    if(!recog){ mic.style.display="none"; return; }
+    box.querySelectorAll(".chsay").forEach(e=>e.onclick=()=>{ if(!conOido()) autocalificar(+e.dataset.i); });
+    if(!conOido()){ mic.style.display="none"; return; }
 
-    function arrancar(){
-      recActive=true; mic.classList.add("rec"); pressAt=Date.now();
-      res.innerHTML=`<div class="chmsg">Te escucho… toca otra vez al terminar</div>`;
-      callarACoco();
-      if(srNecesitaMicExclusivo(recog)) releaseMic();      // v1.69: en iOS el oído va solo
-      try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR, IOS?400:150);
-      setTimeout(()=>{ if(recActive) ensureSR(); },900);
-      clearTimeout(autoStop); autoStop=setTimeout(()=>{ if(recActive) parar(); }, 10000);
-      onHeard=(rl)=>{
-        if(Date.now()-pressAt<400 || COCO_HABLA) return;
-        for(const alt of rl) says.forEach((o,i)=>{ const s=similarity(alt.transcript,o.fr); if(s>bestSim){ bestSim=s; best=i; heard=alt.transcript; } });
-        res.innerHTML=`<div class="chheard">Coco entendió: «${esc(heard.trim())}»</div>`;
-        if(bestSim>=.8){ parar(true); }
-      };
-    }
-    function parar(ya){
-      recActive=false; mic.classList.remove("rec"); clearTimeout(autoStop);
-      setTimeout(()=>{
-        onHeard=null;
-        if(best!==null){ S.prefs.srFails=0; store.save(); puntuar(best, bestSim, heard); return; }
-        S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
-        if(S.prefs.srFails>=2 && !vozSoloHoy){
-          vozSoloHoy=true;                                   // v1.85: solo por hoy, NO se guarda
-          try{ recog.abort(); }catch(_){} recog=null; mic.style.display="none";
-          toast("🎧 Hoy el oído no te está captando: por esta sesión te calificas tú.");
-          res.innerHTML=`<div class="chmsg">Dila en voz alta y toca la que dijiste</div>`;
-        } else res.innerHTML=`<div class="chmsg">No te capté. Toca el micrófono y habla un poco más fuerte</div>`;
-      }, ya?50:1900);
-    }
-    mic.onclick=()=>{ if(!recActive) arrancar(); else parar(); };
+    voz=botonVoz(mic, {
+      alEmpezar(){ res.innerHTML=`<div class="chmsg">Preparando el oído…</div>`; },
+      alListo(){ res.innerHTML=`<div class="chmsg">🔴 Habla ahora… y suelta al terminar</div>`; },
+      alToque(){ res.innerHTML=`<div class="chmsg">🔴 Te escucho… toca otra vez al terminar</div>`; },
+      alParcial(t){ res.innerHTML=`<div class="chheard">Coco escucha: «${esc(t)}»</div>`; },
+      alTerminar(r){
+        if(r.texto){
+          S.prefs.srFails=0; store.save();
+          let best=0, bs=-1, oido=r.texto;
+          r.alts.forEach(a=>says.forEach((o,i)=>{ const sm=similarity(a,o.fr); if(sm>bs){ bs=sm; best=i; oido=a; } }));
+          puntuar(best, bs, oido); return;
+        }
+        const msg=document.createElement("div");
+        if(vozSinTexto(r, msg, null)){ mic.style.display="none"; res.innerHTML=`<div class="chmsg">Dila en voz alta y toca la que dijiste</div>`; }
+        else res.innerHTML=`<div class="chmsg">${msg.innerHTML}</div>`;
+      },
+    });
     // el personaje termina de hablar antes de que el oído pueda arrancar
     mic.disabled=true; habla.then(()=>{ mic.disabled=false; });
     setTimeout(()=>{ mic.disabled=false; }, 6000);
@@ -6163,15 +6639,8 @@ function gameImprov(){
   let mi=0, pts=0;
   const area=$("gameArea");
 
-  // dictado por voz opcional: una sola escucha continua para todo el juego
-  let recog=null, srOn=false, onHeard=null;
-  if(SR){
-    recog=new SR(); recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=1;
-    recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl[0].transcript); };
-    recog.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") recog=null; };
-    recog.onend=()=>{ srOn=false; };
-  }
-  function ensureSR(){ if(recog && !srOn){ try{ recog.start(); srOn=true; }catch(e){} } }
+  // 🎙️ v1.99: el dictado usa el oído nuevo-por-toma (botonVoz), como todos los juegos
+  const recog=null;
 
   function ask(){
     if(mi>=ms.length){ if(recog){try{recog.stop();}catch(e){}} gameDone("🎭 Improvisa",pts); return; }
@@ -6189,27 +6658,22 @@ function gameImprov(){
     const inp=$("ans");
     const mb=$("micBtn");
     if(mb){
-      // un clic dicta, otro clic para
-      let pressAt=0, dictOn=false;
-      mb.onclick=()=>{
-        if(!dictOn){
-          dictOn=true; pressAt=Date.now();
-          mb.classList.add("rec"); mb.textContent="🛑 Parar dictado";
-          if(!srNecesitaMicExclusivo(recog)) getMic().catch(()=>{});   // v1.69: en iOS el oído va solo
-          // flush anti-eco: solo dictar lo dicho DESPUÉS de tocar
-          if(recog){ try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR,150); }
-          setTimeout(()=>{ if(dictOn) ensureSR(); },700);
-          callarACoco();
-          onHeard=(txt)=>{
-            if(Date.now()-pressAt<400) return;       // residuo viejo o eco de Coco
-            if(COCO_HABLA) return;
-            inp.value=(inp.value+" "+txt).trim();
-          };
-        } else {
-          dictOn=false; mb.classList.remove("rec"); mb.textContent="🎙️ Dictar";
-          setTimeout(()=>{ onHeard=null; },1500);
-        }
-      };
+      // mantener oprimido = dicta mientras sostienes; toque corto = empieza y otro toque para.
+      // Lo que va oyendo aparece en vivo en el cuadro; al terminar se queda escrito.
+      let base="";
+      botonVoz(mb, {
+        alEmpezar(){ base=inp.value.trim(); mb.textContent="🔴 Te escucho"; },
+        alParcial(t){ inp.value=(base+" "+t).trim(); },
+        alTerminar(r){
+          mb.textContent="🎙️ Dictar";
+          if(r.texto){ inp.value=(base+" "+r.texto).trim(); S.prefs.srFails=0; return; }
+          inp.value=base;
+          const fb=$("fb");
+          if(/not-allowed|service-not-allowed/.test(r.error)) fb.textContent="Coco no tiene permiso para oírte: escríbelo, o activa el micrófono en Ajustes del iPhone.";
+          else if(r.ms<700) fb.textContent="Mantén oprimido «Dictar» mientras hablas, y suelta al terminar.";
+          else fb.textContent="No te capté. Mantén oprimido y habla cerca del teléfono, o escríbelo.";
+        },
+      });
     }
     let answered=false, correcting=false;
     const submit=()=>{
@@ -6467,10 +6931,13 @@ function gameBuild(){
   noTimer();
   const t=gameSource();
   updateTierChip(diffFor(t.id).tier);
-  // frases cortas del tema + repasos que tocan hoy (3-7 palabras)
-  const fits=v=>{ const n=v.fr.trim().split(/\s+/).length; return n>=3 && n<=7; };
+  // frases del tema + repasos que tocan hoy. 🧗 v1.99: en reto 4-5 entran frases
+  // LARGAS (hasta 11 / 14 palabras) y al menos dos de cada ronda lo son.
+  const tierB=diffFor(t.id).tier, maxW=tierB>=5?14:tierB>=4?11:7;
+  const fits=v=>{ const n=v.fr.trim().split(/\s+/).length; return n>=3 && n<=maxW; };
   const due=shuffle(dueWeak().filter(fits)).slice(0,2);
-  const pool=shuffle(t.vocab.concat(t.speak).filter(fits).filter(v=>!due.find(d=>d.fr===v.fr)));
+  let pool=shuffle(t.vocab.concat(t.speak).filter(fits).filter(v=>!due.find(d=>d.fr===v.fr)));
+  if(tierB>=4){ const largas=pool.filter(v=>v.fr.trim().split(/\s+/).length>7).slice(0,2); pool=largas.concat(pool.filter(v=>!largas.includes(v))); }
   const qs=due.concat(pool).slice(0, S.session.immersion?5:4);
   let qi=0, pts=0;
   const area=$("gameArea");
@@ -7335,8 +7802,10 @@ function leerTanda(tanda, todos, vuelta){
        El listón es generoso a propósito: el ejercicio es LEER de corrido, no
        clavar la pronunciación palabra por palabra. */
     $("lecDecir").onclick=()=>{
-      const fb=$("lecFb");
-      fb.innerHTML=`<button class="btn small red" id="lecMic">🎙️ Leer en voz alta</button>`;
+      // v1.99: el botón va FUERA del texto de respuesta — antes vivía dentro y el
+      // primer mensaje («grabando…») lo borraba: no había cómo parar la toma.
+      $("lecFb").innerHTML=`<button class="btn small red" id="lecMic">🎙️ Leer en voz alta</button><div id="lecFbTx" style="margin-top:8px"></div>`;
+      const fb=$("lecFbTx");
       fb.style.color="var(--ink)";
       wireExamMic($("lecMic"), fb, {
         maxMs:20000,
@@ -7472,55 +7941,25 @@ function examSRStop(){ const r=VOZ.sr; if(r){ try{ r.abort(); }catch(e){} } VOZ.
      · Gracia de ~1,8 s al parar: sin ella se decide antes de que llegue el resultado.
    NO tocar esto sin leer el juego 3 primero.                                    */
 function wireExamMic(mic, fb, cfg){
-  let grabando=false, pressAt=0, tope=null, tomas=[];
-  const empujar=()=>{ const r=examSR(); if(r&&!VOZ.srOn){ try{ r.start(); VOZ.srOn=true; }catch(e){} } };
-  async function start(){
-    grabando=true; tomas=[]; pressAt=Date.now();
-    mic.classList.add("rec"); mic.textContent="🛑 Ya lo dije";
-    fb.innerHTML="🔴 Grabando… habla ahora"; fb.style.color="var(--ink)";
-    callarACoco();          // que Coco no se puntúe a sí mismo
-    // 🎙️ v1.69: en iOS NO se pide getUserMedia si vamos a reconocer — tener el
-    // micro tomado deja SORDO al reconocedor (ver srNecesitaMicExclusivo). Fuera
-    // de iOS sí se espera el permiso antes de escuchar, como arreglamos en v1.63.
-    if(srNecesitaMicExclusivo(examSR())){
-      releaseMic();
-    } else {
-      try{ await getMic(); }
-      catch(err){
-        grabando=false; mic.classList.remove("rec");
-        if(cfg.onBloqueado) cfg.onBloqueado();
-        return;
-      }
-    }
-    if(!grabando) return;                               // paró mientras se pedía el permiso
-    const r=examSR();
-    if(r){ try{ r.abort(); }catch(e){} VOZ.srOn=false; setTimeout(empujar, IOS?400:150); }
-    setTimeout(()=>{ if(grabando) empujar(); }, 900);   // segundo empujón
-    clearTimeout(tope);
-    tope=setTimeout(()=>{ if(grabando) stop(); }, cfg.maxMs||10000);
-    VOZ.onHeard=(rl)=>{
-      if(Date.now()-pressAt<400) return;                // eco o resto de una toma vieja
-      if(COCO_HABLA) return;              // no puntuar la voz de Coco
-      for(let i=0;i<rl.length;i++) if(rl[i]&&rl[i].transcript) tomas.push(rl[i].transcript);
-      if(tomas.length){ fb.innerHTML=`Coco escuchó: "${esc(String(rl[0].transcript).trim())}"`; }
-    };
-  }
-  function stop(){
-    if(!grabando) return; grabando=false;
-    mic.classList.remove("rec"); mic.textContent="🎙️ Otra vez";
-    clearTimeout(tope);
-    if(cfg.onParar) cfg.onParar();   // ya habló: el reloj no debe cortar la gracia
-    setTimeout(()=>{                                    // gracia: deja llegar el resultado final
-      VOZ.onHeard=null;
-      if(tomas.length) cfg.onTomas(tomas);
-      else {
-        S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
-        if(cfg.onMudo) cfg.onMudo(S.prefs.srFails>=2);
-      }
-    }, 1800);
-  }
-  mic.onclick=()=>{ if(grabando) stop(); else start(); };
-  return {stop, activo:()=>grabando};
+  // 🎙️ v1.99: el mismo oído nuevo-por-toma de todos los juegos (botonVoz). Mantener
+  // oprimido = graba mientras sostienes; toque corto = empieza y otro toque termina.
+  const v=botonVoz(mic, {
+    maxMs: cfg.maxMs||15000,
+    alEmpezar(){ mic.textContent="🔴 Te escucho"; fb.innerHTML="Preparando el oído…"; fb.style.color="var(--ink)"; },
+    alListo(){ fb.innerHTML="🔴 Habla ahora… y suelta al terminar"; },
+    alToque(){ fb.innerHTML="🔴 Te escucho… toca otra vez al terminar"; },
+    alParcial(t){ fb.innerHTML=`Coco escucha: "${esc(t)}"`; },
+    alTerminar(r){
+      mic.textContent="🎙️ Otra vez";
+      if(cfg.onParar) cfg.onParar();   // ya habló: el reloj no debe cortar la gracia
+      if(r.texto){ cfg.onTomas(r.alts); return; }
+      if(/not-allowed|service-not-allowed|audio-capture/.test(r.error)){ if(cfg.onBloqueado) cfg.onBloqueado(); return; }
+      if(r.ms<700){ fb.innerHTML="Mantén oprimido mientras hablas, y suelta al terminar."; fb.style.color="var(--orange)"; return; }
+      S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
+      if(cfg.onMudo) cfg.onMudo(S.prefs.srFails>=2);
+    },
+  });
+  return {stop:()=>v.parar(), activo:()=>v.activo()};
 }
 
 function startExam(){
@@ -7533,7 +7972,7 @@ function startExam(){
   S.session=null;
   EXAM={
     items:{ listen:pool.slice(0,EXAM_N), build:pool.slice(EXAM_N,EXAM_N*2),
-            say:pool.slice(EXAM_N*2,EXAM_N*3), improv:shuffle(IMPROV).slice(0,EXAM_N) },
+            say:pool.slice(EXAM_N*2,EXAM_N*3), improv:shuffle(IMPROV.filter(m=>!m.b1)).slice(0,EXAM_N) },
     pool, res:{listen:[],build:[],say:[],improv:[]}, si:0, qi:0, selfGraded:false,
   };
   show("scr-game");
