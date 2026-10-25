@@ -604,6 +604,34 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
 }
 /* v1.97: el chip del idioma (FR / EN) en la píldora de arriba */
 .chip.curso{font:600 .72rem/1 var(--fm); letter-spacing:.08em; min-width:34px; justify-content:center;}
+/* 🗣️ v1.98 — Conversación con guía */
+.chsheet h3{margin:0 0 6px; font-weight:500; font-size:1.3rem;}
+.chgrupo{font:600 .7rem/1 var(--fm); letter-spacing:.1em; text-transform:uppercase; opacity:.6; margin:16px 2px 6px;}
+.chpick{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--card); color:var(--ink);
+  border:1.5px solid var(--soft2); border-radius:14px; padding:11px 14px; margin:6px 0; font:500 1rem/1.25 var(--f); cursor:pointer;}
+.chpick:active{transform:translateY(2px);}
+.chpe{font-size:1.25rem; width:26px; text-align:center; flex:none;}
+.chkit{border-style:dashed;}
+.coach{display:flex; gap:10px; align-items:flex-start; background:var(--tint); border-radius:16px; padding:10px 12px; margin:4px 0 10px;}
+.coachface{flex:none; line-height:0;}
+.coachtx{font-size:.95rem; line-height:1.4;}
+.chtip{margin-top:6px; font-size:.85rem; opacity:.8; border-left:3px solid var(--blue); padding-left:8px;}
+.coachmsg{background:var(--tint)!important;}
+.chsays{display:flex; flex-direction:column; gap:8px;}
+.chsay{position:relative; background:var(--card); border:1.5px solid var(--soft2); border-radius:14px; padding:10px 50px 10px 14px; cursor:default;}
+.chsay.on{border-color:var(--blue);}
+.chsay .replaybtn{position:absolute; right:8px; top:50%; transform:translateY(-50%);}
+.chfr{font-weight:600; font-size:1.08rem;}
+.ches{font-size:.82rem; opacity:.6; margin-top:2px;}
+.chmic{width:76px; height:76px; font-size:1.9rem; margin-top:12px;}
+.chmic:disabled{opacity:.45;}
+.chres{text-align:center; margin-top:8px; min-height:26px; font-size:.95rem;}
+.chstars{font-size:1.5rem; letter-spacing:4px; color:var(--blue);}
+.chmsg{font-weight:500;}
+.chheard{font-size:.85rem; opacity:.7; margin-top:6px;}
+.chtarget{font-size:1.1rem; margin-top:6px;}
+.chpalabras{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px;}
+.chpal{border:none; background:var(--tint); color:var(--ink); border-radius:99px; padding:5px 12px; font:500 .9rem var(--f); cursor:pointer;}
 </style>
 </head>
 <body data-scr="scr-home">
@@ -641,7 +669,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
           <span class="ss">Más preguntas, temas mezclados · 15 min</span></span><span class="ch">›</span></button>
         <button class="hopt" id="btnScene"><span class="ic">💬</span><span class="tx">
           <span class="tt">Conversación</span>
-          <span class="ss">Escenas con giros, sin reloj</span></span><span class="ch">›</span></button>
+          <span class="ss">Con guía, en voz alta</span></span><span class="ch">›</span></button>
         <button class="hopt" id="btnRead"><span class="ic">📖</span><span class="tx">
           <span class="tt">Leer</span>
           <span class="ss">Textos de libros y juegos, por trozos</span></span><span class="ch">›</span></button>
@@ -684,7 +712,7 @@ body:not([data-scr="scr-home"]) #app{padding-top:calc(28px + env(safe-area-inset
       </div>
     </details>
 
-    <div class="footer-note">Coco · v1.97</div>
+    <div class="footer-note">Coco · v1.98</div>
   </div>
 
   <!-- ============ GAME ============ -->
@@ -3269,6 +3297,762 @@ if(EN){
 }
 </script>
 <script>
+/* ================== 🗣️ CONVERSACIONES CON GUÍA (v1.98) ==================
+   Formato: ver gameCharla(). `fr` = el idioma que se aprende. */
+// Coco v1.98 — «Conversación con guía»: contenido en FRANCÉS (3 «conocer» + 7 «viaje»)
+const CHARLAS_FR = [
+ // ───────────── CONOCER ─────────────
+ { id:"cafe-libro", grupo:"conocer", emoji:"📖", title:"Una desconocida en un café", npc:"👩", npcName:"Camille",
+   intro:"Estás en un café de París. La mujer de la mesa de al lado lee un libro que te encantó.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Rompe el hielo con algo de la situación (el libro), no con su físico.",
+      says:[ {fr:"Pardon, c'est un bon livre ?", es:"Perdón, ¿es un buen libro?"},
+             {fr:"Excusez-moi, vous aimez ce livre ?", es:"Disculpe, ¿le gusta ese libro?"} ],
+      tip:"Con una desconocida, empieza de «vous». Si ella te tutea o te lo propone, pasas a «tu»." },
+    { npc:"Oui, je l'adore. Vous l'avez lu ?", npcEs:"Sí, me encanta. ¿Usted lo leyó?",
+      guia:"Te pregunta si lo leíste. Responde y devuélvele una pregunta abierta.",
+      says:[ {fr:"Oui, deux fois ! Vous en êtes où ?", es:"¡Sí, dos veces! ¿Usted en qué parte va?"},
+             {fr:"Oui, l'an dernier. Qu'est-ce qui vous plaît ?", es:"Sí, el año pasado. ¿Qué es lo que le gusta?"} ],
+      tip:"Pregunta abierta = no se responde con sí o no. «Qu'est-ce qui vous plaît ?» da para hablar; «C'est bien ?» se acaba ahí." },
+    { npc:"J'aime les personnages. Vous n'êtes pas d'ici, non ?", npcEs:"Me gustan los personajes. Usted no es de aquí, ¿cierto?",
+      guia:"Notó tu acento. Preséntate: tu nombre y de dónde vienes.",
+      says:[ {fr:"Non, je suis colombien. Je m'appelle Mateo.", es:"No, soy colombiano. Me llamo Mateo."},
+             {fr:"Non, je viens de Barranquilla, en Colombie.", es:"No, vengo de Barranquilla, en Colombia.", r:["Ah, la Colombie ! C'est loin !","¡Ah, Colombia! ¡Qué lejos!"]} ] },
+    { npc:"Enchantée. Moi, c'est Camille. Vous êtes en vacances ?", npcEs:"Mucho gusto. Yo soy Camille. ¿Está de vacaciones?",
+      guia:"Repite su nombre al responder: suena cercano y muestra que la escuchaste.",
+      says:[ {fr:"Enchanté, Camille. Oui, pour une semaine.", es:"Mucho gusto, Camille. Sí, por una semana."},
+             {fr:"Enchanté, Camille. Oui, et je travaille un peu.", es:"Mucho gusto, Camille. Sí, y trabajo un poco."} ] },
+    { npc:"Et vous faites quoi dans la vie ?", npcEs:"¿Y usted a qué se dedica?",
+      guia:"«Faire quoi dans la vie» = a qué te dedicas. Cuenta lo de tu empresa y pregúntale lo mismo.",
+      says:[ {fr:"J'ai une petite entreprise de logiciels. Et vous ?", es:"Tengo una pequeña empresa de software. ¿Y usted?"},
+             {fr:"Je crée des applications. Et vous, vous faites quoi ?", es:"Hago aplicaciones. ¿Y usted a qué se dedica?"} ] },
+    { npc:"Je suis architecte. Mais je dois partir dans dix minutes.", npcEs:"Soy arquitecta. Pero me tengo que ir en diez minutos.",
+      guia:"Tiene poco tiempo. Es el momento: propón verse otro día, sin presionar.",
+      says:[ {fr:"Dommage ! On prend un café un autre jour ?", es:"¡Qué lástima! ¿Nos tomamos un café otro día?"},
+             {fr:"Ça vous dirait, un café un autre jour ?", es:"¿Le provocaría un café otro día?"} ] },
+    { npc:"Avec plaisir ! On peut se tutoyer, non ?", npcEs:"¡Con mucho gusto! Podemos tutearnos, ¿no?",
+      guia:"Ella propone pasar al «tu». Acepta y pídele su número o su Instagram.",
+      says:[ {fr:"Oui, bien sûr ! Tu me donnes ton numéro ?", es:"¡Sí, claro! ¿Me das tu número?"},
+             {fr:"Avec plaisir. Tu as Instagram ?", es:"Con mucho gusto. ¿Tienes Instagram?"} ],
+      tip:"Si ella propone el «tu», pasa al «tu» de una: ton numéro, tu as… Seguir con «vous» suena distante." },
+    { npc:"Voilà. Bonne journée, Mateo !", npcEs:"Listo. ¡Que tengas buen día, Mateo!",
+      guia:"Despídete con su nombre y algo de lo que hablaron.",
+      says:[ {fr:"Merci, Camille. À bientôt !", es:"Gracias, Camille. ¡Hasta pronto!"},
+             {fr:"Bonne lecture, Camille ! À très vite.", es:"¡Que disfrutes el libro, Camille! Nos vemos pronto."} ] }
+   ] },
+
+ { id:"fiesta-amigos", grupo:"conocer", emoji:"🥂", title:"En la fiesta de un amigo", npc:"👩‍🦱", npcName:"Léa",
+   intro:"Una fiesta en casa de Julien, un amigo en común, en Lyon. Una invitada está sola en el balcón.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Abre por lo que comparten: la fiesta y el anfitrión.",
+      says:[ {fr:"Bonsoir ! Vous connaissez Julien comment ?", es:"¡Buenas noches! ¿Usted de dónde conoce a Julien?"},
+             {fr:"Bonsoir. Vous êtes une amie de Julien ?", es:"Buenas noches. ¿Usted es amiga de Julien?"} ],
+      tip:"En una fiesta, el anfitrión es el mejor pretexto: «¿de dónde conoces a…?» funciona en cualquier idioma." },
+    { npc:"Oui, on travaille ensemble. Et toi ? On peut se dire tu, hein.", npcEs:"Sí, trabajamos juntos. ¿Y tú? Nos podemos tutear, ¿cierto?",
+      guia:"Entre amigos de amigos, en Francia el «tu» llega rápido. Ella lo propone: síguele.",
+      says:[ {fr:"Moi, je l'ai connu en Colombie.", es:"Yo lo conocí en Colombia.", r:["En Colombie ? Trop bien !","¿En Colombia? ¡Qué chévere!"]},
+             {fr:"D'accord ! On travaille ensemble sur un projet.", es:"¡Listo! Trabajamos juntos en un proyecto."} ] },
+    { npc:"Je m'appelle Léa. Tu viens d'où, alors ?", npcEs:"Me llamo Léa. ¿Y de dónde eres, entonces?",
+      guia:"Responde y agrega un detalle que dé para hablar: el mar, el calor, el carnaval.",
+      says:[ {fr:"Moi, c'est Mateo. Je viens de Barranquilla.", es:"Yo soy Mateo. Soy de Barranquilla."},
+             {fr:"Mateo, de Barranquilla, au bord de la mer.", es:"Mateo, de Barranquilla, junto al mar."} ] },
+    { npc:"La mer, le soleil… Je suis jalouse ! Tu fais quoi à Lyon ?", npcEs:"El mar, el sol… ¡Qué envidia! ¿Y qué haces en Lyon?",
+      guia:"Cuenta lo tuyo en corto y repregunta: que la conversación vaya y vuelva.",
+      says:[ {fr:"Je suis là pour le travail. Et toi ?", es:"Estoy aquí por trabajo. ¿Y tú?"},
+             {fr:"Des vacances ! Et toi, tu travailles dans quoi ?", es:"¡Vacaciones! ¿Y tú en qué trabajas?"} ] },
+    { npc:"Je suis prof de musique, et je chante dans un groupe.", npcEs:"Soy profesora de música y canto en un grupo.",
+      guia:"Lo que alguien hace con gusto es lo que más le importa. Pregunta por eso.",
+      says:[ {fr:"Génial ! Tu chantes quoi, comme style ?", es:"¡Qué chévere! ¿Qué estilo cantas?"},
+             {fr:"Trop bien ! Tu chantes où, avec ton groupe ?", es:"¡Qué bacano! ¿Dónde cantas con tu grupo?"} ],
+      tip:"Escuchar y repreguntar sobre lo que ella acaba de decir vale más que tener la frase perfecta." },
+    { npc:"Du jazz, dans des petits bars. J'adore ça.", npcEs:"Jazz, en bares pequeños. Me encanta.",
+      guia:"Halaga lo que transmite (su energía, su pasión), no su físico. Corto y sincero.",
+      says:[ {fr:"Ça se voit, tu parles de ça avec passion.", es:"Se nota, hablas de eso con pasión."},
+             {fr:"J'adore ton énergie. Ça donne envie de t'écouter.", es:"Me encanta tu energía. Dan ganas de oírte."} ],
+      tip:"Un halago sobre lo que ella hace o transmite se recibe bien. Sobre su cuerpo, con alguien que acabas de conocer, incomoda." },
+    { npc:"Merci, c'est gentil ! On joue jeudi, d'ailleurs.", npcEs:"¡Gracias, qué amable! Por cierto, tocamos el jueves.",
+      guia:"Te acaba de dar una invitación. Di que te gustaría ir y quedan en contacto.",
+      says:[ {fr:"Je peux venir ? Tu me donnes l'adresse ?", es:"¿Puedo ir? ¿Me das la dirección?"},
+             {fr:"J'adorerais venir ! On échange nos numéros ?", es:"¡Me encantaría ir! ¿Intercambiamos números?"} ] },
+    { npc:"Bien sûr ! Je te donne mon numéro. À jeudi, Mateo !", npcEs:"¡Claro! Te doy mi número. ¡Nos vemos el jueves, Mateo!",
+      guia:"Despídete con su nombre y confirma el plan.",
+      says:[ {fr:"Super, à jeudi, Léa !", es:"¡Súper, nos vemos el jueves, Léa!"},
+             {fr:"Génial. Bonne soirée, Léa. À jeudi !", es:"Genial. Que pases buena noche, Léa. ¡Hasta el jueves!"} ] }
+   ] },
+
+ { id:"cafe-ocupada", grupo:"conocer", emoji:"🎧", title:"Cuando ella no quiere hablar", npc:"👩‍💻", npcName:"Inès",
+   intro:"Un café lleno en Marsella. Una mujer trabaja en su portátil, con audífonos, y a su lado hay una silla.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Abre por la situación, corto y amable: la silla libre.",
+      says:[ {fr:"Pardon, cette chaise est libre ?", es:"Perdón, ¿esta silla está libre?"},
+             {fr:"Excusez-moi, je peux m'asseoir ici ?", es:"Disculpe, ¿me puedo sentar aquí?"} ] },
+    { npc:"Oui, allez-y.", npcEs:"Sí, siga.",
+      guia:"Respondió corto y sin mirarte. Agradece y, si quieres, intenta UNA pregunta ligera.",
+      says:[ {fr:"Merci. Vous travaillez sur quoi ?", es:"Gracias. ¿En qué está trabajando?"},
+             {fr:"Merci beaucoup. Il est bon, le café ici ?", es:"Muchas gracias. ¿Es bueno el café aquí?"} ],
+      tip:"Respuestas cortas, sin mirarte, audífonos puestos: son señales. Una pregunta ligera está bien; tres, no." },
+    { npc:"Désolée, je suis débordée. J'ai un dossier à finir.", npcEs:"Perdón, estoy muy ocupada. Tengo un trabajo que terminar.",
+      guia:"Te dice, con cortesía, que no quiere conversar. Acéptalo con una sonrisa.",
+      says:[ {fr:"Pas de souci, je vous laisse travailler.", es:"Tranquila, la dejo trabajar."},
+             {fr:"Bien sûr, désolé de vous avoir dérangée.", es:"Claro, perdón por interrumpirla."} ],
+      tip:"Un no dicho con cortesía no es un fracaso. «Pas de souci, je vous laisse» te deja elegante, y sin insistir." },
+    { npc:"Merci, c'est gentil de comprendre.", npcEs:"Gracias, muy amable por entender.",
+      guia:"Cierra con buen humor, sin pedir nada más.",
+      says:[ {fr:"Bon courage pour votre dossier !", es:"¡Ánimo con ese trabajo!"},
+             {fr:"Bon courage ! Et le café est très bon, d'ailleurs.", es:"¡Ánimo! Y por cierto, el café está muy bueno."} ],
+      tip:"«Bon courage» se le dice a quien tiene trabajo o un día difícil. Es amable y no compromete a nada." },
+    { npc:"Merci ! Bonne fin de journée.", npcEs:"¡Gracias! Que termine bien el día.",
+      guia:"Despedida corta. Sonríe y no vuelvas a interrumpirla.",
+      says:[ {fr:"Merci, vous aussi !", es:"¡Gracias, igualmente!"},
+             {fr:"Merci, à vous aussi. Au revoir !", es:"Gracias, igualmente. ¡Hasta luego!"} ] }
+   ] },
+
+ // ───────────── VIAJE ─────────────
+ { id:"aeropuerto", grupo:"viaje", emoji:"🛂", title:"Migración en el aeropuerto", npc:"👮‍♂️", npcName:"Agente de migración",
+   intro:"Aterrizas en París, en el aeropuerto Charles de Gaulle. Te toca la ventanilla de migración.",
+   steps:[
+    { npc:"Bonjour. Votre passeport, s'il vous plaît.", npcEs:"Buenos días. Su pasaporte, por favor.",
+      guia:"Saluda antes que nada y entrega el pasaporte.",
+      says:[ {fr:"Bonjour. Voilà mon passeport.", es:"Buenos días. Aquí está mi pasaporte."},
+             {fr:"Bonjour monsieur. Le voici.", es:"Buenos días, señor. Aquí lo tiene."} ],
+      tip:"En Francia, «Bonjour» va antes de TODO: antes de pedir, preguntar o entregar. Sin él, suenas brusco." },
+    { npc:"Quel est le motif de votre voyage ?", npcEs:"¿Cuál es el motivo de su viaje?",
+      guia:"Te pregunta el motivo del viaje: turismo o trabajo. Responde corto.",
+      says:[ {fr:"Je suis ici pour le tourisme.", es:"Vengo de turismo."},
+             {fr:"Pour les vacances.", es:"Por vacaciones."} ] },
+    { npc:"Vous restez combien de temps en France ?", npcEs:"¿Cuánto tiempo se queda en Francia?",
+      guia:"«Combien de temps» = cuánto tiempo. Di los días o las semanas.",
+      says:[ {fr:"Deux semaines.", es:"Dos semanas."},
+             {fr:"Je reste dix jours, jusqu'au quinze.", es:"Me quedo diez días, hasta el quince."} ],
+      tip:"«Combien» (cuánto) es palabra comodín: combien de temps, combien de jours, c'est combien ?" },
+    { npc:"Où est-ce que vous logez ?", npcEs:"¿Dónde se va a alojar?",
+      guia:"Te pregunta dónde te alojas. Di el hotel o el barrio.",
+      says:[ {fr:"Dans un hôtel, à Paris.", es:"En un hotel, en París."},
+             {fr:"Chez un ami, à Lyon.", es:"Donde un amigo, en Lyon."},
+             {fr:"À l'hôtel Lumière, dans le Marais.", es:"En el hotel Lumière, en el Marais."} ] },
+    { npc:"Vous avez votre billet de retour ?", npcEs:"¿Tiene su tiquete de regreso?",
+      guia:"Te pide el tiquete de vuelta. Si no entendiste, pide que repita despacio.",
+      says:[ {fr:"Oui, le voici.", es:"Sí, aquí está."},
+             {fr:"Pardon, vous pouvez répéter plus lentement ?", es:"Perdón, ¿puede repetir más despacio?", r:["Votre billet de retour. Le vol pour rentrer.","Su tiquete de regreso. El vuelo para volver."]} ],
+      tip:"«Vous pouvez répéter plus lentement ?» te salva en cualquier ventanilla. Pedirlo es normal, no da pena." },
+    { npc:"C'est bon. Bon séjour en France !", npcEs:"Listo. ¡Que disfrute su estadía en Francia!",
+      guia:"Ya pasaste. Agradece y despídete.",
+      says:[ {fr:"Merci beaucoup. Au revoir !", es:"Muchas gracias. ¡Hasta luego!"},
+             {fr:"Merci, bonne journée !", es:"¡Gracias, buen día!"} ] }
+   ] },
+
+ { id:"metro-billete", grupo:"viaje", emoji:"🚇", title:"Comprar el tiquete del metro", npc:"🧑‍💼", npcName:"Agente del metro",
+   intro:"Estás en la estación Bastille, en París, y quieres ir al Louvre.",
+   steps:[
+    { npc:"Bonjour, je peux vous aider ?", npcEs:"Buenos días, ¿le puedo ayudar?",
+      guia:"Saluda y di qué quieres con «Je voudrais…»: la fórmula amable para pedir.",
+      says:[ {fr:"Bonjour, je voudrais un ticket, s'il vous plaît.", es:"Buenos días, quisiera un tiquete, por favor."},
+             {fr:"Bonjour. Je voudrais aller au Louvre.", es:"Buenos días. Quisiera ir al Louvre."} ],
+      tip:"«Je voudrais…» (quisiera) es la llave maestra: un ticket, un café, l'addition. Suena mucho más amable que «je veux»." },
+    { npc:"Un ticket ou un pass pour la journée ?", npcEs:"¿Un tiquete o un pase para todo el día?",
+      guia:"Te ofrece un solo viaje o un pase por el día. Si vas a moverte mucho, el pase.",
+      says:[ {fr:"Un pass pour la journée, s'il vous plaît.", es:"Un pase para todo el día, por favor."},
+             {fr:"Juste un ticket, merci.", es:"Solo un tiquete, gracias."} ] },
+    { npc:"D'accord. Vous payez comment ?", npcEs:"Listo. ¿Cómo va a pagar?",
+      guia:"Te pregunta cómo pagas: con tarjeta o en efectivo.",
+      says:[ {fr:"Par carte, s'il vous plaît.", es:"Con tarjeta, por favor."},
+             {fr:"En espèces. Voilà.", es:"En efectivo. Aquí tiene."} ] },
+    { npc:"Voilà votre ticket. Autre chose ?", npcEs:"Aquí tiene su tiquete. ¿Algo más?",
+      guia:"Aprovecha y pregunta qué línea te lleva al Louvre.",
+      says:[ {fr:"Oui, quelle ligne pour le Louvre ?", es:"Sí, ¿qué línea me lleva al Louvre?"},
+             {fr:"C'est quelle ligne pour aller au Louvre ?", es:"¿Qué línea es para ir al Louvre?"} ] },
+    { npc:"Prenez la ligne 1, direction La Défense. Descendez à Palais-Royal.", npcEs:"Tome la línea 1, dirección La Défense. Bájese en Palais-Royal.",
+      guia:"Línea 1, dirección La Défense, te bajas en Palais-Royal. Confirma para no perderte.",
+      says:[ {fr:"Direction La Défense, c'est ça ?", es:"Dirección La Défense, ¿cierto?"},
+             {fr:"D'accord. Je descends à Palais-Royal ?", es:"Listo. ¿Me bajo en Palais-Royal?"} ],
+      tip:"En el metro de París no se dice norte o sur: se dice «direction» y el nombre de la última estación de la línea." },
+    { npc:"Exactement. C'est à cinq arrêts.", npcEs:"Exacto. Son cinco paradas.",
+      guia:"Confirmado. Agradece y despídete.",
+      says:[ {fr:"Parfait, merci beaucoup !", es:"¡Perfecto, muchas gracias!"},
+             {fr:"Merci, bonne journée !", es:"¡Gracias, buen día!"},
+             {fr:"Super, merci pour votre aide. Au revoir !", es:"Súper, gracias por la ayuda. ¡Hasta luego!"} ] }
+   ] },
+
+ { id:"hotel-llegada", grupo:"viaje", emoji:"🏨", title:"Llegar al hotel", npc:"🧑‍💼", npcName:"Recepción",
+   intro:"Llegas a tu hotel en París de noche, después de un vuelo largo.",
+   steps:[
+    { npc:"Bonsoir, bienvenue ! Je peux vous aider ?", npcEs:"Buenas noches, ¡bienvenido! ¿Le puedo ayudar?",
+      guia:"Saluda y di que tienes una reserva.",
+      says:[ {fr:"Bonsoir. J'ai une réservation.", es:"Buenas noches. Tengo una reserva."},
+             {fr:"Bonsoir, j'ai réservé une chambre pour trois nuits.", es:"Buenas noches, reservé una habitación por tres noches."} ],
+      tip:"Desde la tarde-noche (más o menos las 6) se pasa de «Bonjour» a «Bonsoir»." },
+    { npc:"Très bien. C'est à quel nom ?", npcEs:"Muy bien. ¿A nombre de quién?",
+      guia:"«À quel nom» = a nombre de quién. Di tu nombre o entrega el pasaporte.",
+      says:[ {fr:"C'est au nom de Mateo.", es:"Está a nombre de Mateo."},
+             {fr:"Mateo. Voici mon passeport.", es:"Mateo. Aquí tiene mi pasaporte."} ] },
+    { npc:"Parfait. Vous êtes au troisième étage, chambre 305.", npcEs:"Perfecto. Está en el tercer piso, habitación 305.",
+      guia:"Te dio el piso y la habitación. Pregunta por el desayuno.",
+      says:[ {fr:"Merci. Le petit-déjeuner est à quelle heure ?", es:"Gracias. ¿A qué hora es el desayuno?"},
+             {fr:"Le petit-déjeuner est compris ?", es:"¿El desayuno está incluido?", r:["Oui, il est compris.","Sí, está incluido."]} ],
+      tip:"Ojo: el «troisième étage» francés es nuestro cuarto piso. Allá la planta baja es el «rez-de-chaussée» y no cuenta." },
+    { npc:"Il est servi de sept heures à dix heures, au rez-de-chaussée.", npcEs:"Se sirve de siete a diez, en la planta baja.",
+      guia:"Desayuno de 7 a 10, en la planta baja. Ahora pregunta por el wifi.",
+      says:[ {fr:"Super. Et le code wifi, c'est quoi ?", es:"Súper. ¿Y cuál es la clave del wifi?"},
+             {fr:"Merci. Il y a du wifi dans la chambre ?", es:"Gracias. ¿Hay wifi en la habitación?"} ] },
+    { npc:"Oui, le code est sur ce papier. Bonne soirée !", npcEs:"Sí, la clave está en este papel. ¡Buena noche!",
+      guia:"Listo por ahora. Agradece y sube a descansar.",
+      says:[ {fr:"Merci beaucoup, bonne soirée !", es:"¡Muchas gracias, buena noche!"},
+             {fr:"Parfait, merci. À demain !", es:"Perfecto, gracias. ¡Hasta mañana!"} ] },
+    { npc:"Réception, bonsoir. Je vous écoute.", npcEs:"Recepción, buenas noches. Lo escucho.",
+      guia:"Ya en la habitación no hay agua caliente. Llamaste a recepción: explica el problema.",
+      says:[ {fr:"Il n'y a pas d'eau chaude dans ma chambre.", es:"No hay agua caliente en mi habitación."},
+             {fr:"Bonsoir, la douche ne marche pas.", es:"Buenas noches, la ducha no funciona."} ],
+      tip:"«Ça ne marche pas» (no funciona) sirve para todo: la douche, le wifi, la clé, la clim." },
+    { npc:"Je suis désolé. J'envoie quelqu'un tout de suite.", npcEs:"Lo siento mucho. Mando a alguien ya mismo.",
+      guia:"Van a mandar a alguien. Agradece y despídete.",
+      says:[ {fr:"Merci beaucoup, c'est très gentil.", es:"Muchas gracias, muy amable."},
+             {fr:"D'accord, merci. Bonne soirée.", es:"Listo, gracias. Buena noche."} ] }
+   ] },
+
+ { id:"restaurante", grupo:"viaje", emoji:"🍽️", title:"Cenar en un bistró", npc:"🤵", npcName:"Mesero",
+   intro:"Llegas con una amiga a un bistró de Lyon, sin reserva.",
+   steps:[
+    { npc:"Bonsoir ! Vous êtes combien ?", npcEs:"¡Buenas noches! ¿Cuántas personas son?",
+      guia:"Te pregunta cuántos son. Pide mesa para dos.",
+      says:[ {fr:"Bonsoir, une table pour deux, s'il vous plaît.", es:"Buenas noches, una mesa para dos, por favor."},
+             {fr:"Bonsoir ! Deux personnes. Vous avez de la place ?", es:"¡Buenas noches! Dos personas. ¿Tienen cupo?"} ] },
+    { npc:"Oui, suivez-moi. Voici la carte.", npcEs:"Sí, síganme. Aquí está la carta.",
+      guia:"Te da la carta. Pide una recomendación: es lo más fácil y aprendes vocabulario.",
+      says:[ {fr:"Merci. Qu'est-ce que vous nous conseillez ?", es:"Gracias. ¿Qué nos recomienda?"},
+             {fr:"Merci. Quel est le plat du jour ?", es:"Gracias. ¿Cuál es el plato del día?"} ],
+      tip:"«La carte» es el menú completo; «le menu» es un combo a precio fijo (entrada, plato, postre). No es lo mismo." },
+    { npc:"Le plat du jour, c'est un bœuf bourguignon. Il est excellent.", npcEs:"El plato del día es un bœuf bourguignon, carne guisada en vino tinto. Es excelente.",
+      guia:"Te recomienda el plato del día: carne guisada en vino. Pídelo con «je vais prendre».",
+      says:[ {fr:"Parfait, je vais prendre ça.", es:"Perfecto, voy a pedir eso."},
+             {fr:"Très bien, deux plats du jour, s'il vous plaît.", es:"Muy bien, dos platos del día, por favor."} ] },
+    { npc:"Très bien. Vous avez des allergies ?", npcEs:"Muy bien. ¿Tienen alguna alergia?",
+      guia:"Pregunta por alergias. Si alguien no come algo, «sans» = sin.",
+      says:[ {fr:"Non, pas d'allergies, merci.", es:"No, ninguna alergia, gracias."},
+             {fr:"Oui, je suis allergique aux noix.", es:"Sí, soy alérgico a las nueces.", r:["D'accord, je préviens la cuisine.","Listo, le aviso a la cocina."]},
+             {fr:"Pour mon amie, sans gluten, s'il vous plaît.", es:"Para mi amiga, sin gluten, por favor.", r:["Pas de problème, je préviens la cuisine.","No hay problema, le aviso a la cocina."]} ] },
+    { npc:"Et comme boisson ?", npcEs:"¿Y de tomar?",
+      guia:"«Comme boisson» = de tomar. El agua de la llave es gratis: pide «une carafe d'eau».",
+      says:[ {fr:"Une carafe d'eau, s'il vous plaît.", es:"Una jarra de agua, por favor."},
+             {fr:"Deux verres de vin rouge, s'il vous plaît.", es:"Dos copas de vino tinto, por favor."} ],
+      tip:"«Une carafe d'eau» = agua de la llave, gratis y normal en Francia. Si pides «de l'eau», te pueden cobrar una botella." },
+    { npc:"Tout s'est bien passé ? Un dessert, un café ?", npcEs:"¿Todo bien? ¿Un postre, un café?",
+      guia:"Ya comieron. Si no quieres postre, pide la cuenta: aquí no te la traen si no la pides.",
+      says:[ {fr:"C'était délicieux ! L'addition, s'il vous plaît.", es:"¡Estaba delicioso! La cuenta, por favor."},
+             {fr:"Non merci. On peut avoir l'addition ?", es:"No, gracias. ¿Nos trae la cuenta?"} ],
+      tip:"En Francia el mesero no trae la cuenta solo: sería echarte. Pídela tú. El servicio ya va incluido; la propina es opcional." },
+    { npc:"Bien sûr. Vous payez par carte ?", npcEs:"Claro. ¿Paga con tarjeta?",
+      guia:"Te pregunta si pagas con tarjeta. Responde; si quieren, pidan pagar por separado.",
+      says:[ {fr:"Oui, par carte. Merci, c'était très bon !", es:"Sí, con tarjeta. ¡Gracias, estaba muy bueno!"},
+             {fr:"Oui. On peut payer séparément ?", es:"Sí. ¿Podemos pagar por separado?"} ] },
+    { npc:"Voilà. Merci, et bonne soirée !", npcEs:"Listo. ¡Gracias, y buena noche!",
+      guia:"Despídete: en Francia se saluda al llegar y se despide al salir.",
+      says:[ {fr:"Merci, bonne soirée à vous aussi !", es:"¡Gracias, buena noche para usted también!"},
+             {fr:"Merci beaucoup. Au revoir !", es:"Muchas gracias. ¡Hasta luego!"} ] }
+   ] },
+
+ { id:"direcciones", grupo:"viaje", emoji:"🗺️", title:"Preguntar cómo llegar", npc:"🧔", npcName:"Un señor en la calle",
+   intro:"Estás perdido en Marsella. Buscas el Vieux-Port, el puerto viejo, y paras a un señor.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Para a alguien con «Excusez-moi» y pregunta con «Où est… ?».",
+      says:[ {fr:"Excusez-moi, où est le Vieux-Port ?", es:"Disculpe, ¿dónde queda el Vieux-Port?"},
+             {fr:"Bonjour, pardon. Je cherche le Vieux-Port.", es:"Buenos días, perdón. Estoy buscando el Vieux-Port."} ],
+      tip:"«Bonjour» o «Excusez-moi» antes de preguntar. Lanzar la pregunta a secas a un desconocido suena grosero." },
+    { npc:"Le Vieux-Port ? Ce n'est pas loin.", npcEs:"¿El Vieux-Port? No queda lejos.",
+      guia:"Dice que no es lejos. Pregunta si se puede ir a pie.",
+      says:[ {fr:"On peut y aller à pied ?", es:"¿Se puede ir a pie?"},
+             {fr:"C'est à combien de minutes à pied ?", es:"¿A cuántos minutos queda a pie?"} ] },
+    { npc:"Oui, à dix minutes à pied. Vous allez tout droit.", npcEs:"Sí, a diez minutos a pie. Siga derecho.",
+      guia:"«Tout droit» = derecho. Repite para confirmar: así sabe que entendiste.",
+      says:[ {fr:"Tout droit, d'accord. Et après ?", es:"Derecho, listo. ¿Y después?"},
+             {fr:"Tout droit, d'accord.", es:"Derecho, listo."} ],
+      tip:"Repetir lo que te dijeron («tout droit…») confirma que entendiste y le da pie al otro para seguir explicando." },
+    { npc:"Au feu, vous tournez à gauche. Puis c'est la deuxième à droite.", npcEs:"En el semáforo, voltea a la izquierda. Luego es la segunda a la derecha.",
+      guia:"Izquierda en el semáforo, luego la segunda a la derecha. Si fue muy rápido, pide que repita.",
+      says:[ {fr:"Pardon, vous pouvez répéter, s'il vous plaît ?", es:"Perdón, ¿me lo repite, por favor?", r:["Bien sûr. À gauche au feu, puis la deuxième à droite.","Claro. Izquierda en el semáforo, luego la segunda a la derecha."]},
+             {fr:"À gauche au feu, puis la deuxième à droite ?", es:"¿Izquierda en el semáforo y luego la segunda a la derecha?"} ],
+      tip:"Gauche = izquierda, droite = derecha. Truco: «droite» y «derecha» empiezan las dos por «d»." },
+    { npc:"Voilà, c'est ça. Après, vous verrez la mer.", npcEs:"Exacto, así es. Después va a ver el mar.",
+      guia:"Ya lo tienes. Por si acaso, pregunta por un metro cerca para la vuelta.",
+      says:[ {fr:"Et il y a un métro près d'ici ?", es:"¿Y hay un metro cerca de aquí?"},
+             {fr:"Et pour revenir, je prends le métro où ?", es:"¿Y para volver, dónde tomo el metro?"} ] },
+    { npc:"La station est juste là, en face de la banque.", npcEs:"La estación queda ahí mismo, frente al banco.",
+      guia:"«En face de» = al frente de. Agradece y despídete.",
+      says:[ {fr:"Merci beaucoup, vous êtes très gentil !", es:"¡Muchas gracias, muy amable!"},
+             {fr:"Parfait, merci. Bonne journée !", es:"Perfecto, gracias. ¡Buen día!"} ] }
+   ] },
+
+ { id:"museo", grupo:"viaje", emoji:"🖼️", title:"Entradas para el museo", npc:"🧑", npcName:"Taquilla del museo",
+   intro:"Llegas a un museo de arte en Niza y vas a la taquilla.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Saluda y pide la entrada con «Je voudrais…», o pregunta el precio.",
+      says:[ {fr:"Bonjour, je voudrais un billet, s'il vous plaît.", es:"Buenos días, quisiera una entrada, por favor."},
+             {fr:"Bonjour. C'est combien, l'entrée ?", es:"Buenos días. ¿Cuánto vale la entrada?"} ] },
+    { npc:"Douze euros. Vous êtes étudiant ?", npcEs:"Doce euros. ¿Es estudiante?",
+      guia:"Te pregunta si eres estudiante: hay descuentos. Responde y pregunta si hay otra tarifa.",
+      says:[ {fr:"Non. Il y a des réductions ?", es:"No. ¿Hay descuentos?"},
+             {fr:"Non, je ne suis pas étudiant.", es:"No, no soy estudiante."} ],
+      tip:"Pregunta siempre por «réductions»: en Francia hay tarifas para estudiantes y jóvenes, y a veces días gratis." },
+    { npc:"Alors, c'est le plein tarif, désolée. Voilà votre billet.", npcEs:"Entonces es la tarifa completa, lo siento. Aquí tiene su entrada.",
+      guia:"Ya tienes la entrada. Pregunta hasta qué hora abre el museo.",
+      says:[ {fr:"Merci. Le musée ferme à quelle heure ?", es:"Gracias. ¿A qué hora cierra el museo?"},
+             {fr:"Merci. C'est ouvert jusqu'à quelle heure ?", es:"Gracias. ¿Hasta qué hora está abierto?"} ] },
+    { npc:"On ferme à dix-huit heures. Dernière entrée à dix-sept heures.", npcEs:"Cerramos a las seis de la tarde. Última entrada a las cinco.",
+      guia:"Cierra a las 18 h; la última entrada es a las 17 h. Pregunta si hay visita guiada.",
+      says:[ {fr:"Il y a une visite guidée ?", es:"¿Hay visita guiada?"},
+             {fr:"Il y a un audioguide en espagnol ?", es:"¿Hay audioguía en español?"} ],
+      tip:"En Francia la hora se dice en formato de 24 horas: «dix-huit heures» son las seis de la tarde." },
+    { npc:"Oui, il y a une visite à quinze heures, et des audioguides là-bas.", npcEs:"Sí, hay una visita a las tres, y audioguías allá.",
+      guia:"Hay visita a las 15 h y audioguías. Pregunta dónde está algo: el baño o el guardarropa.",
+      says:[ {fr:"Super. Et les toilettes, s'il vous plaît ?", es:"Súper. ¿Y los baños, por favor?"},
+             {fr:"Merci. Où est le vestiaire pour mon sac ?", es:"Gracias. ¿Dónde está el guardarropa para mi morral?"} ],
+      tip:"«Où est… ?» es la pregunta más útil del viaje: où est la gare, où est le métro. En plural: où sont les toilettes." },
+    { npc:"Au fond, à droite. Bonne visite !", npcEs:"Al fondo, a la derecha. ¡Disfrute la visita!",
+      guia:"Al fondo a la derecha. Agradece y despídete.",
+      says:[ {fr:"Merci beaucoup, bonne journée !", es:"¡Muchas gracias, buen día!"},
+             {fr:"Merci, au revoir !", es:"¡Gracias, hasta luego!"} ] }
+   ] },
+
+ { id:"imprevisto", grupo:"viaje", emoji:"🆘", title:"Perdí el celular", npc:"👮‍♀️", npcName:"Policía",
+   intro:"En Niza te das cuenta de que perdiste el celular. Ves a una policía en la calle.",
+   steps:[
+    { npc:"", npcEs:"",
+      guia:"Llama su atención con calma: «Excusez-moi» y pide ayuda.",
+      says:[ {fr:"Excusez-moi, madame. J'ai besoin d'aide.", es:"Disculpe, señora. Necesito ayuda."},
+             {fr:"Pardon, vous pouvez m'aider, s'il vous plaît ?", es:"Perdón, ¿me puede ayudar, por favor?"} ],
+      tip:"«J'ai besoin d'aide» (necesito ayuda) es la frase de emergencia. Apréndetela de memoria, por si acaso." },
+    { npc:"Oui, bien sûr. Qu'est-ce qui se passe ?", npcEs:"Sí, claro. ¿Qué pasa?",
+      guia:"Te pregunta qué pasó. Dilo simple: «J'ai perdu…» = perdí.",
+      says:[ {fr:"J'ai perdu mon téléphone.", es:"Perdí mi celular."},
+             {fr:"Je ne trouve plus mon portable.", es:"No encuentro mi celular."} ],
+      tip:"En Francia el celular es «le portable». «J'ai perdu…» sirve para todo: mon passeport, mon sac, mes clés." },
+    { npc:"Où est-ce que vous l'avez vu pour la dernière fois ?", npcEs:"¿Dónde lo vio por última vez?",
+      guia:"Pregunta dónde lo viste por última vez. Di el lugar y más o menos cuándo.",
+      says:[ {fr:"Dans un café, il y a une heure.", es:"En un café, hace una hora."},
+             {fr:"Dans le bus, je crois. Ce matin.", es:"En el bus, creo. Esta mañana."} ] },
+    { npc:"D'accord. Vous pouvez faire une déclaration au commissariat.", npcEs:"Listo. Puede hacer la declaración de pérdida en la estación de policía.",
+      guia:"Te dice que declares la pérdida en el «commissariat» (estación de policía). Pregunta dónde queda.",
+      says:[ {fr:"Où est le commissariat, s'il vous plaît ?", es:"¿Dónde queda la estación de policía, por favor?"},
+             {fr:"C'est loin, le commissariat ?", es:"¿Queda lejos la estación de policía?"} ] },
+    { npc:"C'est à cinq minutes. Vous avez une pièce d'identité ?", npcEs:"Queda a cinco minutos. ¿Tiene un documento de identidad?",
+      guia:"Queda a cinco minutos. Te pide un documento: el pasaporte sirve.",
+      says:[ {fr:"Oui, j'ai mon passeport sur moi.", es:"Sí, tengo mi pasaporte conmigo."},
+             {fr:"Non, il est à l'hôtel. C'est grave ?", es:"No, está en el hotel. ¿Es grave?", r:["Non, ce n'est pas grave. Apportez-le.","No, no es grave. Tráigalo."]} ] },
+    { npc:"Ça va, monsieur ? Vous êtes tout pâle.", npcEs:"¿Está bien, señor? Está muy pálido.",
+      guia:"Te ve pálido. Si te duele la cabeza, pregunta por una farmacia.",
+      says:[ {fr:"J'ai mal à la tête. Une pharmacie, près d'ici ?", es:"Me duele la cabeza. ¿Hay una farmacia cerca?", r:["Oui, juste là, avec la croix verte.","Sí, ahí mismo, la de la cruz verde."]},
+             {fr:"Ça va, merci. Juste un peu stressé.", es:"Bien, gracias. Solo un poco estresado.", r:["C'est normal. Ça va s'arranger.","Es normal. Todo se va a arreglar."]} ],
+      tip:"La farmacia en Francia es la cruz verde iluminada. «J'ai mal à…» + parte del cuerpo = me duele…" },
+    { npc:"Courage, ça arrive souvent. Le commissariat, c'est tout droit.", npcEs:"Ánimo, eso pasa mucho. La estación de policía es derecho.",
+      guia:"Te da ánimo. Agradece de corazón y despídete.",
+      says:[ {fr:"Merci beaucoup pour votre aide, madame.", es:"Muchas gracias por su ayuda, señora."},
+             {fr:"Vous êtes très gentille. Merci, au revoir !", es:"Usted es muy amable. ¡Gracias, hasta luego!"} ] }
+   ] }
+];
+
+const THEME_VIAJE_FR = { id:"voyage", emoji:"🧳", name:"Viaje: lo básico", minLvl:1,
+  vocab:[
+   {fr:"Bonjour, excusez-moi.", es:"Buenos días, disculpe."},
+   {fr:"Je voudrais un billet, s'il vous plaît.", es:"Quisiera un tiquete, por favor."},
+   {fr:"Où est la gare ?", es:"¿Dónde queda la estación de tren?"},
+   {fr:"Où sont les toilettes ?", es:"¿Dónde están los baños?"},
+   {fr:"C'est combien ?", es:"¿Cuánto vale?"},
+   {fr:"Vous pouvez répéter, s'il vous plaît ?", es:"¿Puede repetir, por favor?"},
+   {fr:"Plus lentement, s'il vous plaît.", es:"Más despacio, por favor."},
+   {fr:"Je ne comprends pas.", es:"No entiendo."},
+   {fr:"Vous parlez espagnol ?", es:"¿Habla español?"},
+   {fr:"L'addition, s'il vous plaît.", es:"La cuenta, por favor."},
+   {fr:"Je peux payer par carte ?", es:"¿Puedo pagar con tarjeta?"},
+   {fr:"J'ai besoin d'aide.", es:"Necesito ayuda."}
+  ],
+  speak:[
+   {fr:"Bonjour, je voudrais une table pour deux.", es:"Buenos días, quisiera una mesa para dos."},
+   {fr:"Excusez-moi, où est le métro, s'il vous plaît ?", es:"Disculpe, ¿dónde queda el metro, por favor?"},
+   {fr:"Pardon, je ne comprends pas. Plus lentement ?", es:"Perdón, no entiendo. ¿Más despacio?"},
+   {fr:"J'ai une réservation au nom de Mateo.", es:"Tengo una reserva a nombre de Mateo."}
+  ] };
+
+// Coco v1.98 — «Conversación con guía» · contenido de INGLÉS (inglés de EE. UU., A1–A2).
+// El campo «fr» guarda el idioma que se aprende (aquí, inglés).
+const CHARLAS_EN = [
+ { id:"cafe-libro", grupo:"conocer", emoji:"📖", title:"Una desconocida en un café", npc:"👩", npcName:"Emily",
+   intro:"Estás en un café de Nueva York. La mujer de al lado lee un libro que te encantó.",
+   steps:[
+    { npc:"", npcEs:"", guia:"Rompe el hielo con el libro que está leyendo, no con su físico.",
+      says:[ {fr:"Sorry, is that book any good?", es:"Perdón, ¿ese libro sí es bueno?"},
+             {fr:"Excuse me, how are you liking that book?", es:"Disculpa, ¿qué tal te está pareciendo ese libro?"} ] },
+    { npc:"I love it, actually. Have you read it?", npcEs:"La verdad, me encanta. ¿Tú lo leíste?",
+      guia:"Dice que le encanta y te pregunta si lo leíste. Responde y suelta un detalle.",
+      says:[ {fr:"Yes, I read it last year.", es:"Sí, lo leí el año pasado."},
+             {fr:"I did! The ending really surprised me.", es:"¡Sí! El final me sorprendió mucho.", r:["No spoilers, please!","¡Sin spoilers, por favor!"]} ],
+      tip:"«Actually» no es «actualmente» (eso es «currently»): significa «la verdad», «en realidad». Trampa clásica." },
+    { npc:"Don't tell me the ending! I'm Emily, by the way.", npcEs:"¡No me cuentes el final! Soy Emily, por cierto.",
+      guia:"Se presentó. Di tu nombre y repite el suyo: así se te queda grabado.",
+      says:[ {fr:"Nice to meet you, Emily. I'm Mateo.", es:"Mucho gusto, Emily. Yo soy Mateo."},
+             {fr:"I'm Mateo. Nice to meet you, Emily.", es:"Yo soy Mateo. Mucho gusto, Emily."} ],
+      tip:"Usar su nombre una o dos veces muestra que la escuchaste. Más que eso ya suena a vendedor." },
+    { npc:"Nice to meet you. Where are you from, if you don't mind me asking?", npcEs:"Mucho gusto. ¿De dónde eres, si no es indiscreción?",
+      guia:"Pregunta de dónde eres. Responde y da un detalle que abra conversación.",
+      says:[ {fr:"I'm from Colombia, from Barranquilla.", es:"Soy de Colombia, de Barranquilla."},
+             {fr:"From Barranquilla, on the Caribbean coast.", es:"De Barranquilla, en la costa caribe.", r:["Oh, I bet it's beautiful there.","Uy, me imagino que es lindo allá."]} ] },
+    { npc:"Colombia! So what brings you to New York?", npcEs:"¡Colombia! ¿Y qué te trae a Nueva York?",
+      guia:"Pregunta qué haces en Nueva York. Cuenta de tu empresa y devuélvele la pregunta.",
+      says:[ {fr:"Work. I have a small software company.", es:"Trabajo. Tengo una empresa pequeña de software."},
+             {fr:"Work and some vacation. What about you?", es:"Trabajo y un poco de vacaciones. ¿Y tú?"},
+             {fr:"I run a software company. What do you do?", es:"Tengo una empresa de software. ¿Y tú a qué te dedicas?"} ] },
+    { npc:"I'm a teacher. Which explains all the books.", npcEs:"Soy profesora. Eso explica todos los libros.",
+      guia:"Es profesora. Humor ligero o una pregunta abierta sobre lo que le gusta leer.",
+      says:[ {fr:"So you're the right person to correct my English.", es:"Entonces eres la persona indicada para corregirme el inglés.", r:["Deal. But your English is really good.","Hecho. Pero tu inglés es muy bueno."]},
+             {fr:"What else do you like to read?", es:"¿Qué más te gusta leer?", r:["Mostly novels. And way too many mysteries.","Sobre todo novelas. Y demasiadas de misterio."]} ],
+      tip:"Pregunta abierta = What, How, Why. «Do you like books?» se responde con un sí y se acaba; «What do you like to read?» abre." },
+    { npc:"Ha! I have to go soon, though.", npcEs:"¡Jaja! Aunque ya me tengo que ir pronto.",
+      guia:"Se tiene que ir. Es el momento: propón seguir otro día, una sola vez y sin presión.",
+      says:[ {fr:"Would you like to get coffee sometime?", es:"¿Te gustaría que nos tomáramos un café algún día?"},
+             {fr:"Could I get your Instagram? No pressure at all.", es:"¿Me pasas tu Instagram? Sin ningún compromiso."} ],
+      tip:"«Would you like to…?» es la forma amable de proponer. Se pregunta una vez; si dice que no, se acepta y ya." },
+    { npc:"Sure, I'd like that. Here, let me put my number in.", npcEs:"Claro, me gustaría. Ven, te pongo mi número.",
+      guia:"Dijo que sí. Despídete con calma y dile que le escribes.",
+      says:[ {fr:"Great. I'll text you. Enjoy the book!", es:"Genial. Te escribo. ¡Disfruta el libro!"},
+             {fr:"Perfect. It was really nice meeting you, Emily.", es:"Perfecto. Me encantó conocerte, Emily."} ] }
+   ] },
+
+ { id:"fiesta-terraza", grupo:"conocer", emoji:"🌇", title:"Una fiesta en una terraza", npc:"👩", npcName:"Sofia",
+   intro:"Fiesta en una terraza de Miami. Te invitó Dani; a tu lado hay una mujer que no conoces.",
+   steps:[
+    { npc:"", npcEs:"", guia:"Abre por lo que tienen en común: la fiesta o el anfitrión.",
+      says:[ {fr:"Hi! How do you know Dani?", es:"¡Hola! ¿Y tú de dónde conoces a Dani?"},
+             {fr:"Hi, I'm Mateo. How do you know Dani?", es:"Hola, soy Mateo. ¿De dónde conoces a Dani?"} ] },
+    { npc:"We work together. I'm Sofia, by the way.", npcEs:"Trabajamos juntos. Soy Sofia, por cierto.",
+      guia:"Trabaja con Dani. Preséntate y pregunta a qué se dedica, sin sonar a entrevista.",
+      says:[ {fr:"Nice to meet you, Sofia. What do you do?", es:"Mucho gusto, Sofia. ¿A qué te dedicas?"},
+             {fr:"Cool. So what kind of work do you do?", es:"Ah, chévere. ¿Y tú en qué trabajas?"} ] },
+    { npc:"I'm a designer. I make apps look good.", npcEs:"Soy diseñadora. Hago que las apps se vean bien.",
+      guia:"¡Diseña apps! Tienen algo en común: cuéntale de tu empresa.",
+      says:[ {fr:"No way! I have a software company.", es:"¡No te creo! Tengo una empresa de software."},
+             {fr:"Small world. I build apps in Colombia.", es:"El mundo es un pañuelo. Yo hago apps en Colombia."} ],
+      tip:"«No way!» es sorpresa alegre, como «¡no puede ser!». No es un «no» rotundo, y se usa muchísimo." },
+    { npc:"Really? Where in Colombia?", npcEs:"¿En serio? ¿De qué parte de Colombia?",
+      guia:"Responde y engánchala con algo vivo de tu ciudad.",
+      says:[ {fr:"Barranquilla. Hot weather, great music, and the sea.", es:"Barranquilla. Calor, buena música y el mar."},
+             {fr:"Barranquilla, on the coast. Have you been?", es:"Barranquilla, en la costa. ¿Has ido?", r:["Not yet, but it's on my list.","Todavía no, pero está en mi lista."]} ] },
+    { npc:"Not yet! What should I do there?", npcEs:"¡Todavía no! ¿Qué debería hacer allá?",
+      guia:"Te pide recomendaciones. Da una y repregunta por lo que le gusta a ella.",
+      says:[ {fr:"Go to the beach, then dance all night.", es:"Ir a la playa y después bailar toda la noche."},
+             {fr:"Carnival, for sure. Do you like to dance?", es:"El Carnaval, sin duda. ¿Te gusta bailar?"} ] },
+    { npc:"I love dancing, but I'm really bad at it.", npcEs:"Me encanta bailar, pero soy malísima.",
+      guia:"Halaga algo que no sea su cuerpo: su energía, su actitud. Con naturalidad.",
+      says:[ {fr:"I doubt it. You have great energy.", es:"Lo dudo. Tienes una energía muy buena."},
+             {fr:"I like your attitude. That's what matters.", es:"Me gusta tu actitud. Eso es lo que importa."} ],
+      tip:"El halago que funciona es concreto y sobre algo que ella eligió: su energía, su idea, su estilo. Nunca su cuerpo." },
+    { npc:"Ha, thank you. That's sweet.", npcEs:"Jaja, gracias. Qué lindo.",
+      guia:"Hay buen ambiente. Propón volver a verse con un plan concreto, fácil de aceptar.",
+      says:[ {fr:"There's a salsa night on Thursday. Want to come?", es:"El jueves hay noche de salsa. ¿Quieres venir?", r:["Only if you teach me!","¡Solo si me enseñas!"]},
+             {fr:"We should grab coffee and talk design sometime.", es:"Deberíamos tomarnos un café algún día y hablar de diseño."} ],
+      tip:"«We should…» propone sin presionar. Un plan concreto (día, sitio) es más fácil de aceptar que un «algún día»." },
+    { npc:"I'd love that. Let me give you my number.", npcEs:"Me encantaría. Déjame darte mi número.",
+      guia:"Aceptó. Cierra con calma y vuelve a la fiesta: no hace falta alargarlo.",
+      says:[ {fr:"Great. I'll text you tomorrow, Sofia.", es:"Genial. Te escribo mañana, Sofia."},
+             {fr:"Awesome. It was really nice talking to you.", es:"Buenísimo. Me encantó hablar contigo."} ] }
+   ] },
+
+ { id:"no-es-momento", grupo:"conocer", emoji:"🚪", title:"Cuando no es el momento", npc:"👩", npcName:"Hannah",
+   intro:"En una librería de Londres. Una mujer mira guías de viaje y quieres saludarla.",
+   steps:[
+    { npc:"", npcEs:"", guia:"Abre por el contexto, algo ligero, y fíjate en cómo responde.",
+      says:[ {fr:"Hi. Planning a trip?", es:"Hola. ¿Planeando un viaje?"},
+             {fr:"Sorry, are any of these travel books good?", es:"Perdón, ¿alguna de estas guías de viaje es buena?"} ] },
+    { npc:"Oh. Yeah, kind of.", npcEs:"Ah. Sí, más o menos.",
+      guia:"Respuesta corta y sin mirarte. Puede ser prisa o timidez: un intento más, suave.",
+      says:[ {fr:"Anywhere fun?", es:"¿A algún lugar chévere?"},
+             {fr:"Portugal is my dream. Where are you going?", es:"Portugal es mi sueño. ¿Tú para dónde vas?"} ],
+      tip:"Respuestas de una palabra, sin mirarte ni preguntarte nada, son una señal. Un intento más; si sigue igual, te retiras." },
+    { npc:"Sorry, I'm in a bit of a rush, actually.", npcEs:"Perdona, la verdad es que voy un poco de afán.",
+      guia:"Te está diciendo que no es el momento. Acéptalo sin pedir explicaciones.",
+      says:[ {fr:"No worries at all. Sorry to bother you.", es:"Tranquila, no pasa nada. Perdona la molestia."},
+             {fr:"Of course. I'll let you get back to it.", es:"Claro. Te dejo seguir con lo tuyo."} ] },
+    { npc:"Thanks. It's nothing personal.", npcEs:"Gracias. No es nada personal.",
+      guia:"Lo dice con amabilidad. Cierra con buen humor, sin insistir ni pedir el número.",
+      says:[ {fr:"Don't worry, I get it.", es:"Tranqui, te entiendo."},
+             {fr:"Totally fine. Enjoy your trip!", es:"Todo bien. ¡Disfruta tu viaje!"} ],
+      tip:"Saber retirarse con elegancia también es saber conversar. Un no es una respuesta completa: no hay que convencer a nadie." },
+    { npc:"Thanks. Have a good one.", npcEs:"Gracias. Que te vaya bien.",
+      guia:"Despedida corta y con una sonrisa. Te vas tranquilo: lo hiciste bien.",
+      says:[ {fr:"You too. Take care!", es:"Igualmente. ¡Cuídate!"},
+             {fr:"Thanks, you too. Bye!", es:"Gracias, igualmente. ¡Chao!"} ] }
+   ] },
+
+ { id:"aeropuerto", grupo:"viaje", emoji:"🛂", title:"Migración en el aeropuerto", npc:"👮", npcName:"Oficial de migración",
+   intro:"Aterrizas en Nueva York. En migración, el oficial te hace las preguntas de siempre.",
+   steps:[
+    { npc:"Good morning. Passport, please.", npcEs:"Buenos días. Pasaporte, por favor.",
+      guia:"Te pide el pasaporte. Entrégalo y saluda: corto y amable.",
+      says:[ {fr:"Good morning. Here you go.", es:"Buenos días. Aquí tiene."},
+             {fr:"Sure, here it is.", es:"Claro, aquí está."} ] },
+    { npc:"What's the purpose of your visit?", npcEs:"¿Cuál es el motivo de su visita?",
+      guia:"Pregunta el motivo del viaje. Di si es turismo o trabajo, en pocas palabras.",
+      says:[ {fr:"Tourism. I'm here on vacation.", es:"Turismo. Vengo de vacaciones."},
+             {fr:"Business. I have a few meetings.", es:"Negocios. Tengo unas reuniones."} ] },
+    { npc:"How long are you staying?", npcEs:"¿Cuánto tiempo se va a quedar?",
+      guia:"Pregunta cuánto tiempo te quedas. Di los días.",
+      says:[ {fr:"One week.", es:"Una semana."},
+             {fr:"Ten days. I fly back on the twentieth.", es:"Diez días. Me devuelvo el veinte."} ] },
+    { npc:"Where are you staying?", npcEs:"¿Dónde se va a hospedar?",
+      guia:"Pregunta dónde te alojas. Di el hotel o el barrio.",
+      says:[ {fr:"At a hotel in Manhattan.", es:"En un hotel en Manhattan."},
+             {fr:"With a friend in Brooklyn.", es:"Donde un amigo, en Brooklyn.", r:["Do you have the address?","¿Tiene la dirección?"]} ],
+      tip:"Lleva la dirección donde te quedas a mano, en el celular o en papel: te la pueden pedir aquí y en el formulario." },
+    { npc:"Is this your first time in the United States?", npcEs:"¿Es su primera vez en Estados Unidos?",
+      guia:"Si no entendiste, pide que repita despacio. Si entendiste, responde.",
+      says:[ {fr:"Sorry, could you say that again, slowly?", es:"Perdón, ¿me lo repite más despacio?"},
+             {fr:"Yes, it's my first time.", es:"Sí, es mi primera vez."},
+             {fr:"No, I came two years ago.", es:"No, vine hace dos años."} ],
+      tip:"«Could you say that again, slowly?» te salva en cualquier situación. Pedir que repitan no es grosero: es normal." },
+    { npc:"Do you have anything to declare?", npcEs:"¿Tiene algo que declarar?",
+      guia:"Pregunta si traes algo que declarar, como comida. Casi siempre: no.",
+      says:[ {fr:"No, nothing to declare.", es:"No, nada que declarar."},
+             {fr:"Just some coffee from Colombia.", es:"Solo un poco de café de Colombia.", r:["Coffee is fine.","El café no hay problema."]} ] },
+    { npc:"All right. Welcome to the United States.", npcEs:"Listo. Bienvenido a Estados Unidos.",
+      guia:"Te deja pasar. Agradece y despídete.",
+      says:[ {fr:"Thank you. Have a good day.", es:"Gracias. Que tenga buen día."},
+             {fr:"Thanks so much. Bye!", es:"Muchas gracias. ¡Chao!"} ] }
+   ] },
+
+ { id:"metro", grupo:"viaje", emoji:"🚇", title:"El metro de Nueva York", npc:"🧑", npcName:"Empleado del metro",
+   intro:"En el metro de Nueva York. Vas al Museo Metropolitano y no sabes cómo pagar.",
+   steps:[
+    { npc:"", npcEs:"", guia:"Pregunta cómo pagar. «How do I…?» sirve para pedir cualquier instrucción.",
+      says:[ {fr:"Excuse me, how do I pay for the subway?", es:"Disculpe, ¿cómo pago el metro?"},
+             {fr:"Hi. Can I buy a ticket here?", es:"Hola. ¿Puedo comprar un tiquete aquí?"} ],
+      tip:"En Estados Unidos el metro es «the subway»; en Londres, «the Tube». La palabra «metro» casi no se usa allá." },
+    { npc:"Just tap your card or phone at the turnstile.", npcEs:"Solo acerque la tarjeta o el celular al torniquete.",
+      guia:"Dice que acerques la tarjeta o el celular al torniquete. Confirma o pregunta el precio.",
+      says:[ {fr:"With my credit card? Great.", es:"¿Con mi tarjeta de crédito? Perfecto."},
+             {fr:"Oh, easy. How much is it?", es:"Ah, fácil. ¿Cuánto vale?", r:["About three dollars a ride.","Unos tres dólares por viaje."]} ] },
+    { npc:"Where are you going?", npcEs:"¿Para dónde va?",
+      guia:"Pregunta para dónde vas. Di tu destino.",
+      says:[ {fr:"To the Met, the museum.", es:"Al Met, el museo."},
+             {fr:"I'm going to the Metropolitan Museum.", es:"Voy para el Museo Metropolitano."} ] },
+    { npc:"Take the 4 or the 5 uptown.", npcEs:"Coja el 4 o el 5 hacia el norte (uptown).",
+      guia:"«Uptown» es hacia el norte; «downtown», hacia el sur. Repite para confirmar.",
+      says:[ {fr:"The 4 or the 5, uptown. Got it.", es:"El 4 o el 5, hacia el norte. Entendido."},
+             {fr:"Sorry, which train? Could you repeat that?", es:"Perdón, ¿cuál tren? ¿Me lo repite?"} ],
+      tip:"Repetir lo que entendiste («The 4, uptown?») es la mejor forma de confirmar sin que te expliquen todo otra vez." },
+    { npc:"Yes. Get off at 86th Street.", npcEs:"Sí. Bájese en la calle 86.",
+      guia:"Te dice en qué estación bajarte. Pregunta cuántas paradas son.",
+      says:[ {fr:"How many stops is that?", es:"¿Cuántas paradas son?"},
+             {fr:"Is it far from here?", es:"¿Queda lejos de aquí?"} ],
+      tip:"«Get off» es bajarse y «get on», subirse. «Get down» no sirve para bajarse del tren." },
+    { npc:"About six stops. Fifteen minutes or so.", npcEs:"Unas seis paradas. Más o menos quince minutos.",
+      guia:"Seis paradas, unos quince minutos. Agradece y despídete.",
+      says:[ {fr:"Perfect. Thank you so much!", es:"Perfecto. ¡Muchísimas gracias!"},
+             {fr:"Great, thanks for your help.", es:"Genial, gracias por la ayuda."} ] }
+   ] },
+
+ { id:"hotel", grupo:"viaje", emoji:"🏨", title:"Check-in en el hotel", npc:"💁", npcName:"Recepcionista",
+   intro:"Llegas a tu hotel en Miami: check-in, desayuno, wifi y un problema en el cuarto.",
+   steps:[
+    { npc:"Hi, welcome! Checking in?", npcEs:"¡Hola, bienvenido! ¿Va a hacer el check-in?",
+      guia:"Te da la bienvenida. Di que tienes reserva y a nombre de quién.",
+      says:[ {fr:"Yes, I have a reservation under Mateo.", es:"Sí, tengo una reserva a nombre de Mateo."},
+             {fr:"Hi! Yes, it's under Mateo.", es:"¡Hola! Sí, está a nombre de Mateo."} ] },
+    { npc:"Perfect. Can I see your ID and a credit card?", npcEs:"Perfecto. ¿Me muestra su documento y una tarjeta de crédito?",
+      guia:"Pide documento y tarjeta, para el depósito. Entrégalos.",
+      says:[ {fr:"Sure. Here's my passport and my card.", es:"Claro. Aquí están mi pasaporte y mi tarjeta."},
+             {fr:"Here you go. Is there a deposit?", es:"Aquí tiene. ¿Hay que dejar depósito?", r:["Yes, a hold of one hundred dollars.","Sí, una retención de cien dólares."]} ],
+      tip:"En EE. UU. casi todos los hoteles retienen un depósito en tu tarjeta («a hold»). Lo liberan cuando sales." },
+    { npc:"You're all set. Room 512, on the fifth floor.", npcEs:"Listo. Habitación 512, en el quinto piso.",
+      guia:"Ya tienes habitación. Pregunta por el desayuno.",
+      says:[ {fr:"Is breakfast included?", es:"¿El desayuno está incluido?"},
+             {fr:"Great. What time is breakfast?", es:"Genial. ¿A qué hora es el desayuno?"} ] },
+    { npc:"Yes, from seven to ten, in the lobby.", npcEs:"Sí, de siete a diez, en el lobby.",
+      guia:"Desayuno de siete a diez en el lobby. Ahora pregunta por el wifi.",
+      says:[ {fr:"And what's the wifi password?", es:"¿Y cuál es la clave del wifi?"},
+             {fr:"Thanks. Is there wifi in the room?", es:"Gracias. ¿Hay wifi en la habitación?"} ],
+      tip:"«Wifi» se pronuncia «uái-fai», no «uífi». Y la clave es «password»: «What's the wifi password?»." },
+    { npc:"It's on the card with your key. Anything else?", npcEs:"Está en la tarjeta, con su llave. ¿Algo más?",
+      guia:"Pregunta si necesitas algo más. Pregunta la hora de salida o agradece.",
+      says:[ {fr:"What time is checkout?", es:"¿A qué hora es la salida?", r:["Checkout is at eleven.","La salida es a las once."]},
+             {fr:"No, that's all. Thank you!", es:"No, eso es todo. ¡Gracias!"} ] },
+    { npc:"Front desk, how can I help you?", npcEs:"Recepción, ¿en qué le puedo ayudar?",
+      guia:"Ya en el cuarto, el aire acondicionado no sirve. Llamas: di tu habitación y el problema.",
+      says:[ {fr:"Hi, this is room 512. The AC isn't working.", es:"Hola, habla la habitación 512. El aire no funciona."},
+             {fr:"Hi. The air conditioning in my room is broken.", es:"Hola. El aire acondicionado de mi cuarto está dañado."} ],
+      tip:"Al teléfono te presentas con «This is…»: «This is room 512». Decir «I am room 512» suena rarísimo." },
+    { npc:"I'm so sorry. I'll send someone right up.", npcEs:"Qué pena con usted. Ya mismo le mando a alguien.",
+      guia:"Se disculpa y manda a alguien. Agradece y cierra.",
+      says:[ {fr:"Thank you so much. I appreciate it.", es:"Muchas gracias. Se lo agradezco."},
+             {fr:"Great, thanks. Have a good night.", es:"Perfecto, gracias. Que pase buena noche."} ] }
+   ] },
+
+ { id:"restaurante", grupo:"viaje", emoji:"🍽️", title:"Cena en un restaurante", npc:"🧑", npcName:"Mesero",
+   intro:"Cena en Nueva York con un amigo: la mesa, el pedido, una alergia y la cuenta.",
+   steps:[
+    { npc:"Hi there! How many?", npcEs:"¡Hola! ¿Cuántos son?",
+      guia:"Pregunta cuántas personas son. Pide mesa para dos.",
+      says:[ {fr:"Table for two, please.", es:"Mesa para dos, por favor."},
+             {fr:"Hi! Just the two of us.", es:"¡Hola! Somos dos nada más."} ] },
+    { npc:"Right this way. Can I get you something to drink?", npcEs:"Por aquí. ¿Les traigo algo de tomar?",
+      guia:"Pregunta qué van a tomar. Para pedir, «Can I get…?» es lo más natural.",
+      says:[ {fr:"Can I get a lemonade, please?", es:"¿Me trae una limonada, por favor?"},
+             {fr:"Just water for now, thanks.", es:"Solo agua por ahora, gracias."} ],
+      tip:"Para pedir se dice «Can I get…?» o «I'll have…». «I want…» suena brusco: en español «quiero» es normal, en inglés no." },
+    { npc:"Are you ready to order?", npcEs:"¿Ya saben qué van a pedir?",
+      guia:"Antes de decidir, pide una recomendación.",
+      says:[ {fr:"What do you recommend?", es:"¿Qué nos recomienda?"},
+             {fr:"Almost. What's good here?", es:"Casi. ¿Qué es lo bueno aquí?"} ] },
+    { npc:"The salmon is great. And our burger is famous.", npcEs:"El salmón es muy bueno. Y nuestra hamburguesa es famosa.",
+      guia:"Pide lo que quieras. «I'll have…» es «para mí…».",
+      says:[ {fr:"I'll have the salmon, please.", es:"Para mí el salmón, por favor."},
+             {fr:"I'll have the burger, medium, please.", es:"Para mí la hamburguesa, término medio, por favor."} ] },
+    { npc:"Great choice. Any allergies I should know about?", npcEs:"Buena elección. ¿Alguna alergia que deba saber?",
+      guia:"Pregunta por alergias. Di la tuya, o pide el plato sin algún ingrediente.",
+      says:[ {fr:"Yes, I'm allergic to peanuts.", es:"Sí, soy alérgico al maní."},
+             {fr:"No allergies, but no onions, please.", es:"Ninguna alergia, pero sin cebolla, por favor."},
+             {fr:"No, none. Thanks for asking.", es:"No, ninguna. Gracias por preguntar."} ] },
+    { npc:"How is everything?", npcEs:"¿Cómo va todo?",
+      guia:"Pasa a ver si todo está bien. Responde y pide la cuenta.",
+      says:[ {fr:"Delicious, thanks. Can we get the check?", es:"Delicioso, gracias. ¿Nos trae la cuenta?"},
+             {fr:"Everything's great. The check, please.", es:"Todo muy bueno. La cuenta, por favor."} ],
+      tip:"En EE. UU. la cuenta es «the check»; en Inglaterra, «the bill». Y no te la traen hasta que la pides." },
+    { npc:"Here you go. I'll take that whenever you're ready.", npcEs:"Aquí tienen. Me la llevo cuando estén listos.",
+      guia:"Te deja la cuenta. Pregunta si puedes pagar con tarjeta o dividirla.",
+      says:[ {fr:"Can I pay by card?", es:"¿Puedo pagar con tarjeta?"},
+             {fr:"Here's my card. Can we split it?", es:"Aquí está mi tarjeta. ¿La podemos dividir?", r:["Sure, half and half?","Claro, ¿mitad y mitad?"]} ],
+      tip:"En EE. UU. la propina no es opcional: se deja entre 18 y 20 % sobre la cuenta. En la maquinita eliges el porcentaje." },
+    { npc:"Thank you, guys! Have a great night.", npcEs:"¡Gracias, muchachos! Que tengan muy buena noche.",
+      guia:"Se despide. Agradece y sal con buena energía.",
+      says:[ {fr:"Thank you! Everything was delicious.", es:"¡Gracias! Todo estuvo delicioso."},
+             {fr:"Thanks, you too. Good night!", es:"Gracias, igualmente. ¡Buenas noches!"} ] }
+   ] },
+
+ { id:"direcciones", grupo:"viaje", emoji:"🧭", title:"Pedir direcciones", npc:"👵", npcName:"Una señora",
+   intro:"Estás perdido en Londres buscando el Museo Británico. Le preguntas a una señora.",
+   steps:[
+    { npc:"", npcEs:"", guia:"Disculpa la interrupción y pregunta dónde queda el lugar.",
+      says:[ {fr:"Excuse me, where is the British Museum?", es:"Disculpe, ¿dónde queda el Museo Británico?"},
+             {fr:"Sorry, how do I get to the British Museum?", es:"Perdón, ¿cómo llego al Museo Británico?"} ] },
+    { npc:"Oh, it's not far. Go straight down this street.", npcEs:"Ah, no queda lejos. Siga derecho por esta calle.",
+      guia:"«Go straight» es seguir derecho. Pregunta si se puede llegar a pie.",
+      says:[ {fr:"Can I walk there?", es:"¿Puedo ir caminando?"},
+             {fr:"Is it far to walk?", es:"¿Queda lejos para ir a pie?"} ],
+      tip:"«Straight» (derecho) no es «right» (derecha). «Go straight» = todo recto; «turn right» = gire a la derecha." },
+    { npc:"No, about ten minutes. Then turn left at the bank.", npcEs:"No, unos diez minutos. Después gire a la izquierda en el banco.",
+      guia:"Diez minutos y a la izquierda en el banco. Repite para confirmar.",
+      says:[ {fr:"Straight, then left at the bank?", es:"¿Derecho y después a la izquierda en el banco?"},
+             {fr:"Left at the bank. Okay.", es:"A la izquierda en el banco. Listo."} ] },
+    { npc:"That's it. And then it's on your right.", npcEs:"Eso es. Y luego queda a su derecha.",
+      guia:"Queda a tu derecha. Si algo se te escapó, pide que lo repita despacio.",
+      says:[ {fr:"Sorry, could you say that more slowly?", es:"Perdón, ¿lo puede decir más despacio?", r:["Of course. Straight, left at the bank, then on your right.","Claro. Derecho, a la izquierda en el banco y luego a su derecha."]},
+             {fr:"On my right. Got it, thanks.", es:"A mi derecha. Entendido, gracias."} ],
+      tip:"«It's on your right» = queda a tu derecha. «Turn right» = gira a la derecha. Una dice dónde está; la otra, qué hacer." },
+    { npc:"You're welcome. Are you visiting?", npcEs:"Con mucho gusto. ¿Está de visita?",
+      guia:"Pregunta si estás de visita. Responde y comparte algo breve.",
+      says:[ {fr:"Yes, I'm from Colombia. First time in London.", es:"Sí, soy de Colombia. Primera vez en Londres."},
+             {fr:"Yes, just for a few days.", es:"Sí, solo por unos días."} ] },
+    { npc:"Lovely! Enjoy the museum.", npcEs:"¡Qué bien! Disfrute el museo.",
+      guia:"Se despide con cariño. Agradece y despídete.",
+      says:[ {fr:"Thank you so much. Have a nice day!", es:"Muchísimas gracias. ¡Que tenga buen día!"},
+             {fr:"Thanks, you're very kind. Bye!", es:"Gracias, muy amable. ¡Chao!"} ] }
+   ] },
+
+ { id:"museo", grupo:"viaje", emoji:"🏛️", title:"Entradas al museo", npc:"🧑", npcName:"Taquilla",
+   intro:"En la taquilla del Museo Metropolitano: entradas, precio, horario y un tour.",
+   steps:[
+    { npc:"Hi! How can I help you?", npcEs:"¡Hola! ¿En qué le puedo ayudar?",
+      guia:"Pide entradas. «I'd like…» es la forma cortés de pedir cualquier cosa.",
+      says:[ {fr:"Hi! Two tickets, please.", es:"¡Hola! Dos entradas, por favor."},
+             {fr:"I'd like one ticket, please.", es:"Quisiera una entrada, por favor."} ],
+      tip:"«I'd like…» (I would like) es tu comodín para pedir con cortesía: una entrada, un café, una habitación." },
+    { npc:"Sure. Adult tickets are thirty dollars each.", npcEs:"Claro. La entrada de adulto vale treinta dólares.",
+      guia:"Treinta dólares por adulto. Pregunta si hay descuento o cómo pagar.",
+      says:[ {fr:"Is there a student discount?", es:"¿Hay descuento para estudiantes?", r:["Only with a valid student ID.","Solo con carné estudiantil vigente."]},
+             {fr:"Okay. Can I pay by card?", es:"Bueno. ¿Puedo pagar con tarjeta?"} ],
+      tip:"Ojo con -teen y -ty: «thirteen» (13) se acentúa al final; «thirty» (30), al principio. Si dudas, pregunta." },
+    { npc:"Here you go. Anything else?", npcEs:"Aquí tiene. ¿Algo más?",
+      guia:"Ya tienes las entradas. Pregunta a qué hora cierran.",
+      says:[ {fr:"What time do you close today?", es:"¿A qué hora cierran hoy?"},
+             {fr:"Yes, what are your hours?", es:"Sí, ¿cuál es el horario?"} ] },
+    { npc:"We close at five, and at nine on Fridays.", npcEs:"Cerramos a las cinco, y los viernes a las nueve.",
+      guia:"Cierran a las cinco; los viernes, a las nueve. Pregunta por un tour guiado.",
+      says:[ {fr:"Is there a guided tour in Spanish?", es:"¿Hay visita guiada en español?"},
+             {fr:"Are there any tours today?", es:"¿Hay tours hoy?"} ] },
+    { npc:"Yes. There's a free tour at two, by the main stairs.", npcEs:"Sí. Hay un tour gratis a las dos, junto a la escalera principal.",
+      guia:"Tour gratis a las dos en la escalera principal. Pregunta dónde está algo que quieras ver.",
+      says:[ {fr:"Great. Where are the Van Gogh paintings?", es:"Genial. ¿Dónde están los cuadros de Van Gogh?"},
+             {fr:"Perfect. Where's the restroom, please?", es:"Perfecto. ¿Dónde queda el baño, por favor?"} ],
+      tip:"En EE. UU. el baño es «restroom» o «bathroom»; «toilet» suena demasiado directo. En Inglaterra sí dicen «toilet»." },
+    { npc:"Second floor. Here's a map.", npcEs:"En el segundo piso. Aquí tiene un mapa.",
+      guia:"Te da un mapa. Agradece y despídete.",
+      says:[ {fr:"Thank you! Have a good one.", es:"¡Gracias! Que le vaya bien."},
+             {fr:"Perfect, thanks for your help.", es:"Perfecto, gracias por la ayuda."} ] }
+   ] },
+
+ { id:"imprevisto", grupo:"viaje", emoji:"📱", title:"Un imprevisto", npc:"👩‍⚕️", npcName:"Farmaceuta",
+   intro:"En Miami se te perdió el celular. Entras a una farmacia a pedir ayuda.",
+   steps:[
+    { npc:"Hi, can I help you find something?", npcEs:"Hola, ¿le ayudo a encontrar algo?",
+      guia:"Estás estresado: perdiste el celular. Pide ayuda con calma.",
+      says:[ {fr:"Hi. I need help, please.", es:"Hola. Necesito ayuda, por favor."},
+             {fr:"Yes, please. I lost my phone.", es:"Sí, por favor. Perdí mi celular."} ] },
+    { npc:"Oh no. Where did you last have it?", npcEs:"Uy, no. ¿Dónde lo tuvo por última vez?",
+      guia:"Pregunta dónde lo tuviste por última vez. Di el lugar.",
+      says:[ {fr:"I think in a taxi.", es:"Creo que en un taxi."},
+             {fr:"At the beach, maybe an hour ago.", es:"En la playa, hace como una hora."} ] },
+    { npc:"Do you want to call it from my phone?", npcEs:"¿Quiere llamarlo desde mi teléfono?",
+      guia:"Te ofrece su teléfono para llamar al tuyo. Acepta y agradece.",
+      says:[ {fr:"Yes, please. That's very kind of you.", es:"Sí, por favor. Muy amable de su parte."},
+             {fr:"Could I? Thank you so much.", es:"¿Puedo? Muchísimas gracias."} ] },
+    { npc:"Good news, someone picked up. They have your phone.", npcEs:"Buenas noticias, alguien contestó. Tienen su celular.",
+      guia:"¡Alguien lo tiene! Pregunta dónde lo puedes recoger.",
+      says:[ {fr:"Really? Where can I pick it up?", es:"¿En serio? ¿Dónde lo puedo recoger?"},
+             {fr:"What a relief! Where are they?", es:"¡Qué alivio! ¿Dónde están?"} ],
+      tip:"«Pick up» sirve para dos cosas: contestar el teléfono y recoger algo. «Where can I pick it up?» = ¿dónde lo recojo?" },
+    { npc:"At a hotel on Ocean Drive. Ten minutes from here.", npcEs:"En un hotel de Ocean Drive. A diez minutos de aquí.",
+      guia:"Ya sabes dónde está. Antes de irte, pide algo para el dolor de cabeza del susto.",
+      says:[ {fr:"Thanks! Do you have something for a headache?", es:"¡Gracias! ¿Tiene algo para el dolor de cabeza?"},
+             {fr:"Great. Also, I need something for a headache.", es:"Genial. Además, necesito algo para el dolor de cabeza."} ] },
+    { npc:"Sure. Take two of these with water.", npcEs:"Claro. Tómese dos de estas con agua.",
+      guia:"Te da unas pastillas: dos con agua. Pregunta cuánto valen o cómo pagar.",
+      says:[ {fr:"How much is it?", es:"¿Cuánto vale?"},
+             {fr:"Perfect. Can I pay by card?", es:"Perfecto. ¿Puedo pagar con tarjeta?"} ],
+      tip:"En EE. UU. lo básico se vende sin fórmula («over the counter»). Para lo demás piden «a prescription»." },
+    { npc:"It's six fifty. Good luck with your phone!", npcEs:"Son seis cincuenta. ¡Suerte con su celular!",
+      guia:"Te desea suerte. Paga, agradece de corazón y despídete.",
+      says:[ {fr:"Thank you for everything. You saved my day!", es:"Gracias por todo. ¡Me salvó el día!"},
+             {fr:"Thanks so much. Have a great day!", es:"Muchísimas gracias. ¡Que tenga un excelente día!"} ] }
+   ] }
+];
+
+const THEME_VIAJE_EN = { id:"travel-basics", emoji:"🧳", name:"Viaje: lo básico", minLvl:1,
+  vocab:[
+   {fr:"Excuse me.", es:"Disculpe."},
+   {fr:"Sorry, I don't understand.", es:"Perdón, no entiendo."},
+   {fr:"Could you say that again, slowly?", es:"¿Me lo repite más despacio?"},
+   {fr:"Do you speak Spanish?", es:"¿Habla español?"},
+   {fr:"I'd like a coffee, please.", es:"Quisiera un café, por favor."},
+   {fr:"Can I get the check, please?", es:"¿Me trae la cuenta, por favor?"},
+   {fr:"Where is the restroom?", es:"¿Dónde queda el baño?"},
+   {fr:"How much is it?", es:"¿Cuánto vale?"},
+   {fr:"How do I get to the airport?", es:"¿Cómo llego al aeropuerto?"},
+   {fr:"Is it far from here?", es:"¿Queda lejos de aquí?"},
+   {fr:"Can I pay by card?", es:"¿Puedo pagar con tarjeta?"},
+   {fr:"I need help, please.", es:"Necesito ayuda, por favor."}
+  ],
+  speak:[
+   {fr:"I have a reservation under Mateo.", es:"Tengo una reserva a nombre de Mateo."},
+   {fr:"I'm here on vacation for one week.", es:"Vine de vacaciones por una semana."},
+   {fr:"Can I get a table for two?", es:"¿Me da una mesa para dos?"},
+   {fr:"I'm allergic to peanuts.", es:"Soy alérgico al maní."}
+  ] };
+const CHARLAS = EN ? CHARLAS_EN : CHARLAS_FR;
+const THEME_VIAJE = EN ? THEME_VIAJE_EN : THEME_VIAJE_FR;
+THEMES.push(THEME_VIAJE);   // TODO ES EJERCITABLE: lo básico del viaje también se juega
+</script>
+<script>
 /* ================== ESTADO ================== */
 const S = {
   xp: 0, streak: 0, bestStreak: 0, lastDay: null,
@@ -3905,7 +4689,8 @@ function diffWords(mine, target){
   }
   const mineHtml = A.map(t=>!t.key||t.ok ? esc(t.orig) : `<span class="dw-bad">${esc(t.orig)}</span>`).join(" ");
   const targetHtml = B.map(t=>!t.key||t.ok ? esc(t.orig) : `<span class="dw-miss">${esc(t.orig)}</span>`).join(" ");
-  return {mineHtml, targetHtml};
+  const missed = B.filter(t=>t.key && !t.ok).map(t=>t.orig.replace(/^[«"¿¡(]+|[»".,!?;:)]+$/g,""));
+  return {mineHtml, targetHtml, missed};
 }
 
 /* ================== EFECTOS ================== */
@@ -4246,7 +5031,7 @@ function noTimer(){ stopTimer(); $("timer").textContent=""; $("timer").classList
 
 function startSession(games, opts){
   cocoJuego("feliz");                                  // 🦜 cada sesión empieza contenta
-  S.session={ games, idx:0, score:0, combo:0, best:0, hits:0, tries:0, perGame:[], newWords:[], review:[], immersion:!!(opts&&opts.immersion) };
+  S.session={ games, idx:0, score:0, combo:0, best:0, hits:0, tries:0, perGame:[], newWords:[], review:[], immersion:!!(opts&&opts.immersion), charla:(opts&&opts.charla)||null };
   $("dots").innerHTML = games.map(()=>`<div class="pdot"></div>`).join("");
   show("scr-game");
   nextGame();
@@ -4273,6 +5058,7 @@ function launchGame(g){
   else if(g==="match") gameMatch();
   else if(g==="build") gameBuild();
   else if(g==="lectura") gameRead();   // 📖 v1.71
+  else if(g==="charla") gameCharla();   // 🗣️ v1.98
 }
 function nextGame(){
   const s=S.session;
@@ -5169,6 +5955,191 @@ function gameScene(){
   step();
 }
 
+/* ================== 🗣️ CONVERSACIÓN CON GUÍA (v1.98) ==================
+   Mateo: «practicando con mi tío me doy cuenta que en una conversación estoy
+   perdido… pero es ahí donde aprendo más. Quiero algo más inmersivo: cómo abordar
+   a una mujer que no conoces, y me vas dando la guía y me corriges la
+   pronunciación. Y los conceptos básicos para un viaje de turismo.»
+   Cada turno: el personaje habla → Coco te susurra qué pasa y qué conviene decir
+   → ves 2-3 respuestas buenas (estilos distintos, ninguna «mala») → dices UNA en
+   voz alta → Coco marca las palabras que no se entendieron y te deja repetir.
+   La voz sigue las mismas reglas que ¡Suéltalo! (v1.69 iOS: el oído va SOLO;
+   v1.85: el respaldo «me califico» es solo por hoy). No toca speakFR/getMic. */
+let charlaCerrar=null;
+function charlaNom(s){ return String(s||"").replace(/Mateo/g, S.name||"Mateo"); }
+function abrirCharlas(){
+  const ov=document.createElement("div"); ov.className="cheatov"; ov.id="chPick";
+  const fila=c=>`<button class="chpick" data-ch="${c.id}"><span class="chpe">${c.emoji}</span><span class="chpt">${esc(c.title)}</span></button>`;
+  const g=k=>CHARLAS.filter(c=>c.grupo===k).map(fila).join("");
+  ov.innerHTML=`<div class="cheat chsheet">
+    <h3>Conversación</h3>
+    <div class="chgrupo">Conocer a alguien</div>${g("conocer")}
+    <div class="chgrupo">De viaje</div>${g("viaje")}
+    <button class="chpick chkit" id="chKit"><span class="chpe">${THEME_VIAJE.emoji}</span><span class="chpt">${esc(THEME_VIAJE.name)}</span></button>
+    <div class="chgrupo">Otras</div>
+    <button class="chpick" id="chAzar"><span class="chpe">🎲</span><span class="chpt">Escena con opciones</span></button>
+  </div>`;
+  document.body.appendChild(ov);
+  const cerrar=()=>ov.remove();
+  ov.onclick=e=>{ if(e.target===ov) cerrar(); };
+  ov.querySelectorAll("[data-ch]").forEach(b=>b.onclick=()=>{ cerrar(); startSession(["charla"],{charla:b.dataset.ch}); });
+  $("chKit").onclick=()=>{ cerrar(); openCheat(THEMES.find(t=>t.id===THEME_VIAJE.id)||THEME_VIAJE); };
+  $("chAzar").onclick=()=>{ cerrar(); startSession(["scene"]); };
+}
+function gameCharla(){
+  const c = CHARLAS.find(x=>x.id===S.session.charla) || rnd(CHARLAS);
+  $("gameTitle").textContent=c.title;
+  noTimer();
+  updateTierChip(diffFor("charla").tier);
+  const area=$("gameArea");
+  area.innerHTML=`<div class="chatwrap" id="chat"></div><div id="chBox"></div>`;
+  const chat=$("chat"), box=$("chBox");
+  let si=0, pts=0;
+
+  // 🎙️ el oído: uno solo para toda la charla, igual que ¡Suéltalo!
+  let recog=null, srOn=false, onHeard=null, recActive=false;
+  if(SR && !((S.prefs && S.prefs.vg==="self") || vozSoloHoy)){
+    recog=new SR(); recog.lang=LANG_TAG; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=3;
+    recog.onresult=e=>{ const rl=e.results[e.results.length-1]; if(onHeard) onHeard(rl); };
+    recog.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") recog=null; };
+    recog.onend=()=>{ srOn=false; if(recActive) setTimeout(ensureSR,120); };
+  }
+  function ensureSR(){
+    if(!recog || srOn) return;
+    try{ recog.start(); srOn=true; }
+    catch(e){ try{ recog.abort(); }catch(_){} setTimeout(()=>{ try{ recog.start(); srOn=true; }catch(_){} },150); }
+  }
+  function cerrarOido(){ recActive=false; onHeard=null; if(recog){ try{ recog.stop(); }catch(e){} } releaseMic(); charlaCerrar=null; }
+  charlaCerrar=cerrarOido;   // «Salir» a mitad de charla también suelta el oído
+
+  function burbuja(cls, html){
+    const d=document.createElement("div"); d.className=cls; d.innerHTML=html;
+    chat.appendChild(d); chat.scrollTop=chat.scrollHeight; return d;
+  }
+  function npcSay(fr, es){
+    fr=charlaNom(fr); es=charlaNom(es);
+    const oculta = diffFor("charla").tier>=2;   // reto 2+: la traducción se pide, como «¿pardon?»
+    const d=burbuja("npcline", `<div class="npcface">${c.npc}</div><div class="msg npc">${esc(fr)}
+      <span class="tr${oculta?" hiddenTr":""}">${oculta?"traducir":esc(es)}</span>
+      <button class="replaybtn" title="repetir">🔊</button> <button class="replaybtn npcsave" title="a mis repasos">⭐</button></div>`);
+    const tr=d.querySelector(".hiddenTr"); if(tr) tr.onclick=()=>{ tr.textContent=es; tr.classList.remove("hiddenTr"); };
+    d.querySelector(".replaybtn").onclick=()=>speakFR(fr,0.7);
+    const sv=d.querySelector(".npcsave"); sv.onclick=()=>{ markWeak({fr,es}); store.save(); sv.textContent="✔"; sv.disabled=true; };
+    noteNew(fr, es);
+    return speakFR(fr,0.85);
+  }
+  function meSay(o){
+    const d=burbuja("msg me", `${esc(o.fr)}<span class="tr">${esc(o.es)}</span>`);
+    return d;
+  }
+
+  function turno(){
+    if(si>=c.steps.length){
+      cerrarOido(); box.innerHTML="";
+      burbuja("msg npc", `<b>Fin de la conversación</b>`);
+      setTimeout(()=>gameDone("💬 "+c.title, pts), 1100);
+      return;
+    }
+    const st=c.steps[si];
+    const says=st.says.map(o=>({fr:charlaNom(o.fr), es:charlaNom(o.es), r:o.r}));
+    const habla = st.npc ? npcSay(st.npc, st.npcEs) : Promise.resolve();
+    box.innerHTML=`
+      <div class="coach"><div class="coachface">${cocoFace(30)}</div><div class="coachtx">${withCoco(esc(charlaNom(st.guia)))}
+        ${st.tip?`<div class="chtip">${esc(charlaNom(st.tip))}</div>`:""}</div></div>
+      <div class="chsays">${says.map((o,i)=>`<div class="chsay" data-i="${i}"><div class="chfr">${esc(o.fr)}</div><div class="ches">${esc(o.es)}</div>
+        <button class="replaybtn" data-oir="${i}" title="escuchar">🔊</button></div>`).join("")}</div>
+      <button class="micbtn chmic" id="chMic">🎙️</button>
+      <div class="chres" id="chRes">${recog?"Toca el micrófono y di una":"Escúchala, dila en voz alta y toca la que dijiste"}</div>`;
+    box.querySelectorAll("[data-oir]").forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); speakFR(says[+b.dataset.oir].fr,0.7); });
+    const mic=$("chMic"), res=$("chRes");
+    setTimeout(()=>{ try{ mic.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(e){} }, 300);
+    let intentos=0, contado=false, ganado=false, ultN=3, ultOido=null, best=null, bestSim=-1, heard="", autoStop=null, pressAt=0;
+
+    function puntuar(i, sim, oido){
+      const o=says[i];
+      intentos++;
+      const n = sim>=.8?3 : sim>=.55?2 : sim>=.3?1 : 0;
+      if(!contado){ contado=true; S.session.tries++; recordAnswer("charla", n>=2); recordSkill("hablar", n>=2); }
+      box.querySelectorAll(".chsay").forEach((e,j)=>e.classList.toggle("on", j===i));
+      let html="";
+      if(oido!==null){
+        const dw=diffWords(oido, o.fr);
+        html+=`<div class="chheard">Coco entendió: «${esc(oido.trim())}»</div><div class="chtarget">${dw.targetHtml}</div>`;
+        if(n<3 && dw.missed.length) html+=`<div class="chpalabras">${dw.missed.slice(0,4).map(w=>`<button class="chpal" data-w="${esc(w)}">🔊 ${esc(w)}</button>`).join("")}</div>`;
+      }
+      const msg = n===3 ? "¡Clavada!" : n===2 ? "Se entiende. Pule las palabras marcadas" : intentos<2 ? "Escúchala lenta y dila otra vez" : "Seguimos: queda en tus repasos";
+      res.innerHTML = `<div class="chstars">${"★".repeat(n)}${"☆".repeat(3-n)}</div><div class="chmsg">${msg}</div>`+html;
+      res.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>speakFR(b.dataset.w,0.6));
+      if(n>=2){ if(!ganado){ ganado=true; pts+=addPts(n===3?20:12); } else ding(true); }
+      else{ missPts(); if(intentos<2) speakFR(o.fr,0.65); }
+      ultN=n; ultOido=oido;
+      const fila=document.createElement("div"); fila.className="btn-row"; fila.style.marginTop="10px";
+      if(n<3 && intentos<3) fila.innerHTML+=`<button class="btn small ghost" id="chOtra">Otra vez</button>`;
+      if(n>=2 || intentos>=2) fila.innerHTML+=`<button class="btn green" id="chSeguir">Seguir</button>`;
+      res.appendChild(fila);
+      const ot=$("chOtra"); if(ot) ot.onclick=()=>{ best=null; bestSim=-1; heard=""; res.textContent=recog?"Toca el micrófono y dila otra vez":"Dila en voz alta y califícate"; };
+      const sg=$("chSeguir"); if(sg) sg.onclick=()=>avanzar(o);
+      setTimeout(()=>{ try{ res.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(e){} }, 60);   // la corrección, a la vista
+    }
+    async function avanzar(o){
+      // lo que no salió limpio queda anotado (y si ni se entendió, a tus repasos)
+      if(ultN<3) noteReview(ultN>=2?"ok":"fail", o.fr, o.es, ultOido!==null ? `al decirla, Coco entendió «${ultOido.trim()}»` : "te calificaste tú");
+      if(ultN<2) markWeak({fr:o.fr, es:o.es});
+      box.innerHTML=""; meSay(o);
+      await Promise.race([speakFR(o.fr,0.85), sleep(4500)]);
+      if(o.r){ await Promise.race([npcSay(o.r[0], o.r[1]), sleep(4500)]); }
+      si++; setTimeout(turno, 350);
+    }
+    // sin oído (o «me califico»): tocas la que dijiste y te calificas
+    function autocalificar(i){
+      box.querySelectorAll(".chsay").forEach((e,j)=>e.classList.toggle("on", j===i));
+      res.innerHTML=`<div class="chmsg">¿Cómo te salió?</div><div class="btn-row" style="margin-top:8px">
+        <button class="btn small green">Clavada</button><button class="btn small orange">Más o menos</button><button class="btn small red">Regular</button></div>`;
+      const [a,b,cc]=res.querySelectorAll("button");
+      a.onclick=()=>puntuar(i,.9,null); b.onclick=()=>puntuar(i,.6,null); cc.onclick=()=>puntuar(i,.35,null);
+    }
+    box.querySelectorAll(".chsay").forEach(e=>e.onclick=()=>{ if(!recog) autocalificar(+e.dataset.i); });
+    if(!recog){ mic.style.display="none"; return; }
+
+    function arrancar(){
+      recActive=true; mic.classList.add("rec"); pressAt=Date.now();
+      res.innerHTML=`<div class="chmsg">Te escucho… toca otra vez al terminar</div>`;
+      callarACoco();
+      if(srNecesitaMicExclusivo(recog)) releaseMic();      // v1.69: en iOS el oído va solo
+      try{ recog.abort(); }catch(e){} srOn=false; setTimeout(ensureSR, IOS?400:150);
+      setTimeout(()=>{ if(recActive) ensureSR(); },900);
+      clearTimeout(autoStop); autoStop=setTimeout(()=>{ if(recActive) parar(); }, 10000);
+      onHeard=(rl)=>{
+        if(Date.now()-pressAt<400 || COCO_HABLA) return;
+        for(const alt of rl) says.forEach((o,i)=>{ const s=similarity(alt.transcript,o.fr); if(s>bestSim){ bestSim=s; best=i; heard=alt.transcript; } });
+        res.innerHTML=`<div class="chheard">Coco entendió: «${esc(heard.trim())}»</div>`;
+        if(bestSim>=.8){ parar(true); }
+      };
+    }
+    function parar(ya){
+      recActive=false; mic.classList.remove("rec"); clearTimeout(autoStop);
+      setTimeout(()=>{
+        onHeard=null;
+        if(best!==null){ S.prefs.srFails=0; store.save(); puntuar(best, bestSim, heard); return; }
+        S.prefs.srFails=(S.prefs.srFails||0)+1; store.save();
+        if(S.prefs.srFails>=2 && !vozSoloHoy){
+          vozSoloHoy=true;                                   // v1.85: solo por hoy, NO se guarda
+          try{ recog.abort(); }catch(_){} recog=null; mic.style.display="none";
+          toast("🎧 Hoy el oído no te está captando: por esta sesión te calificas tú.");
+          res.innerHTML=`<div class="chmsg">Dila en voz alta y toca la que dijiste</div>`;
+        } else res.innerHTML=`<div class="chmsg">No te capté. Toca el micrófono y habla un poco más fuerte</div>`;
+      }, ya?50:1900);
+    }
+    mic.onclick=()=>{ if(!recActive) arrancar(); else parar(); };
+    // el personaje termina de hablar antes de que el oído pueda arrancar
+    mic.disabled=true; habla.then(()=>{ mic.disabled=false; });
+    setTimeout(()=>{ mic.disabled=false; }, 6000);
+  }
+
+  burbuja("npcline", `<div class="npcface">${cocoFace(28)}</div><div class="msg npc coachmsg">${esc(charlaNom(c.intro))}</div>`);
+  setTimeout(turno, 600);
+}
+
 /* ================== JUEGO 5: IMPROVISA 🎭 ================== */
 /* 🎙️ v1.78 — PRIMERO LAS MISIONES QUE AÚN NO ESTÁN CLAVADAS.
    Mateo: "No siento avance, veo el mismo 85% de hace rato". Parte de la razón
@@ -5808,10 +6779,10 @@ function sesionDeHoy(){
 }
 $("btnPlay").onclick =()=>startSession(sesionDeHoy());
 $("btnLong").onclick =()=>startSession(["blitz","listen",rnd(["match","build"]),"speak","scene","improv"],{immersion:true});
-$("btnScene").onclick=()=>startSession(["scene"]);
+$("btnScene").onclick=()=>abrirCharlas();   // v1.98: escoges la situación
 $("btnRead").onclick =()=>startSession(["lectura"]);   // 📖 v1.71
 $("btnSongs").onclick=()=>startSession(["songs"]);
-$("btnQuit").onclick =()=>{ stopTimer(); callarACoco(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
+$("btnQuit").onclick =()=>{ stopTimer(); callarACoco(); if(charlaCerrar) charlaCerrar(); try{releaseMic();}catch(e){} EXAM=null; delete S.ps; store.save(); show("scr-home"); cocoSay("¡No pasa nada! Aquí te espero 🦜"); };
 $("btnHome").onclick =()=>{ show("scr-home"); cocoSay(rnd(COCO_HOME)); };
 $("mascot").onclick  =()=>{ cocoPose("celebra", 1600); speakFR(rnd(EN?["Hi!","Hello!","Hey there!","Let's go!","You got this!"]:["Bonjour !","Salut !","Coucou !","On y va !","Allez !"]),0.9); cocoSay(rnd(COCO_HOME)); };
 $("saveCode").onclick=()=>{
